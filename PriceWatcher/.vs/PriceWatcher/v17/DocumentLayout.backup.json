@@ -1,0 +1,54 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pricewatcher.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pricewatcher.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PriceWatcher",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
+              "RelativeDocumentMoniker": "PriceWatcher\\PriceWatcher.csproj",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
+              "RelativeToolTip": "PriceWatcher\\PriceWatcher.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-11-18T16:07:33.464Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\appsettings.json",
+              "RelativeDocumentMoniker": "PriceWatcher\\appsettings.json",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\appsettings.json",
+              "RelativeToolTip": "PriceWatcher\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-18T16:06:58.627Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
