@@ -21,42 +21,20 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("google")]
-    public IActionResult GoogleLogin([FromQuery] string? returnUrl = null)
+    public IActionResult GoogleLogin([FromQuery] string? returnUrl = "/")
     {
-        var redirectUrl = string.IsNullOrWhiteSpace(returnUrl) ? Url.Action(nameof(GoogleCallback)) : returnUrl;
         var properties = new AuthenticationProperties
         {
-            RedirectUri = redirectUrl ?? "/signin-google"
+            RedirectUri = string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl
         };
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
     }
 
-    [HttpGet("/signin-google")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GoogleCallback(CancellationToken cancellationToken)
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
     {
-        var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        if (result?.Principal == null)
-        {
-            return Unauthorized();
-        }
-
-        var googleInfo = ExtractGoogleInfo(result.Principal);
-        if (string.IsNullOrEmpty(googleInfo.Email))
-        {
-            return BadRequest("Google account email missing.");
-        }
-
-        var user = await _userService.GetOrCreateUserFromGoogleAsync(googleInfo, cancellationToken);
-
-        await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
-            result.Principal,
-            result.Properties ?? new AuthenticationProperties());
-
-        await _userService.OnLoginSuccessAsync(user, Request, cancellationToken);
-
-        return Ok(new { userId = user.UserId, email = user.Email, fullName = user.FullName });
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        return Redirect("/");
     }
 
     private static GoogleUserInfo ExtractGoogleInfo(ClaimsPrincipal principal)

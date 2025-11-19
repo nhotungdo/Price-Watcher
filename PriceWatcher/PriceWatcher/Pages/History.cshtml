@@ -1,0 +1,37 @@
+@page
+@model PriceWatcher.Pages.HistoryModel
+@{
+    ViewData["Title"] = "Lịch sử tìm kiếm";
+}
+
+<h1>Lịch sử tìm kiếm</h1>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Thời gian</th>
+                <th>Loại</th>
+                <th>Nội dung</th>
+                <th>Từ khóa</th>
+                <th>Giá tốt nhất</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var h in Model.Items)
+        {
+            <tr>
+                <td>@h.SearchTime?.ToLocalTime()</td>
+                <td>@h.SearchType</td>
+                <td>@h.InputContent</td>
+                <td>@h.DetectedKeyword</td>
+                <td>@(h.BestPriceFound?.ToString("N0"))</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    @if (Model.Items.Count == 0)
+    {
+        <p>Chưa có lịch sử.</p>
+    }
+}

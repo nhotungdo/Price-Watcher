@@ -8,5 +8,8 @@ public interface IUserService
 {
     Task<User> GetOrCreateUserFromGoogleAsync(GoogleUserInfo info, CancellationToken cancellationToken = default);
     Task OnLoginSuccessAsync(User user, HttpRequest request, CancellationToken cancellationToken = default);
+    Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default);
+    Task<User> RegisterLocalAsync(string email, string? fullName, CancellationToken cancellationToken = default);
+    Task UpdateLastLoginAsync(User user, CancellationToken cancellationToken = default);
 }
 

@@ -11,14 +11,14 @@ public class ImageSearchServiceStub : IImageSearchService
         {
             Platform = "shopee",
             ProductId = "i.12345.67890",
-            CanonicalUrl = "https://shopee.vn/product/12345/67890",
+            CanonicalUrl = "https://shopee.vn/",
             TitleHint = "mocked shopee product"
         },
         new()
         {
             Platform = "lazada",
             ProductId = "998877",
-            CanonicalUrl = "https://www.lazada.vn/products/mock-998877.html",
+            CanonicalUrl = "https://www.lazada.vn/",
             TitleHint = "mocked lazada product"
         }
     };

@@ -1,10 +1,192 @@
-﻿@page
-@model IndexModel
+@page
+@model PriceWatcher.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "AI Price Advisor";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-container" role="main">
+    <div class="home-content container">
+        <h1 class="main-title">
+            <span class="title-ai">AI</span>
+            <span class="title-price-advisor">Price Advisor</span>
+        </h1>
+        <p class="subtitle">Nhận định giá sản phẩm hợp lý bằng trí tuệ nhân tạo</p>
+
+        <div class="form-card">
+            <form id="priceAnalysisForm" method="post" novalidate aria-label="Price analysis form">
+                <div class="form-group">
+                    <label for="productLink" class="form-label">Link sản phẩm (Tùy chọn)</label>
+                    <input type="url" class="form-control" id="productLink" name="productLink"
+                        placeholder="https://example.com/product-link" aria-label="Product link" />
+                </div>
+
+                <div class="form-group">
+                    <label for="productImage" class="form-label">Hình ảnh sản phẩm (Tùy chọn)</label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <input type="file" id="productImage" name="productImage"
+                            accept="image/png,image/jpeg,image/jpg,image/gif" style="display: none;"
+                            aria-label="Product image" />
+                        <div class="upload-icon">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <span class="plus-icon">+</span>
+                        </div>
+                        <p class="upload-text">Tải ảnh lên hoặc kéo thả</p>
+                        <p class="upload-hint">PNG, JPG, GIF lên tới 4MB</p>
+                        <div id="imagePreview" class="image-preview" style="display: none;">
+                            <img id="previewImg" src="" alt="Preview" />
+                            <button type="button" class="remove-image" id="removeImage">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-analyze" aria-label="Analyze price">Phân tích giá</button>
+            </form>
+            <div id="analysisResults" class="analysis-results" style="margin-top: 20px;"></div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        // Image upload handling
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        const productImageInput = document.getElementById('productImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImg = document.getElementById('previewImg');
+        const removeImageBtn = document.getElementById('removeImage');
+
+        // Click to upload
+        imageUploadArea.addEventListener('click', () => {
+            productImageInput.click();
+        });
+
+        // Drag and drop
+        imageUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.add('drag-over');
+        });
+
+        imageUploadArea.addEventListener('dragleave', () => {
+            imageUploadArea.classList.remove('drag-over');
+        });
+
+        imageUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            imageUploadArea.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleImageFile(files[0]);
+            }
+        });
+
+        // File input change
+        productImageInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+
+        function handleImageFile(file) {
+            // Validate file type
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
+            if (!validTypes.includes(file.type)) {
+                alert('Vui lòng chọn file ảnh hợp lệ (PNG, JPG, GIF)');
+                return;
+            }
+
+            // Validate file size (4MB)
+            if (file.size > 4 * 1024 * 1024) {
+                alert('Kích thước file không được vượt quá 4MB');
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImg.src = e.target.result;
+                imagePreview.style.display = 'block';
+                imageUploadArea.querySelector('.upload-icon').style.display = 'none';
+                imageUploadArea.querySelector('.upload-text').style.display = 'none';
+                imageUploadArea.querySelector('.upload-hint').style.display = 'none';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Remove image
+        removeImageBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            productImageInput.value = '';
+            imagePreview.style.display = 'none';
+            previewImg.src = '';
+            imageUploadArea.querySelector('.upload-icon').style.display = 'flex';
+            imageUploadArea.querySelector('.upload-text').style.display = 'block';
+            imageUploadArea.querySelector('.upload-hint').style.display = 'block';
+        });
+
+        document.getElementById('priceAnalysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const link = document.getElementById('productLink').value.trim();
+            const fileInput = document.getElementById('productImage');
+            const uid = parseInt(document.body.getAttribute('data-uid') || '0', 10);
+            const formData = new FormData();
+            formData.append('userId', String(uid));
+            if (link) formData.append('url', link);
+            if (fileInput.files && fileInput.files.length > 0) {
+                formData.append('image', fileInput.files[0]);
+            }
+            const res = await fetch('/search/submit', { method: 'POST', body: formData });
+            if (!res.ok) {
+                alert('Gửi yêu cầu phân tích thất bại');
+                return;
+            }
+            const { searchId } = await res.json();
+            const resultsEl = document.getElementById('analysisResults');
+            resultsEl.innerHTML = 'Đang phân tích...';
+            let status = null;
+            for (let i = 0; i < 30; i++) {
+                const sres = await fetch(`/search/status/${searchId}`);
+                if (sres.ok) {
+                    status = await sres.json();
+                    if (status.status === 'Completed' || status.status === 'Failed') break;
+                }
+                await new Promise(r => setTimeout(r, 1000));
+            }
+            if (!status) {
+                resultsEl.textContent = 'Không nhận được kết quả, vui lòng thử lại.';
+                return;
+            }
+            if (status.status === 'Failed') {
+                resultsEl.textContent = status.message || 'Phân tích thất bại.';
+                return;
+            }
+            const items = status.results || [];
+            if (items.length === 0) {
+                resultsEl.textContent = 'Không tìm thấy đề xuất phù hợp.';
+                return;
+            }
+            const html = items.map(it => {
+                const labels = (it.labels || []).join(', ');
+                const total = (it.totalCost || 0).toLocaleString('vi-VN');
+                const price = (it.price || 0).toLocaleString('vi-VN');
+                const ship = (it.shippingCost || 0).toLocaleString('vi-VN');
+                return `
+                <div class="result-item" style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #eee;border-radius:8px;margin-bottom:12px;">
+                    <img src="${it.thumbnailUrl}" alt="thumb" style="width:64px;height:64px;object-fit:cover;border-radius:6px;"/>
+                    <div style="flex:1;">
+                        <div style="font-weight:600;">${it.title}</div>
+                        <div style="color:#666;">${it.platform} • ${it.shopName} • ⭐ ${it.shopRating?.toFixed ? it.shopRating.toFixed(2) : it.shopRating}</div>
+                        <div style="margin-top:4px;">Giá: ${price}₫ • Ship: ${ship}₫ • Tổng: <strong>${total}₫</strong></div>
+                        ${labels ? `<div style="margin-top:4px;color:#0a7;">${labels}</div>` : ''}
+                    </div>
+                    <a href="${it.productUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-primary">Mở</a>
+                </div>`;
+            }).join('');
+            resultsEl.innerHTML = html;
+        });
+    </script>
+}

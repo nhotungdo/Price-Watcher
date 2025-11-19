@@ -2,6 +2,8 @@ using System.Net.Http;
 using System.Threading.Channels;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication.OAuth;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Polly;
@@ -25,6 +27,7 @@ builder.Services.AddDbContext<PriceWatcherDbContext>(options =>
 
 builder.Services.Configure<RecommendationOptions>(builder.Configuration.GetSection("Recommendation"));
 builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection("Telegram"));
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 
 builder.Services.AddHttpClient("telegram")
     .AddPolicyHandler(CreateRetryPolicy());
@@ -49,9 +52,31 @@ builder.Services.AddAuthentication(options =>
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? string.Empty;
         options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? string.Empty;
         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.CallbackPath = "/signin-google";
+        options.SaveTokens = true;
+        options.CorrelationCookie.SameSite = SameSiteMode.Lax;
+        options.Events = new OAuthEvents
+        {
+            OnCreatingTicket = async ctx =>
+            {
+                var userService = ctx.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                var googleInfo = new PriceWatcher.Dtos.GoogleUserInfo
+                {
+                    GoogleId = ctx.Principal?.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? string.Empty,
+                    Email = ctx.Principal?.FindFirstValue(System.Security.Claims.ClaimTypes.Email) ?? string.Empty,
+                    Name = ctx.Principal?.FindFirstValue(System.Security.Claims.ClaimTypes.Name),
+                    AvatarUrl = ctx.Principal?.FindFirstValue("picture")
+                };
+
+                var user = await userService.GetOrCreateUserFromGoogleAsync(googleInfo);
+                await userService.OnLoginSuccessAsync(user, ctx.HttpContext.Request);
+                ctx.Identity?.AddClaim(new Claim("uid", user.UserId.ToString()));
+            }
+        };
     });
 
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<ILinkProcessor, LinkProcessor>();
 builder.Services.AddScoped<IImageSearchService, ImageSearchServiceStub>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
@@ -80,7 +105,10 @@ else
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+if (app.Environment.IsProduction())
+{
+    app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 
 app.UseRouting();
