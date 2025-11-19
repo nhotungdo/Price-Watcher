@@ -40,20 +40,24 @@ public class LinkProcessor : ILinkProcessor
     private static ProductQuery ProcessShopee(Uri uri)
     {
         var match = ShopeeRegex.Match(uri.PathAndQuery);
-        if (!match.Success)
+        if (match.Success)
         {
-            throw new InvalidOperationException("Unable to detect Shopee product id.");
+            var shopId = match.Groups["shop"].Value;
+            var itemId = match.Groups["item"].Value;
+            var canonical = $"https://{uri.Host}/product/{shopId}/{itemId}";
+            return new ProductQuery
+            {
+                Platform = "shopee",
+                ProductId = $"i.{shopId}.{itemId}",
+                CanonicalUrl = canonical,
+                TitleHint = ExtractTitleFromPath(uri)
+            };
         }
-
-        var shopId = match.Groups["shop"].Value;
-        var itemId = match.Groups["item"].Value;
-        var canonical = $"https://{uri.Host}/product/{shopId}/{itemId}";
-
         return new ProductQuery
         {
             Platform = "shopee",
-            ProductId = $"i.{shopId}.{itemId}",
-            CanonicalUrl = canonical,
+            ProductId = "seo",
+            CanonicalUrl = RemoveTracking(uri),
             TitleHint = ExtractTitleFromPath(uri)
         };
     }
@@ -61,35 +65,45 @@ public class LinkProcessor : ILinkProcessor
     private static ProductQuery ProcessLazada(Uri uri)
     {
         var match = LazadaRegex.Match(uri.PathAndQuery);
-        if (!match.Success)
+        if (match.Success)
         {
-            throw new InvalidOperationException("Unable to detect Lazada product id.");
+            var shopId = match.Groups["shop"].Value;
+            var title = ExtractTitleFromPath(uri);
+            return new ProductQuery
+            {
+                Platform = "lazada",
+                ProductId = shopId,
+                CanonicalUrl = RemoveTracking(uri),
+                TitleHint = title
+            };
         }
-
-        var shopId = match.Groups["shop"].Value;
-        var title = ExtractTitleFromPath(uri);
         return new ProductQuery
         {
             Platform = "lazada",
-            ProductId = shopId,
+            ProductId = "seo",
             CanonicalUrl = RemoveTracking(uri),
-            TitleHint = title
+            TitleHint = ExtractTitleFromPath(uri)
         };
     }
 
     private static ProductQuery ProcessTiki(Uri uri)
     {
         var match = TikiRegex.Match(uri.PathAndQuery);
-        if (!match.Success)
+        if (match.Success)
         {
-            throw new InvalidOperationException("Unable to detect Tiki product id.");
+            var productId = match.Groups["item"].Value;
+            return new ProductQuery
+            {
+                Platform = "tiki",
+                ProductId = productId,
+                CanonicalUrl = RemoveTracking(uri),
+                TitleHint = ExtractTitleFromPath(uri)
+            };
         }
-
-        var productId = match.Groups["item"].Value;
         return new ProductQuery
         {
             Platform = "tiki",
-            ProductId = productId,
+            ProductId = "seo",
             CanonicalUrl = RemoveTracking(uri),
             TitleHint = ExtractTitleFromPath(uri)
         };

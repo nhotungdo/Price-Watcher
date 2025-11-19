@@ -20,24 +20,30 @@ public class SearchHistoryService : ISearchHistoryService
 
     public async Task SaveSearchHistoryAsync(Guid searchId, int userId, string searchType, string inputContent, ProductQuery query, IEnumerable<ProductCandidateDto> results, CancellationToken cancellationToken = default)
     {
-        var topResult = results.FirstOrDefault();
-
-        var history = new SearchHistory
+        try
         {
-            UserId = userId,
-            SearchType = searchType,
-            InputContent = inputContent,
-            DetectedKeyword = query.TitleHint,
-            BestPriceFound = topResult?.TotalCost,
-            SearchTime = DateTime.UtcNow
-        };
+            var topResult = results.FirstOrDefault();
+            var history = new SearchHistory
+            {
+                UserId = userId,
+                SearchType = searchType,
+                InputContent = inputContent,
+                DetectedKeyword = query.TitleHint,
+                BestPriceFound = topResult?.TotalCost,
+                SearchTime = DateTime.UtcNow
+            };
 
-        _dbContext.SearchHistories.Add(history);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+            _dbContext.SearchHistories.Add(history);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-        await EnforceHistoryLimitAsync(userId, cancellationToken);
+            await EnforceHistoryLimitAsync(userId, cancellationToken);
 
-        _logger.LogInformation("Saved search history {SearchId} for user {UserId}", searchId, userId);
+            _logger.LogInformation("Saved search history {SearchId} for user {UserId}", searchId, userId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Skip saving history for {SearchId} due to storage error", searchId);
+        }
     }
 
     public async Task<IReadOnlyCollection<SearchHistoryDto>> GetUserHistoryAsync(int userId, int page, int pageSize, CancellationToken cancellationToken = default)

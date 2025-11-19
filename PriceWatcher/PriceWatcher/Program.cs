@@ -79,6 +79,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<ILinkProcessor, LinkProcessor>();
 builder.Services.AddScoped<IImageSearchService, ImageSearchServiceStub>();
+builder.Services.AddSingleton<IImageEmbeddingService, ImageEmbeddingService>();
+builder.Services.AddSingleton<IMetricsService, MetricsService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
 builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
 builder.Services.AddScoped<ITelegramNotifier, TelegramNotifier>();
@@ -87,6 +89,10 @@ builder.Services.AddScoped<ISearchProcessingService, SearchProcessingService>();
 builder.Services.AddScoped<IProductScraper, ShopeeScraperStub>();
 builder.Services.AddScoped<IProductScraper, LazadaScraperStub>();
 builder.Services.AddScoped<IProductScraper, TikiScraperStub>();
+
+builder.Services.AddHttpClient("shopee").AddPolicyHandler(CreateRetryPolicy());
+builder.Services.AddHttpClient("lazada").AddPolicyHandler(CreateRetryPolicy());
+builder.Services.AddHttpClient("tiki").AddPolicyHandler(CreateRetryPolicy());
 
 builder.Services.AddSingleton(Channel.CreateUnbounded<SearchJob>());
 builder.Services.AddSingleton<ISearchJobQueue, SearchJobQueue>();

@@ -35,7 +35,29 @@ public class SearchProcessingService : ISearchProcessingService
 
         try
         {
-            var query = job.QueryOverride ?? await ResolveQueryAsync(job, cancellationToken);
+            ProductQuery? query;
+            try
+            {
+                query = job.QueryOverride ?? await ResolveQueryAsync(job, cancellationToken);
+            }
+            catch (ArgumentException ex)
+            {
+                _logger.LogWarning(ex, "Invalid input URL for {SearchId}", job.SearchId);
+                _statusService.Fail(job.SearchId, "URL sản phẩm không hợp lệ.");
+                return;
+            }
+            catch (NotSupportedException ex)
+            {
+                _logger.LogWarning(ex, "Unsupported platform for {SearchId}", job.SearchId);
+                _statusService.Fail(job.SearchId, "Nền tảng chưa được hỗ trợ (chỉ Shopee/Lazada/Tiki).");
+                return;
+            }
+            catch (InvalidOperationException ex)
+            {
+                _logger.LogWarning(ex, "Cannot extract product id for {SearchId}", job.SearchId);
+                _statusService.Fail(job.SearchId, "Không xác định được mã sản phẩm từ URL. Vui lòng dùng link chi tiết sản phẩm.");
+                return;
+            }
 
             if (query == null)
             {

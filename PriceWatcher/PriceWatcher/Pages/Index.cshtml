@@ -128,6 +128,16 @@
             imageUploadArea.querySelector('.upload-hint').style.display = 'block';
         });
 
+        function isSupportedProductUrl(url) {
+            try {
+                const u = new URL(url);
+                const h = u.hostname.toLowerCase();
+                return h.includes('shopee') || h.includes('lazada') || h.includes('tiki');
+            } catch {
+                return false;
+            }
+        }
+
         document.getElementById('priceAnalysisForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const link = document.getElementById('productLink').value.trim();
@@ -135,17 +145,30 @@
             const uid = parseInt(document.body.getAttribute('data-uid') || '0', 10);
             const formData = new FormData();
             formData.append('userId', String(uid));
-            if (link) formData.append('url', link);
+            const resultsEl = document.getElementById('analysisResults');
+            if (link) {
+                if (!isSupportedProductUrl(link)) {
+                    resultsEl.textContent = 'URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.';
+                    return;
+                }
+                formData.append('url', link);
+            }
             if (fileInput.files && fileInput.files.length > 0) {
                 formData.append('image', fileInput.files[0]);
             }
-            const res = await fetch('/search/submit', { method: 'POST', body: formData });
-            if (!res.ok) {
-                alert('Gửi yêu cầu phân tích thất bại');
+            let searchId;
+            try {
+                const res = await fetch('/search/submit', { method: 'POST', body: formData });
+                if (!res.ok) {
+                    const txt = await res.text();
+                    resultsEl.textContent = txt || 'Gửi yêu cầu phân tích thất bại';
+                    return;
+                }
+                ({ searchId } = await res.json());
+            } catch (err) {
+                resultsEl.textContent = 'Không thể kết nối tới máy chủ. Vui lòng kiểm tra server đang chạy tại http://localhost:5000.';
                 return;
             }
-            const { searchId } = await res.json();
-            const resultsEl = document.getElementById('analysisResults');
             resultsEl.innerHTML = 'Đang phân tích...';
             let status = null;
             for (let i = 0; i < 30; i++) {
@@ -169,7 +192,21 @@
                 resultsEl.textContent = 'Không tìm thấy đề xuất phù hợp.';
                 return;
             }
-            const html = items.map(it => {
+            const byPlatform = {};
+            for (const it of items) {
+                const k = it.platform;
+                if (!byPlatform[k] || byPlatform[k].totalCost > it.totalCost) byPlatform[k] = it;
+            }
+            const summary = Object.keys(byPlatform).map(p => {
+                const it = byPlatform[p];
+                const total = (it.totalCost || 0).toLocaleString('vi-VN');
+                return `<div>• ${p}: <strong>${total}₫</strong> — <a href="${it.productUrl}" target="_blank" rel="noopener">Mở</a></div>`;
+            }).join('');
+
+            const html = `<div style="padding:12px;border:1px dashed #ccc;border-radius:8px;margin-bottom:12px;">
+                <div style="font-weight:600;margin-bottom:6px;">Giá tốt nhất theo từng sàn</div>
+                ${summary || 'Không có dữ liệu theo sàn'}
+            </div>` + items.map(it => {
                 const labels = (it.labels || []).join(', ');
                 const total = (it.totalCost || 0).toLocaleString('vi-VN');
                 const price = (it.price || 0).toLocaleString('vi-VN');

@@ -38,6 +38,11 @@ public class SearchController : ControllerBase
             return BadRequest("url is required for JSON submissions.");
         }
 
+        if (!IsSupportedProductUrl(request.Url))
+        {
+            return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
+        }
+
         return await QueueSearchAsync(request.UserId, "url", request.Url, null, cancellationToken);
     }
 
@@ -65,6 +70,11 @@ public class SearchController : ControllerBase
             await using var ms = new MemoryStream();
             await request.Image.CopyToAsync(ms, cancellationToken);
             return await QueueSearchAsync(request.UserId, "image", request.Url, ms.ToArray(), cancellationToken);
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Url) && !IsSupportedProductUrl(request.Url))
+        {
+            return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
         }
 
         return await QueueSearchAsync(request.UserId, "url", request.Url!, null, cancellationToken);
@@ -100,6 +110,20 @@ public class SearchController : ControllerBase
         _logger.LogInformation("Queued search {SearchId} for user {UserId}", searchId, userId);
 
         return Accepted(new { searchId });
+    }
+
+    private static bool IsSupportedProductUrl(string url)
+    {
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return false;
+        }
+        var host = uri.Host.ToLowerInvariant();
+        if (!(host.Contains("shopee") || host.Contains("lazada") || host.Contains("tiki")))
+        {
+            return false;
+        }
+        return true;
     }
 }
 

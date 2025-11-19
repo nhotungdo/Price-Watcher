@@ -26,6 +26,16 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "PriceWatcher.Controllers.MetricsController",
+    "Method": "Get",
+    "RelativePath": "metrics",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "PriceWatcher.Controllers.SearchController",
     "Method": "GetStatus",
     "RelativePath": "search/status/{searchId}",
