@@ -6,14 +6,11 @@
 
 # Price-Watcher
 
-_Công cụ hỗ trợ mua sắm thông minh — tìm sản phẩm bằng Link hoặc bằng Hình ảnh_
+_Công cụ so sánh giá thông minh — tìm sản phẩm bằng Link hoặc Hình ảnh_
 
-<!-- Badges -->
-
-[![Build Status](https://github.com/nhotungdo/Price-Watcher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/nhotungdo/Price-Watcher/actions)  
-![GitHub last commit](https://img.shields.io/github/last-commit/nhotungdo/Price-Watcher)  
-![GitHub repo size](https://img.shields.io/github/repo-size/nhotungdo/Price-Watcher)  
-![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+[![Build Status](https://github.com/nhotungdo/Price-Watcher/actions/workflows/dotnet.yml/badge.svg)](https://github.com/nhotungdo/Price-Watcher/actions)
+![GitHub last commit](https://img.shields.io/github/last-commit/nhotungdo/Price-Watcher)
+![GitHub repo size](https://img.shields.io/github/repo-size/nhotungdo/Price-Watcher)
 
 ---
 
@@ -27,39 +24,36 @@ _Công cụ hỗ trợ mua sắm thông minh — tìm sản phẩm bằng Link h
 
 ---
 
-## ✨ Tổng quan
+## Mô tả
 
-Price-Watcher là một web app giúp người dùng tìm kiếm sản phẩm nhanh chóng bằng URL sản phẩm hoặc bằng cách tải lên hình ảnh (image search). Ứng dụng theo dõi thay đổi giá, lưu lịch sử tìm kiếm và gửi thông báo khi có biến động giá quan trọng.
+Price-Watcher là ứng dụng web giúp người dùng tìm các sản phẩm tương tự trên nhiều sàn thương mại điện tử và đề xuất mức giá tốt nhất. Người dùng có thể dán URL sản phẩm hoặc tải lên ảnh, hệ thống sẽ chuẩn hóa đầu vào, thu thập dữ liệu và đưa ra gợi ý nhanh.
 
-### ✅ Tính năng chính
+## Tính năng chính
 
-- Tìm kiếm sản phẩm theo `URL`
-- Tìm kiếm theo `Ảnh` (image search)
-- Lưu lịch sử tìm kiếm (Search history)
-- Lưu trữ ảnh và snapshot giá (Price snapshots)
-- Gửi thông báo (Telegram/notification)
-- Bảng điều khiển và UI đơn giản, responsive
+- Tìm kiếm theo URL sản phẩm (Shopee, Lazada, Tiki)
+- Tìm kiếm theo Ảnh (image search, stub)
+- Máy gợi ý: lọc outliers, tính điểm theo giá/ship/rating/tiêu đề
+- Lưu lịch sử tìm kiếm và snapshot giá
+- Thông báo Telegram (tùy chọn)
 
 ---
 
-## 💻 Cài đặt & Chạy nhanh
+## Cài đặt
 
 Yêu cầu: [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0).
-
-Trên Windows PowerShell (từ thư mục gốc `PriceWatcher`):
 
 ```powershell
 cd PriceWatcher
 dotnet restore
-dotnet ef database update  # nếu dùng EF Migrations (nếu chưa có DB hãy cập nhật connection string trong appsettings.json)
-dotnet run
+dotnet ef database update  # nếu dùng EF Migrations
+dotnet run --launch-profile http
 ```
 
-Mở trình duyệt tới `https://localhost:5001` (hoặc port hiển thị trong console).
+Mở trình duyệt tới `http://localhost:5000`.
 
 ---
 
-## 🔐 Cấu hình OAuth & Telegram
+## Cấu hình
 
 Thêm secrets vào `appsettings.json` (hoặc `appsettings.Development.json` khi chạy local):
 
@@ -87,91 +81,66 @@ Thêm secrets vào `appsettings.json` (hoặc `appsettings.Development.json` khi
 }
 ```
 
-- Để an toàn, dùng [dotnet user-secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) hoặc biến môi trường.
-- `AdminChatId` lấy qua @userinfobot trên Telegram.
-- Tham số Recommendation điều chỉnh thuật toán gợi ý sản phẩm.
+Khuyến nghị dùng [dotnet user-secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) hoặc biến môi trường cho secrets.
 
 ---
 
-## 🧭 Cách dùng nhanh — Ví dụ
+## Cách sử dụng
 
 1. Truy cập trang chính
-2. Dán `URL` sản phẩm vào ô tìm kiếm — hoặc tải lên `Ảnh` — bấm `Search`
-3. Chờ kết quả, chọn đề xuất và xem lịch sử / snapshot giá cũ
+2. Dán URL sản phẩm hoặc tải lên ảnh
+3. Bấm “Phân tích giá” và xem Top đề xuất theo từng sàn
 
-> Tip: Bạn có thể dùng extension/browser bookmark để nhanh chóng copy link sản phẩm.
+API nội bộ:
+
+- `POST /search/submit` — tạo job tìm kiếm
+  - Body mẫu:
+    ```json
+    { "userId": 0, "url": "https://shopee.vn/..." }
+    ```
+- `GET /search/status/{searchId}` — xem trạng thái và kết quả
 
 ---
 
-## 🔧 Hướng dẫn phát triển
-
-- Xem `Program.cs` để hiểu luồng khởi tạo (DI & middleware).
-- Controllers: `SearchController`, `UsersController`, `AuthController`.
-- Services: `SearchProcessingService`, `RecommendationService`, `UserService` và các interface trong `Services/Interfaces/`.
-
-Thử local tests:
+## Phát triển & Test
 
 ```powershell
 dotnet test PriceWatcher/PriceWatcher.Tests
 ```
 
-Các unit test hiện có:
-
-- `LinkProcessorTests`: kiểm tra việc nhận diện nền tảng & productId từ URL
-- `RecommendationServiceTests`: đảm bảo quy trình lọc, tính điểm & dán nhãn
-- `SearchHistoryServiceTests`: xác nhận lịch sử tìm kiếm không vượt quá 50 bản ghi/user
+Các thành phần chính: `Program.cs` (DI & middleware), `SearchController` (API), `SearchProcessingService` (xử lý), `RecommendationService` (gợi ý).
 
 ---
 
-## 🎨 Hướng dẫn thêm animation / GIF demo (gợi ý)
+## Công nghệ sử dụng
 
-Bạn có thể thêm GIF demo (bước tìm kiếm -> trả kết quả) vào README để tăng tính trực quan. Một số công cụ hữu ích:
-
-- LICEcap — quay GIF trực tiếp từ màn hình.
-- Peek (Linux) hoặc ScreenToGif (Windows) — chỉnh sửa frame và xuất GIF.
-- GIF optimization: `gifsicle` để nén GIF trước khi upload.
-
-Gợi ý chèn GIF:
-
-```md
-![Demo Search](assets/demo-search.gif)
-```
-
-Tốt nhất upload `assets/demo-search.gif` trong repo rồi tham chiếu đường dẫn tương đối để đảm bảo hiển thị ổn định.
+- .NET 8, ASP.NET Core, Razor Pages
+- Entity Framework Core (SQL Server)
+- Polly (retry cho HTTP client)
+- Telegram.Bot
+- xUnit cho unit tests
 
 ---
 
-## 📦 Releases & Badges
+## Badges
 
-Để thêm animation badges hoặc badges động, sử dụng `shields.io` & các service như `readme-typing-svg` hoặc animated SVG từ repo chủ:
-
-- Typing effect: `https://readme-typing-svg.herokuapp.com`
-- Animated SVG badges: `https://shields.io`
-
-Ví dụ con fly-in badge:
-
-```md
-![GitHub last commit](https://img.shields.io/github/last-commit/nhotungdo/Price-Watcher)
-```
+- Build: GitHub Actions (.NET)
+- Last commit, repo size: shields.io
 
 ---
 
-## 🤝 Contributing
-
-Rất hoan nghênh PR! Vui lòng:
+## Đóng góp
 
 1. Fork repo
-2. Tạo branch mới: `feature/my-cool-feature`
-3. Thêm test cho logic mới
-4. Submit PR kèm mô tả thực thi
-
-Bạn có thể thêm GIF demo cho tính năng mới trong `assets/` và cập nhật README để hiển thị.
+2. Tạo branch: `feature/<ten-tinh-nang>`
+3. Viết test cho logic mới
+4. Gửi PR kèm mô tả chi tiết
 
 ---
 
-## 📝 License
+## Giấy phép
 
-This project doesn't have a license file yet — nếu bạn muốn license MIT, hãy tạo file `LICENSE` với nội dung MIT.
+Chưa có file license trong repo. Nếu muốn dùng MIT, tạo file `LICENSE` với nội dung MIT và cập nhật badge tương ứng.
 
 ---
 
