@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "IkVkXBwHOhY=",
+  "dgSpecHash": "Qo9peM0nfDg=",
   "success": true,
-  "projectFilePath": "f:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
+  "projectFilePath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
