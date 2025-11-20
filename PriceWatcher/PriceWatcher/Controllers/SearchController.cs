@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using Microsoft.Extensions.Logging;
 using PriceWatcher.Dtos;
 using PriceWatcher.Services;
@@ -10,8 +11,8 @@ namespace PriceWatcher.Controllers;
 [Route("search")]
 public class SearchController : ControllerBase
 {
-    private const long MaxImageBytes = 8 * 1024 * 1024;
-    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" };
+    private const long MaxImageBytes = 5 * 1024 * 1024;
+    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" , "image/webp"};
 
     private readonly ISearchJobQueue _jobQueue;
     private readonly ISearchStatusService _statusService;
@@ -43,7 +44,7 @@ public class SearchController : ControllerBase
             return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
         }
 
-        return await QueueSearchAsync(request.UserId, "url", request.Url, null, cancellationToken);
+        return await QueueSearchAsync(request.UserId, "url", request.Url, null, cancellationToken, null, null);
     }
 
     [HttpPost("submit")]
@@ -59,17 +60,19 @@ public class SearchController : ControllerBase
         {
             if (!AllowedContentTypes.Contains(request.Image.ContentType))
             {
-                return BadRequest("Only jpg/png supported.");
+                return BadRequest("Only jpg/png/webp supported.");
             }
 
             if (request.Image.Length > MaxImageBytes)
             {
-                return BadRequest("Image exceeds 8MB limit.");
+                return BadRequest("Image exceeds 5MB limit.");
             }
 
             await using var ms = new MemoryStream();
             await request.Image.CopyToAsync(ms, cancellationToken);
-            return await QueueSearchAsync(request.UserId, "image", request.Url, ms.ToArray(), cancellationToken);
+            var hint = GenerateKeywordFromFilename(request.Image.FileName);
+            var queryOverride = string.IsNullOrWhiteSpace(hint) ? null : new ProductQuery { TitleHint = hint };
+            return await QueueSearchAsync(request.UserId, "image", request.Url, ms.ToArray(), cancellationToken, request.Image.ContentType, queryOverride);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Url) && !IsSupportedProductUrl(request.Url))
@@ -77,7 +80,7 @@ public class SearchController : ControllerBase
             return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
         }
 
-        return await QueueSearchAsync(request.UserId, "url", request.Url!, null, cancellationToken);
+        return await QueueSearchAsync(request.UserId, "url", request.Url!, null, cancellationToken, null, null);
     }
 
     [HttpGet("status/{searchId:guid}")]
@@ -92,7 +95,7 @@ public class SearchController : ControllerBase
         return Ok(status);
     }
 
-    private async Task<IActionResult> QueueSearchAsync(int userId, string searchType, string? url, byte[]? imageBytes, CancellationToken cancellationToken)
+    private async Task<IActionResult> QueueSearchAsync(int userId, string searchType, string? url, byte[]? imageBytes, CancellationToken cancellationToken, string? imageContentType, ProductQuery? queryOverride)
     {
         var searchId = Guid.NewGuid();
         _statusService.Initialize(searchId);
@@ -103,7 +106,9 @@ public class SearchController : ControllerBase
             UserId = userId,
             Url = url,
             ImageBytes = imageBytes,
-            SearchType = searchType
+            ImageContentType = imageContentType,
+            SearchType = searchType,
+            QueryOverride = queryOverride
         };
 
         await _jobQueue.QueueAsync(job, cancellationToken);
@@ -124,6 +129,31 @@ public class SearchController : ControllerBase
             return false;
         }
         return true;
+    }
+
+    private static string GenerateKeywordFromFilename(string fileName)
+    {
+        var name = Path.GetFileNameWithoutExtension(fileName ?? string.Empty).ToLowerInvariant();
+        name = RemoveDiacritics(name);
+        name = System.Text.RegularExpressions.Regex.Replace(name, @"[_\-]+", " ");
+        name = System.Text.RegularExpressions.Regex.Replace(name, @"[^a-zA-Z0-9\p{L}\s]", "");
+        var tokens = name.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        var stop = new HashSet<string>(new[] { "img", "image", "anh", "hinh", "picture", "photo", "scan", "untitled", "new", "copy" });
+        var filtered = tokens.Where(t => t.Length >= 2 && !stop.Contains(t) && !int.TryParse(t, out _)).Take(6);
+        return string.Join(' ', filtered);
+    }
+
+    private static string RemoveDiacritics(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return text;
+        var normalized = text.Normalize(NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder();
+        foreach (var ch in normalized)
+        {
+            var uc = System.Globalization.CharUnicodeInfo.GetUnicodeCategory(ch);
+            if (uc != System.Globalization.UnicodeCategory.NonSpacingMark) sb.Append(ch);
+        }
+        return sb.ToString().Normalize(NormalizationForm.FormC);
     }
 }
 

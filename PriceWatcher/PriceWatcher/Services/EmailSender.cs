@@ -41,7 +41,7 @@ public class EmailSender : IEmailSender
         using var message = new MailMessage(from, to)
         {
             Subject = "Xác nhận đăng ký PriceWatcher",
-            Body = $"Chào {fullName ?? toEmail},\n\nTài khoản của bạn đã được tạo thành công bằng Google.\n\nCảm ơn bạn đã sử dụng PriceWatcher!",
+            Body = $"Chào {fullName ?? toEmail},\n\nTài khoản của bạn đã được tạo thành công.\n\nCảm ơn bạn đã sử dụng PriceWatcher!",
             IsBodyHtml = false
         };
 

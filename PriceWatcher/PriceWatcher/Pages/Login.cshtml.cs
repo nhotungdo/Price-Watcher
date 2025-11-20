@@ -41,10 +41,10 @@ namespace PriceWatcher.Pages
 
             _logger.LogInformation("Login attempt for email: {Email}", Email);
 
-            var user = await _userService.GetByEmailAsync(Email);
+            var user = await _userService.VerifyLocalLoginAsync(Email, Password);
             if (user == null)
             {
-                ModelState.AddModelError(string.Empty, "Tài khoản không tồn tại.");
+                ModelState.AddModelError(string.Empty, "Sai email hoặc mật khẩu.");
                 return Page();
             }
 

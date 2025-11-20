@@ -15,6 +15,10 @@ public partial class User
 
     public string? GoogleId { get; set; }
 
+    public byte[]? PasswordHash { get; set; }
+
+    public byte[]? PasswordSalt { get; set; }
+
     public DateTime? CreatedAt { get; set; }
 
     public DateTime? LastLogin { get; set; }

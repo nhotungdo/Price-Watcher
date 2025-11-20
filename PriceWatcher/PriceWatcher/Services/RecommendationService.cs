@@ -22,14 +22,50 @@ public class RecommendationService : IRecommendationService
     public async Task<IEnumerable<ProductCandidateDto>> RecommendAsync(ProductQuery query, int top = 3, CancellationToken cancellationToken = default)
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
-        var gatherTasks = _scrapers.Select(scraper => GatherFromScraper(scraper, query, cancellationToken));
+        var gatherTasks = new List<Task<IEnumerable<ProductCandidateDto>>>();
+        var platformScraper = _scrapers.FirstOrDefault(s => string.Equals(s.Platform, query.Platform, StringComparison.OrdinalIgnoreCase));
+        if (!string.IsNullOrWhiteSpace(query.CanonicalUrl))
+        {
+            if (platformScraper != null)
+            {
+                gatherTasks.Add(GatherFromScraper(platformScraper, query, cancellationToken));
+                var byUrl = await SafeGetByUrl(platformScraper, query, cancellationToken);
+                if (byUrl != null)
+                {
+                    gatherTasks.Add(Task.FromResult<IEnumerable<ProductCandidateDto>>(new[] { byUrl }));
+                }
+            }
+        }
+        else
+        {
+            foreach (var scraper in _scrapers)
+            {
+                gatherTasks.Add(GatherFromScraper(scraper, query, cancellationToken));
+            }
+        }
+
         var gathered = await Task.WhenAll(gatherTasks);
         var candidates = gathered.SelectMany(x => x).ToList();
 
         if (!candidates.Any())
         {
-            _logger.LogWarning("No candidates gathered for {@Query}", query);
-            return Array.Empty<ProductCandidateDto>();
+            // Fallback: if we have a meaningful title hint, try cross-platform search even when a canonical URL is present
+            if (!string.IsNullOrWhiteSpace(query.TitleHint))
+            {
+                var crossTasks = new List<Task<IEnumerable<ProductCandidateDto>>>();
+                foreach (var scraper in _scrapers)
+                {
+                    crossTasks.Add(GatherFromScraper(scraper, query, cancellationToken));
+                }
+                var cross = await Task.WhenAll(crossTasks);
+                candidates = cross.SelectMany(x => x).ToList();
+            }
+
+            if (!candidates.Any())
+            {
+                _logger.LogWarning("No candidates gathered for {@Query}", query);
+                return Array.Empty<ProductCandidateDto>();
+            }
         }
 
         var medianPrice = CalculateMedian(candidates.Select(c => c.Price));
@@ -40,13 +76,15 @@ public class RecommendationService : IRecommendationService
 
         if (!filtered.Any())
         {
-            _logger.LogWarning("All candidates filtered out for {@Query}", query);
-            return Array.Empty<ProductCandidateDto>();
+            filtered = candidates.Where(c => c.Price > 0).ToList();
+            if (!filtered.Any()) filtered = candidates.ToList();
+            _logger.LogWarning("All candidates filtered by strict rules; using relaxed filtering for {@Query}", query);
         }
 
         var title = (query.TitleHint ?? string.Empty).ToLowerInvariant();
         var scored = ScoreCandidates(filtered, title);
-        var ordered = scored.OrderByDescending(c => c.score).Select(c => c.candidate).ToList();
+        var orderedByScore = scored.OrderByDescending(c => c.score).Select(c => c.candidate).ToList();
+        var ordered = orderedByScore.OrderBy(c => c.TotalCost).ToList();
         LabelCandidates(ordered);
 
         sw.Stop();
@@ -67,6 +105,19 @@ public class RecommendationService : IRecommendationService
         {
             _logger.LogError(ex, "Scraper {Platform} failed", scraper.Platform);
             return Array.Empty<ProductCandidateDto>();
+        }
+    }
+
+    private async Task<ProductCandidateDto?> SafeGetByUrl(IProductScraper scraper, ProductQuery query, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await scraper.GetByUrlAsync(query, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "GetByUrl failed for {Platform}", scraper.Platform);
+            return null;
         }
     }
 
@@ -104,6 +155,8 @@ public class RecommendationService : IRecommendationService
                         + shippingScore * _options.WeightShipping
                         + titleScore * _options.WeightTitleSimilarity;
 
+            candidate.MatchScore = score;
+            candidate.FitReason = BuildReason(priceScore, ratingScore, shippingScore, titleScore);
             yield return (candidate, score);
         }
     }
@@ -119,6 +172,16 @@ public class RecommendationService : IRecommendationService
         var inter = a.Intersect(b).Count();
         var union = a.Union(b).Count();
         return union == 0 ? 0 : (decimal)inter / union;
+    }
+
+    private static string BuildReason(decimal priceScore, decimal ratingScore, decimal shippingScore, decimal titleScore)
+    {
+        var reasons = new List<string>();
+        if (priceScore >= 0.6m) reasons.Add("Giá tốt");
+        if (ratingScore >= 0.8m) reasons.Add("Shop uy tín");
+        if (titleScore >= 0.3m) reasons.Add("Tên khớp");
+        if (shippingScore >= 0.6m) reasons.Add("Phí ship thấp");
+        return string.Join(", ", reasons);
     }
 
     private void LabelCandidates(IList<ProductCandidateDto> candidates)

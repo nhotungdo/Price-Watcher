@@ -6,4 +6,5 @@ public interface IImageEmbeddingService
 {
     Task<float[]> ComputeEmbeddingAsync(Stream imageStream, CancellationToken cancellationToken = default);
     double CosineSimilarity(IReadOnlyList<float> a, IReadOnlyList<float> b);
+    Task<byte[]> PreprocessAsync(Stream imageStream, CancellationToken cancellationToken = default);
 }

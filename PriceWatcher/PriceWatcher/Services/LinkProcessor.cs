@@ -8,6 +8,7 @@ public class LinkProcessor : ILinkProcessor
 {
     private static readonly Regex ShopeeRegex = new(@"i\.(?<shop>\d+)\.(?<item>\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex LazadaRegex = new(@"-s(?<shop>\d+)\.html", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex LazadaPdpRegex = new(@"pdp-i(?<item>\d+)-s(?<shop>\d+)\.html", RegexOptions.Compiled | RegexOptions.IgnoreCase);
     private static readonly Regex TikiRegex = new(@"-p(?<item>\d+)\.html", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public Task<ProductQuery> ProcessUrlAsync(string url, CancellationToken cancellationToken = default)
@@ -64,6 +65,22 @@ public class LinkProcessor : ILinkProcessor
 
     private static ProductQuery ProcessLazada(Uri uri)
     {
+        var pdpMatch = LazadaPdpRegex.Match(uri.PathAndQuery);
+        if (pdpMatch.Success)
+        {
+            var shopId = pdpMatch.Groups["shop"].Value;
+            var itemId = pdpMatch.Groups["item"].Value;
+            var title = ExtractTitleFromPath(uri);
+            return new ProductQuery
+            {
+                Platform = "lazada",
+                ProductId = shopId,
+                CanonicalUrl = RemoveTracking(uri),
+                TitleHint = title,
+                Metadata = new Dictionary<string, string> { { "itemId", itemId } }
+            };
+        }
+
         var match = LazadaRegex.Match(uri.PathAndQuery);
         if (match.Success)
         {
@@ -128,8 +145,15 @@ public class LinkProcessor : ILinkProcessor
         }
 
         var lastSegment = segments[^1];
-        var cleaned = lastSegment.Replace(".html", string.Empty, StringComparison.OrdinalIgnoreCase);
+        var decoded = Uri.UnescapeDataString(lastSegment);
+        var cleaned = decoded.Replace(".html", string.Empty, StringComparison.OrdinalIgnoreCase);
+        // loại bỏ phần i.{shop}.{item} nếu có trong slug Shopee
+        cleaned = Regex.Replace(cleaned, @"-?i\.\d+\.\d+", string.Empty, RegexOptions.IgnoreCase);
+        // loại bỏ phần lazada định danh sản phẩm dạng -pdp-i{item}-s{shop} hoặc -s{shop}
+        cleaned = Regex.Replace(cleaned, @"-pdp-i\d+-s\d+", string.Empty, RegexOptions.IgnoreCase);
+        cleaned = Regex.Replace(cleaned, @"-s\d+", string.Empty, RegexOptions.IgnoreCase);
         cleaned = cleaned.Replace("-", " ");
+        cleaned = cleaned.Trim();
         return string.IsNullOrWhiteSpace(cleaned) ? null : cleaned;
     }
 }

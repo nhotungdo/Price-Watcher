@@ -30,13 +30,37 @@ public class SearchStatusService : ISearchStatusService
             });
     }
 
-    public void Complete(Guid searchId, IEnumerable<ProductCandidateDto> results)
+    public void Complete(Guid searchId, ProductQuery query, IEnumerable<ProductCandidateDto> results)
     {
+        var arr = results.ToArray();
+        var samePlatform = arr.Where(r => string.Equals(r.Platform, query.Platform, StringComparison.OrdinalIgnoreCase)).ToArray();
+        var baselinePool = samePlatform.Length > 0 ? samePlatform : arr;
+        decimal? originalPrice = null;
+        if (baselinePool.Length > 0)
+        {
+            var prices = baselinePool.Select(r => r.Price).OrderBy(p => p).ToArray();
+            var mid = prices.Length / 2;
+            originalPrice = prices.Length % 2 == 0 ? (prices[mid - 1] + prices[mid]) / 2 : prices[mid];
+        }
+        var lower = originalPrice.HasValue
+            ? arr.Where(r => r.TotalCost < originalPrice.Value).OrderBy(r => r.TotalCost).ToArray()
+            : Array.Empty<ProductCandidateDto>();
+        var higher = originalPrice.HasValue
+            ? arr.Where(r => r.TotalCost >= originalPrice.Value).OrderBy(r => r.TotalCost).ToArray()
+            : Array.Empty<ProductCandidateDto>();
+
+        var firstImage = samePlatform.FirstOrDefault()?.ThumbnailUrl ?? arr.FirstOrDefault()?.ThumbnailUrl;
         var dto = new SearchStatusDto
         {
             SearchId = searchId,
             Status = "Completed",
-            Results = results.ToArray()
+            Results = arr.OrderBy(r => r.TotalCost).ToArray(),
+            OriginalPrice = originalPrice,
+            ProductName = query.TitleHint,
+            ProductImageUrl = firstImage,
+            Category = InferCategory(query.TitleHint),
+            Lower = lower,
+            Higher = higher
         };
         _statuses[searchId] = dto;
     }
@@ -55,6 +79,15 @@ public class SearchStatusService : ISearchStatusService
     {
         _statuses.TryGetValue(searchId, out var status);
         return status;
+    }
+
+    private static string? InferCategory(string? title)
+    {
+        var t = (title ?? string.Empty).ToLowerInvariant();
+        if (t.Contains("iphone") || t.Contains("kính cường lực") || t.Contains("ốp") || t.Contains("sạc")) return "Điện thoại & Phụ kiện";
+        if (t.Contains("laptop") || t.Contains("chuột") || t.Contains("bàn phím")) return "Máy tính & Phụ kiện";
+        if (t.Contains("áo") || t.Contains("quần") || t.Contains("giày")) return "Thời trang";
+        return null;
     }
 }
 

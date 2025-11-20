@@ -25,7 +25,11 @@
 		<PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
 		<PackageReference Include="Telegram.Bot" Version="19.0.0" />
-		<PackageReference Include="System.Drawing.Common" Version="8.0.7" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.9" />
 	</ItemGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);RSG002</NoWarn>
+	</PropertyGroup>
 
 </Project>

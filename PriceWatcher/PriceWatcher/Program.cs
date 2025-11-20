@@ -90,15 +90,60 @@ builder.Services.AddScoped<IProductScraper, ShopeeScraperStub>();
 builder.Services.AddScoped<IProductScraper, LazadaScraperStub>();
 builder.Services.AddScoped<IProductScraper, TikiScraperStub>();
 
-builder.Services.AddHttpClient("shopee").AddPolicyHandler(CreateRetryPolicy());
-builder.Services.AddHttpClient("lazada").AddPolicyHandler(CreateRetryPolicy());
-builder.Services.AddHttpClient("tiki").AddPolicyHandler(CreateRetryPolicy());
+builder.Services.AddHttpClient("shopee", c =>
+{
+    c.BaseAddress = new Uri("https://shopee.vn");
+    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+    c.DefaultRequestHeaders.Accept.ParseAdd("application/json,text/html");
+    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+    c.DefaultRequestHeaders.Add("x-api-source", "pc");
+    c.DefaultRequestHeaders.Add("x-shopee-language", "vi");
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    CookieContainer = new System.Net.CookieContainer(),
+    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+}).AddPolicyHandler(CreateRetryPolicy());
+builder.Services.AddHttpClient("lazada", c =>
+{
+    c.BaseAddress = new Uri("https://www.lazada.vn");
+    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+    c.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/json");
+    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    CookieContainer = new System.Net.CookieContainer(),
+    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+}).AddPolicyHandler(CreateRetryPolicy());
+builder.Services.AddHttpClient("tiki", c =>
+{
+    c.BaseAddress = new Uri("https://tiki.vn");
+    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+    c.DefaultRequestHeaders.Accept.ParseAdd("application/json,text/html");
+    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+    c.DefaultRequestHeaders.Referrer = new Uri("https://tiki.vn");
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    CookieContainer = new System.Net.CookieContainer(),
+    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+}).AddPolicyHandler(CreateRetryPolicy());
 
 builder.Services.AddSingleton(Channel.CreateUnbounded<SearchJob>());
 builder.Services.AddSingleton<ISearchJobQueue, SearchJobQueue>();
 builder.Services.AddHostedService<SearchProcessingWorker>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<PriceWatcherDbContext>();
+    db.Database.EnsureCreated();
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"IF COL_LENGTH('Users','PasswordHash') IS NULL ALTER TABLE Users ADD PasswordHash VARBINARY(64) NULL;
+IF COL_LENGTH('Users','PasswordSalt') IS NULL ALTER TABLE Users ADD PasswordSalt VARBINARY(16) NULL;");
+    }
+    catch { }
+}
 
 if (app.Environment.IsDevelopment())
 {

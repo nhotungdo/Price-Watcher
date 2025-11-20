@@ -3,7 +3,7 @@
 
 // Login Form Handler
 document.addEventListener('DOMContentLoaded', function() {
-    const loginForm = document.getElementById('loginForm');
+    const loginForm = document.getElementById('loginModalForm');
     if (loginForm) {
         loginForm.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Register Form Handler
-    const registerForm = document.getElementById('registerForm');
+    const registerForm = document.getElementById('registerModalForm');
     if (registerForm) {
         registerForm.addEventListener('submit', function(e) {
             e.preventDefault();

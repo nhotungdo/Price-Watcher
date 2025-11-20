@@ -87,6 +87,71 @@ public class UserService : IUserService
         return user;
     }
 
+    public async Task<User> RegisterLocalWithPasswordAsync(string email, string? fullName, string password, CancellationToken cancellationToken = default)
+    {
+        var existing = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        var salt = new byte[16];
+        using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+        {
+            rng.GetBytes(salt);
+        }
+        byte[] hash;
+        using (var pbkdf2 = new System.Security.Cryptography.Rfc2898DeriveBytes(password, salt, 100000, System.Security.Cryptography.HashAlgorithmName.SHA256))
+        {
+            hash = pbkdf2.GetBytes(32);
+        }
+
+        var user = new User
+        {
+            Email = email,
+            FullName = fullName,
+            PasswordSalt = salt,
+            PasswordHash = hash,
+            CreatedAt = DateTime.UtcNow,
+            LastLogin = DateTime.UtcNow
+        };
+
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        try
+        {
+            await _emailSender.SendRegistrationConfirmationAsync(user.Email, user.FullName, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send registration email to {Email}", user.Email);
+        }
+        return user;
+    }
+
+    public async Task<User?> VerifyLocalLoginAsync(string email, string password, CancellationToken cancellationToken = default)
+    {
+        var user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        if (user == null)
+        {
+            return null;
+        }
+        if (user.PasswordHash == null || user.PasswordSalt == null)
+        {
+            return null;
+        }
+        using (var pbkdf2 = new System.Security.Cryptography.Rfc2898DeriveBytes(password, user.PasswordSalt, 100000, System.Security.Cryptography.HashAlgorithmName.SHA256))
+        {
+            var computed = pbkdf2.GetBytes(32);
+            var ok = System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(computed, user.PasswordHash);
+            if (!ok)
+            {
+                return null;
+            }
+        }
+        return user;
+    }
+
     public async Task UpdateLastLoginAsync(User user, CancellationToken cancellationToken = default)
     {
         user.LastLogin = DateTime.UtcNow;

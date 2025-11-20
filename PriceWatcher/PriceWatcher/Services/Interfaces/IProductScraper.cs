@@ -7,5 +7,7 @@ public interface IProductScraper
     string Platform { get; }
 
     Task<IEnumerable<ProductCandidateDto>> SearchByQueryAsync(ProductQuery query, CancellationToken cancellationToken = default);
+
+    Task<ProductCandidateDto?> GetByUrlAsync(ProductQuery query, CancellationToken cancellationToken = default);
 }
 

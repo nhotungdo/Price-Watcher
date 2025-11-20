@@ -6,7 +6,6 @@
 USE master;
 GO
 
--- Create database if it doesn't exist
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'PriceWatcher')
 BEGIN
     CREATE DATABASE PriceWatcher;
@@ -63,6 +62,8 @@ CREATE TABLE Users (
     Email VARCHAR(100) NOT NULL UNIQUE,
     AvatarUrl NVARCHAR(500) NULL,
     GoogleId VARCHAR(100) NULL,
+    PasswordHash VARBINARY(64) NULL,
+    PasswordSalt VARBINARY(16) NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     LastLogin DATETIME NULL
 );
