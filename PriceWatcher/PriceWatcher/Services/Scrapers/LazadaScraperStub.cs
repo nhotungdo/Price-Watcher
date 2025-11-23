@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using PriceWatcher.Dtos;
 using PriceWatcher.Services.Interfaces;
@@ -11,6 +12,12 @@ public class LazadaScraperStub : IProductScraper
     private readonly SemaphoreSlim _rate = new(5);
     private readonly IMetricsService _metrics;
     private readonly ILogger<LazadaScraperStub> _logger;
+    private static readonly SemaphoreSlim _robotsLock = new(1,1);
+    private static volatile bool _robotsLoaded;
+    private static readonly HashSet<string> _disallow = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string,(DateTime ts, List<ProductCandidateDto> items)> _searchCache = new();
+    private static readonly ConcurrentDictionary<string,(DateTime ts, ProductCandidateDto? item)> _detailCache = new();
+    private const int CacheTtlSeconds = 120;
 
     public LazadaScraperStub(IHttpClientFactory httpFactory, IMetricsService metrics, ILogger<LazadaScraperStub> logger)
     {
@@ -27,6 +34,7 @@ public class LazadaScraperStub : IProductScraper
         await _rate.WaitAsync(cancellationToken);
         try
         {
+            await EnsureRobotsAsync(cancellationToken);
             var keyword = string.IsNullOrWhiteSpace(query.TitleHint) ? query.ProductId : query.TitleHint!;
             var notUseful = Regex.IsMatch(keyword ?? string.Empty, @"^pdp\s+i\d+\s+s\d+$", RegexOptions.IgnoreCase) || Regex.IsMatch(keyword ?? string.Empty, @"^\d+$");
             if (notUseful && !string.IsNullOrWhiteSpace(query.CanonicalUrl))
@@ -62,10 +70,19 @@ public class LazadaScraperStub : IProductScraper
                 }
                 catch { }
             }
-            var searchUrl = $"/search?q={Uri.EscapeDataString(keyword)}";
+            var safeKeyword = (keyword ?? string.Empty);
+            var cacheKey = safeKeyword.Trim().ToLowerInvariant();
+            if (_searchCache.TryGetValue(cacheKey, out var cached) && (DateTime.UtcNow - cached.ts).TotalSeconds < CacheTtlSeconds)
+            {
+                return cached.items;
+            }
+            var searchUrl = $"/search?q={Uri.EscapeDataString(safeKeyword)}";
+            if (!IsAllowed("/search")) return Array.Empty<ProductCandidateDto>();
             var req = new HttpRequestMessage(HttpMethod.Get, searchUrl);
             req.Headers.Referrer = new Uri("https://www.lazada.vn/");
-            req.Headers.Accept.ParseAdd("text/html,application/json");
+            req.Headers.Accept.ParseAdd("text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+            req.Headers.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
             var res = await _http.SendAsync(req, cancellationToken);
             var html = await res.Content.ReadAsStringAsync(cancellationToken);
             var m = Regex.Match(html, @"listItems\s*:\s*\[(.*?)\]\s*,\s*totalResults", RegexOptions.Singleline);
@@ -101,7 +118,8 @@ public class LazadaScraperStub : IProductScraper
                 }
                 if (list.Count == 0)
                 {
-                    var catalogUrl = $"/catalog/?q={Uri.EscapeDataString(keyword)}&_keyori=ss&from=input";
+                    var catalogUrl = $"/catalog/?q={Uri.EscapeDataString(safeKeyword)}&_keyori=ss&from=input";
+                    if (!IsAllowed("/catalog/")) return Array.Empty<ProductCandidateDto>();
                     var creq = new HttpRequestMessage(HttpMethod.Get, catalogUrl);
                     creq.Headers.Referrer = new Uri("https://www.lazada.vn/");
                     creq.Headers.Accept.ParseAdd("text/html,application/json");
@@ -117,6 +135,7 @@ public class LazadaScraperStub : IProductScraper
                 }
             }
             _logger.LogInformation("Lazada parsed {Count} items for {Keyword}", list.Count, keyword);
+            _searchCache[cacheKey] = (DateTime.UtcNow, list);
             return list;
         }
         finally
@@ -158,7 +177,7 @@ public class LazadaScraperStub : IProductScraper
                         if (originalPrice.HasValue && originalPrice > 0 && price > 0) discountPct = (double)((originalPrice.Value - price) / originalPrice.Value);
                     }
                 }
-                return new ProductCandidateDto
+                var dto = new ProductCandidateDto
                 {
                     Platform = Platform,
                     Title = title,
@@ -174,6 +193,38 @@ public class LazadaScraperStub : IProductScraper
                     DiscountPercent = discountPct,
                     SellerType = sellerName.Contains("LazMall", StringComparison.OrdinalIgnoreCase) ? "Chính hãng (LazMall)" : "Đại lý"
                 };
+                _detailCache[query.CanonicalUrl.Trim().ToLowerInvariant()] = (DateTime.UtcNow, dto);
+                dto.IsOutOfStock = Regex.IsMatch(html, "hết hàng|out of stock", RegexOptions.IgnoreCase);
+                var hasVoucher = Regex.IsMatch(html, "voucher", RegexOptions.IgnoreCase);
+                var hasFree = Regex.IsMatch(html, "miễn phí vận chuyển|free shipping", RegexOptions.IgnoreCase);
+                dto.IsFreeShip = hasFree;
+                dto.PromotionSummary = (hasVoucher || hasFree) ? string.Join(", ", new[]{ hasVoucher ? "Voucher" : null, hasFree ? "Freeship" : null }.Where(x => x != null)) : null;
+                if (dto.Price == 0)
+                {
+                    var mState = Regex.Match(html, @"window\.__LAZADA_STATE__\s*=\s*(\{[\s\S]*?\});", RegexOptions.Singleline);
+                    if (mState.Success)
+                    {
+                        try
+                        {
+                            using var st = JsonDocument.Parse(mState.Groups[1].Value);
+                            var p2 = ExtractPriceFromState(st.RootElement);
+                            if (p2 > 0) dto.Price = p2;
+                        }
+                        catch { }
+                    }
+                    var mLz = Regex.Match(html, @"window\.__LZ_DATA__\s*=\s*(\{[\s\S]*?\});", RegexOptions.Singleline);
+                    if (dto.Price == 0 && mLz.Success)
+                    {
+                        try
+                        {
+                            using var ld = JsonDocument.Parse(mLz.Groups[1].Value);
+                            var p3 = ExtractPriceFromState(ld.RootElement);
+                            if (p3 > 0) dto.Price = p3;
+                        }
+                        catch { }
+                    }
+                }
+                return dto;
             }
         }
 
@@ -348,6 +399,104 @@ public class LazadaScraperStub : IProductScraper
     {
         var v = ParsePriceString(s);
         return v == 0m ? (decimal?)null : v;
+    }
+    private static decimal ExtractPriceFromState(JsonElement root)
+    {
+        try
+        {
+            if (root.ValueKind != JsonValueKind.Object) return 0m;
+            if (root.TryGetProperty("root", out var r) && r.ValueKind == JsonValueKind.Object)
+            {
+                if (r.TryGetProperty("pdpData", out var pd) && pd.ValueKind == JsonValueKind.Object)
+                {
+                    if (pd.TryGetProperty("skuInfos", out var si) && si.ValueKind == JsonValueKind.Array)
+                    {
+                        foreach (var sku in si.EnumerateArray())
+                        {
+                            if (sku.ValueKind != JsonValueKind.Object) continue;
+                            if (sku.TryGetProperty("price", out var pr))
+                            {
+                                if (pr.ValueKind == JsonValueKind.Number) return pr.GetDecimal();
+                                if (pr.ValueKind == JsonValueKind.String)
+                                {
+                                    var s = pr.GetString();
+                                    var d = ParsePriceString(s);
+                                    if (d > 0) return d;
+                                }
+                                if (pr.ValueKind == JsonValueKind.Object)
+                                {
+                                    if (pr.TryGetProperty("value", out var v) && v.ValueKind == JsonValueKind.Number) return v.GetDecimal();
+                                    if (pr.TryGetProperty("minPrice", out var mp))
+                                    {
+                                        if (mp.ValueKind == JsonValueKind.Number) return mp.GetDecimal();
+                                        if (mp.ValueKind == JsonValueKind.String)
+                                        {
+                                            var s = mp.GetString();
+                                            var d = ParsePriceString(s);
+                                            if (d > 0) return d;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            foreach (var prop in root.EnumerateObject())
+            {
+                var v = prop.Value;
+                var p = ExtractPriceFromState(v);
+                if (p > 0) return p;
+            }
+        }
+        catch { }
+        return 0m;
+    }
+
+    private async Task EnsureRobotsAsync(CancellationToken ct)
+    {
+        if (_robotsLoaded) return;
+        await _robotsLock.WaitAsync(ct);
+        try
+        {
+            if (_robotsLoaded) return;
+            var res = await _http.GetAsync("/robots.txt", ct);
+            var txt = await res.Content.ReadAsStringAsync(ct);
+            var lines = txt.Split('\n');
+            var uaAny = false;
+            foreach (var raw in lines)
+            {
+                var line = raw.Trim();
+                if (line.StartsWith("User-agent:", StringComparison.OrdinalIgnoreCase))
+                {
+                    uaAny = line.Contains("*");
+                    continue;
+                }
+                if (!uaAny) continue;
+                if (line.StartsWith("Disallow:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var path = line.Substring("Disallow:".Length).Trim();
+                    if (!string.IsNullOrWhiteSpace(path)) _disallow.Add(path);
+                }
+            }
+            _robotsLoaded = true;
+        }
+        finally
+        {
+            _robotsLock.Release();
+        }
+    }
+
+    private static bool IsAllowed(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return true;
+        foreach (var d in _disallow)
+        {
+            if (string.IsNullOrWhiteSpace(d)) continue;
+            if (d == "/") return false;
+            if (path.StartsWith(d, StringComparison.OrdinalIgnoreCase)) return false;
+        }
+        return true;
     }
 }
 

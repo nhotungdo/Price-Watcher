@@ -6,13 +6,13 @@
 USE master;
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'PriceWatcher')
+IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'PriceWatcherDB')
 BEGIN
-    CREATE DATABASE PriceWatcher;
+    CREATE DATABASE PriceWatcherDB;
 END
 GO
 
-USE PriceWatcher;
+USE PriceWatcherDB;
 GO
 
 -- =============================================
@@ -28,6 +28,10 @@ GO
 
 IF OBJECT_ID('SearchHistories', 'U') IS NOT NULL
     DROP TABLE SearchHistories;
+GO
+
+IF OBJECT_ID('ProductMappings', 'U') IS NOT NULL
+    DROP TABLE ProductMappings;
 GO
 
 IF OBJECT_ID('Users', 'U') IS NOT NULL
@@ -113,6 +117,16 @@ CREATE TABLE SearchHistories (
 );
 GO
 
+-- ProductMappings Table
+CREATE TABLE ProductMappings (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    SourceUrl NVARCHAR(1000) NOT NULL,
+    SourceProductId NVARCHAR(200) NULL,
+    MatchedCandidatesJson NVARCHAR(MAX) NULL,
+    LastSeen DATETIME NOT NULL DEFAULT GETDATE()
+);
+GO
+
 -- SystemLogs Table
 CREATE TABLE SystemLogs (
     LogId INT IDENTITY(1,1) PRIMARY KEY,
@@ -160,6 +174,10 @@ GO
 
 -- Index on SystemLogs.Level for filtering logs by level
 CREATE NONCLUSTERED INDEX IX_SystemLogs_Level ON SystemLogs(Level);
+GO
+
+-- Index on ProductMappings.SourceUrl for faster lookups
+CREATE NONCLUSTERED INDEX IX_ProductMappings_SourceUrl ON ProductMappings(SourceUrl);
 GO
 
 -- =============================================
@@ -285,7 +303,7 @@ GO
 -- =============================================
 -- Script completed successfully
 -- =============================================
-PRINT 'Database PriceWatcher created successfully!';
+PRINT 'Database PriceWatcherDB created successfully!';
 PRINT 'Tables created: Platforms, Users, Products, PriceSnapshots, SearchHistories, SystemLogs';
 PRINT 'Indexes created for performance optimization';
 PRINT 'Seed data inserted for Platforms';

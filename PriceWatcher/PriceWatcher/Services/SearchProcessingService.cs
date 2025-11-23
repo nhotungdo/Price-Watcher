@@ -3,6 +3,8 @@ using System.Text;
 using System.Net.Http;
 using PriceWatcher.Services.Interfaces;
 using PriceWatcher.Dtos;
+using PriceWatcher.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace PriceWatcher.Services;
 
@@ -16,6 +18,7 @@ public class SearchProcessingService : ISearchProcessingService
     private readonly ILogger<SearchProcessingService> _logger;
     private readonly IImageEmbeddingService _embeddingService;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly PriceWatcherDbContext _dbContext;
 
     public SearchProcessingService(
         ILinkProcessor linkProcessor,
@@ -25,7 +28,8 @@ public class SearchProcessingService : ISearchProcessingService
         ISearchStatusService statusService,
         ILogger<SearchProcessingService> logger,
         IImageEmbeddingService embeddingService,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        PriceWatcherDbContext dbContext)
     {
         _linkProcessor = linkProcessor;
         _imageSearchService = imageSearchService;
@@ -35,6 +39,7 @@ public class SearchProcessingService : ISearchProcessingService
         _logger = logger;
         _embeddingService = embeddingService;
         _httpClientFactory = httpClientFactory;
+        _dbContext = dbContext;
     }
 
     public async Task ProcessAsync(SearchJob job, CancellationToken cancellationToken)
@@ -140,6 +145,8 @@ public class SearchProcessingService : ISearchProcessingService
                 recommendations,
                 cancellationToken);
 
+            await SaveProductsAsync(recommendations, cancellationToken);
+
             _statusService.Complete(job.SearchId, query, recommendations);
         }
         catch (Exception ex)
@@ -156,6 +163,11 @@ public class SearchProcessingService : ISearchProcessingService
         if (job.SearchType == "url" && !string.IsNullOrWhiteSpace(job.Url))
         {
             return await _linkProcessor.ProcessUrlAsync(job.Url, cancellationToken);
+        }
+
+        if (job.SearchType == "keyword" && !string.IsNullOrWhiteSpace(job.Url))
+        {
+            return new ProductQuery { TitleHint = job.Url };
         }
 
         if (job.SearchType == "image" && job.ImageBytes is { Length: > 0 })
@@ -210,6 +222,74 @@ public class SearchProcessingService : ISearchProcessingService
             if (uc != System.Globalization.UnicodeCategory.NonSpacingMark) sb.Append(ch);
         }
         return sb.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private async Task SaveProductsAsync(IEnumerable<ProductCandidateDto> candidates, CancellationToken ct)
+    {
+        try
+        {
+            // Save top 5 candidates to DB for tracking
+            var top = candidates.Take(5).ToList();
+            foreach (var item in top)
+            {
+                if (string.IsNullOrWhiteSpace(item.ProductUrl)) continue;
+
+                var product = await _dbContext.Products
+                    .FirstOrDefaultAsync(p => p.OriginalUrl == item.ProductUrl, ct);
+
+                if (product == null)
+                {
+                    product = new Product
+                    {
+                        ProductName = item.Title,
+                        OriginalUrl = item.ProductUrl,
+                        ShopName = item.ShopName,
+                        ImageUrl = item.ThumbnailUrl,
+                        CurrentPrice = item.Price,
+                        Rating = item.ShopRating,
+                        ReviewCount = item.SoldCount, // Mapping SoldCount to ReviewCount loosely or just storing it
+                        LastUpdated = DateTime.UtcNow
+                    };
+                    
+                    // Try to map platform
+                    var platformName = item.Platform.ToLowerInvariant();
+                    var platform = await _dbContext.Platforms.FirstOrDefaultAsync(p => p.PlatformName == platformName, ct);
+                    if (platform != null) product.PlatformId = platform.PlatformId;
+
+                    _dbContext.Products.Add(product);
+                    await _dbContext.SaveChangesAsync(ct); // Save to get ID
+                }
+                else
+                {
+                    product.CurrentPrice = item.Price;
+                    product.LastUpdated = DateTime.UtcNow;
+                    // Update other fields if needed
+                }
+
+                // Add snapshot if price changed or it's new
+                var lastSnapshot = await _dbContext.PriceSnapshots
+                    .Where(s => s.ProductId == product.ProductId)
+                    .OrderByDescending(s => s.RecordedAt)
+                    .FirstOrDefaultAsync(ct);
+
+                if (lastSnapshot == null || lastSnapshot.Price != item.Price)
+                {
+                    _dbContext.PriceSnapshots.Add(new PriceSnapshot
+                    {
+                        ProductId = product.ProductId,
+                        Price = item.Price,
+                        RecordedAt = DateTime.UtcNow
+                    });
+                }
+
+                item.ProductId = product.ProductId;
+            }
+            await _dbContext.SaveChangesAsync(ct);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to save products to database");
+        }
     }
 }
 

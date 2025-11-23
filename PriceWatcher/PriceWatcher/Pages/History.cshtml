@@ -6,6 +6,28 @@
 
 <h1>Lịch sử tìm kiếm</h1>
 
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label asp-for="Keyword" class="form-label">Từ khóa</label>
+                <input asp-for="Keyword" class="form-control" placeholder="Nhập từ khóa..." />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="StartDate" class="form-label">Từ ngày</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="EndDate" class="form-label">Đến ngày</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Lọc</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>

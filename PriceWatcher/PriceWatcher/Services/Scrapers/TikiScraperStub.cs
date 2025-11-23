@@ -32,6 +32,7 @@ public class TikiScraperStub : IProductScraper
             var url = $"https://api.tiki.vn/raiden/v2/products?q={Uri.EscapeDataString(keyword)}&page=1&limit=20";
             var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Referrer = new Uri("https://tiki.vn");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
             var res = await _http.SendAsync(req, cancellationToken);
             if (res.IsSuccessStatusCode)
             {

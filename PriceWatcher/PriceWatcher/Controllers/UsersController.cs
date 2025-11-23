@@ -20,7 +20,7 @@ public class UsersController : ControllerBase
         page = Math.Max(page, 1);
         pageSize = Math.Clamp(pageSize, 1, 50);
 
-        var history = await _historyService.GetUserHistoryAsync(id, page, pageSize, cancellationToken);
+        var history = await _historyService.GetUserHistoryAsync(id, page, pageSize, null, null, null, cancellationToken);
         return Ok(history);
     }
 

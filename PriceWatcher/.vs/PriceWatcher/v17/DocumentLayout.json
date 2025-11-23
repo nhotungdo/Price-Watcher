@@ -3,6 +3,34 @@
   "WorkspaceRootPath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\scrapers\\tikiscraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\scrapers\\tikiscraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\scrapers\\lazadascraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\scrapers\\lazadascraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\database\\createdatabase.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\database\\createdatabase.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -13,10 +41,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
       "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\controllers\\searchcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -63,16 +87,8 @@
       "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\emailsender.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\scrapers\\lazadascraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\scrapers\\lazadascraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\scrapers\\shopeescraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\scrapers\\shopeescraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\scrapers\\tikiscraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\services\\scrapers\\tikiscraperstub.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -98,36 +114,47 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 1,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAABUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-21T02:21:54.07Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
               "Title": "Index.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Index.cshtml",
               "RelativeDocumentMoniker": "PriceWatcher\\Pages\\Index.cshtml",
               "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Index.cshtml",
               "RelativeToolTip": "PriceWatcher\\Pages\\Index.cshtml",
-              "ViewState": "AgIAAEwAAAAAAAAAAAAowEwAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAAAAoAAAAsAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-11-20T08:27:00.911Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 7,
               "Title": "AuthController.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Controllers\\AuthController.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Controllers\\AuthController.cs",
               "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Controllers\\AuthController.cs",
               "RelativeToolTip": "PriceWatcher\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T08:25:50.162Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T08:25:50.162Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 14,
               "Title": "IProductScraper.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\IProductScraper.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\IProductScraper.cs",
@@ -139,7 +166,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 15,
               "Title": "IMetricsService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\IMetricsService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\IMetricsService.cs",
@@ -151,7 +178,44 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 0,
+              "Title": "TikiScraperStub.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
+              "RelativeDocumentMoniker": "PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
+              "RelativeToolTip": "PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAAwCcAAABkAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-20T08:16:31.566Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "PriceWatcher\\Pages\\_ViewStart.cshtml",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\_ViewStart.cshtml",
+              "RelativeToolTip": "PriceWatcher\\Pages\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-21T02:23:20.345Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "_ValidationScriptsPartial.cshtml",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeDocumentMoniker": "PriceWatcher\\Pages\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeToolTip": "PriceWatcher\\Pages\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-11-21T02:23:22.774Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
               "Title": "ILinkProcessor.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\ILinkProcessor.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\ILinkProcessor.cs",
@@ -163,7 +227,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 9,
               "Title": "appsettings.json",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\appsettings.json",
               "RelativeDocumentMoniker": "PriceWatcher\\appsettings.json",
@@ -175,7 +239,30 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 5,
+              "Title": "LazadaScraperStub.cs",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
+              "RelativeDocumentMoniker": "PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
+              "RelativeToolTip": "PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
+              "ViewState": "AgIAAH4BAAAAAAAAAAAwwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-19T03:42:10.107Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "CreateDatabase.sql",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Database\\CreateDatabase.sql",
+              "RelativeDocumentMoniker": "PriceWatcher\\Database\\CreateDatabase.sql",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Database\\CreateDatabase.sql",
+              "RelativeToolTip": "PriceWatcher\\Database\\CreateDatabase.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2025-11-21T02:07:49.949Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "launchSettings.json",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "PriceWatcher\\Properties\\launchSettings.json",
@@ -183,12 +270,11 @@
               "RelativeToolTip": "PriceWatcher\\Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAcAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-19T02:18:38.091Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-19T02:18:38.091Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 11,
               "Title": "MetricsController.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Controllers\\MetricsController.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Controllers\\MetricsController.cs",
@@ -200,7 +286,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 10,
               "Title": "SearchController.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Controllers\\SearchController.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Controllers\\SearchController.cs",
@@ -212,7 +298,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 17,
               "Title": "IImageEmbeddingService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\IImageEmbeddingService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\IImageEmbeddingService.cs",
@@ -224,7 +310,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 13,
               "Title": "ImageEmbeddingService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\ImageEmbeddingService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\ImageEmbeddingService.cs",
@@ -236,7 +322,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 12,
               "Title": "ImageSearchServiceStub.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\ImageSearchServiceStub.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\ImageSearchServiceStub.cs",
@@ -248,7 +334,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 18,
               "Title": "IEmailSender.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\IEmailSender.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\IEmailSender.cs",
@@ -260,7 +346,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 19,
               "Title": "IImageSearchService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Interfaces\\IImageSearchService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Interfaces\\IImageSearchService.cs",
@@ -272,7 +358,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 20,
               "Title": "EmailSender.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\EmailSender.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\EmailSender.cs",
@@ -284,7 +370,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 21,
               "Title": "ShopeeScraperStub.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\ShopeeScraperStub.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\Scrapers\\ShopeeScraperStub.cs",
@@ -296,19 +382,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "TikiScraperStub.cs",
-              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
-              "RelativeDocumentMoniker": "PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
-              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
-              "RelativeToolTip": "PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T08:16:31.566Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 22,
               "Title": "UserService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\UserService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\UserService.cs",
@@ -320,7 +394,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 23,
               "Title": "SearchHistoryService.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\SearchHistoryService.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\SearchHistoryService.cs",
@@ -332,7 +406,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 24,
               "Title": "LinkProcessor.cs",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\LinkProcessor.cs",
               "RelativeDocumentMoniker": "PriceWatcher\\Services\\LinkProcessor.cs",
@@ -344,19 +418,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
-              "Title": "LazadaScraperStub.cs",
-              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
-              "RelativeDocumentMoniker": "PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
-              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
-              "RelativeToolTip": "PriceWatcher\\Services\\Scrapers\\LazadaScraperStub.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-19T03:42:10.107Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 25,
               "Title": "PriceWatcher.csproj",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
               "RelativeDocumentMoniker": "PriceWatcher\\PriceWatcher.csproj",

@@ -23,22 +23,41 @@ public class RecommendationService : IRecommendationService
     {
         var sw = System.Diagnostics.Stopwatch.StartNew();
         var gatherTasks = new List<Task<IEnumerable<ProductCandidateDto>>>();
-        var platformScraper = _scrapers.FirstOrDefault(s => string.Equals(s.Platform, query.Platform, StringComparison.OrdinalIgnoreCase));
+        
+        // 1. If we have a direct URL, try to fetch that specific item first
+        ProductCandidateDto? directItem = null;
         if (!string.IsNullOrWhiteSpace(query.CanonicalUrl))
         {
+            var platformScraper = _scrapers.FirstOrDefault(s => string.Equals(s.Platform, query.Platform, StringComparison.OrdinalIgnoreCase));
             if (platformScraper != null)
             {
-                gatherTasks.Add(GatherFromScraper(platformScraper, query, cancellationToken));
-                var byUrl = await SafeGetByUrl(platformScraper, query, cancellationToken);
-                if (byUrl != null)
-                {
-                    gatherTasks.Add(Task.FromResult<IEnumerable<ProductCandidateDto>>(new[] { byUrl }));
-                }
+                directItem = await SafeGetByUrl(platformScraper, query, cancellationToken);
             }
         }
-        else
+
+        // 2. Determine the keyword to search
+        // If we found a direct item, use its title. Otherwise use the provided TitleHint.
+        string? rawKeyword = directItem?.Title ?? query.TitleHint;
+        string? searchKeyword = CleanSearchKeyword(rawKeyword);
+
+        // 3. Search on ALL platforms if we have a keyword
+        if (!string.IsNullOrWhiteSpace(searchKeyword))
         {
+            var searchQuery = new ProductQuery 
+            { 
+                TitleHint = searchKeyword,
+                // We don't pass CanonicalUrl here to avoid restricting search to just one item/platform
+            };
+
             foreach (var scraper in _scrapers)
+            {
+                gatherTasks.Add(GatherFromScraper(scraper, searchQuery, cancellationToken));
+            }
+        }
+        else if (directItem == null)
+        {
+            // No URL match and no keyword? Try searching with whatever we have if it's not empty
+             foreach (var scraper in _scrapers)
             {
                 gatherTasks.Add(GatherFromScraper(scraper, query, cancellationToken));
             }
@@ -47,25 +66,21 @@ public class RecommendationService : IRecommendationService
         var gathered = await Task.WhenAll(gatherTasks);
         var candidates = gathered.SelectMany(x => x).ToList();
 
+        // 4. Add the direct item if it exists and isn't already in the list
+        if (directItem != null)
+        {
+            // Remove duplicates based on URL or very similar title/price? 
+            // For now, just add it if not present by URL
+            if (!candidates.Any(c => c.ProductUrl == directItem.ProductUrl))
+            {
+                candidates.Insert(0, directItem);
+            }
+        }
+
         if (!candidates.Any())
         {
-            // Fallback: if we have a meaningful title hint, try cross-platform search even when a canonical URL is present
-            if (!string.IsNullOrWhiteSpace(query.TitleHint))
-            {
-                var crossTasks = new List<Task<IEnumerable<ProductCandidateDto>>>();
-                foreach (var scraper in _scrapers)
-                {
-                    crossTasks.Add(GatherFromScraper(scraper, query, cancellationToken));
-                }
-                var cross = await Task.WhenAll(crossTasks);
-                candidates = cross.SelectMany(x => x).ToList();
-            }
-
-            if (!candidates.Any())
-            {
-                _logger.LogWarning("No candidates gathered for {@Query}", query);
-                return Array.Empty<ProductCandidateDto>();
-            }
+            _logger.LogWarning("No candidates gathered for {@Query}", query);
+            return Array.Empty<ProductCandidateDto>();
         }
 
         var medianPrice = CalculateMedian(candidates.Select(c => c.Price));
@@ -220,6 +235,35 @@ public class RecommendationService : IRecommendationService
     private static void AssignLabels(ProductCandidateDto candidate, IEnumerable<string> labels)
     {
         candidate.Labels = labels.Distinct().ToArray();
+    }
+
+    private static string? CleanSearchKeyword(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input)) return null;
+        
+        // Remove common e-commerce noise
+        var noise = new[] { 
+            "chính hãng", "bảo hành", "quốc tế", "nhập khẩu", "giá rẻ", "freeship", "cao cấp", "xả kho", 
+            "fullbox", "new", "like new", "99%", "vn/a", "lla", "vna", "chính", "hãng", "lazmall", "mall" 
+        };
+        
+        var lower = input.ToLowerInvariant();
+        foreach (var n in noise)
+        {
+            lower = lower.Replace(n, " ");
+        }
+
+        // Remove special chars but keep numbers and basic punctuation
+        lower = System.Text.RegularExpressions.Regex.Replace(lower, @"[^\w\s\d\-\.]", " ");
+        
+        // Normalize whitespace
+        var parts = lower.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        
+        // Take first 5-6 significant words to form a search query
+        // (Too long queries often fail on e-commerce search engines)
+        var selected = parts.Take(6); 
+        
+        return string.Join(" ", selected);
     }
 }
 

@@ -36,15 +36,23 @@ public class SearchController : ControllerBase
 
         if (string.IsNullOrWhiteSpace(request.Url))
         {
-            return BadRequest("url is required for JSON submissions.");
+            return BadRequest("Input is required.");
         }
 
-        if (!IsSupportedProductUrl(request.Url))
+        string searchType = "url";
+        if (Uri.TryCreate(request.Url, UriKind.Absolute, out _))
         {
-            return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
+            if (!IsSupportedProductUrl(request.Url))
+            {
+                return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ (Shopee/Lazada/Tiki).");
+            }
+        }
+        else
+        {
+            searchType = "keyword";
         }
 
-        return await QueueSearchAsync(request.UserId, "url", request.Url, null, cancellationToken, null, null);
+        return await QueueSearchAsync(request.UserId, searchType, request.Url, null, cancellationToken, null, null);
     }
 
     [HttpPost("submit")]
@@ -75,12 +83,23 @@ public class SearchController : ControllerBase
             return await QueueSearchAsync(request.UserId, "image", request.Url, ms.ToArray(), cancellationToken, request.Image.ContentType, queryOverride);
         }
 
-        if (!string.IsNullOrWhiteSpace(request.Url) && !IsSupportedProductUrl(request.Url))
+        string searchType = "url";
+        if (!string.IsNullOrWhiteSpace(request.Url))
         {
-            return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
+            if (Uri.TryCreate(request.Url, UriKind.Absolute, out _))
+            {
+                if (!IsSupportedProductUrl(request.Url))
+                {
+                    return BadRequest("URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ.");
+                }
+            }
+            else
+            {
+                searchType = "keyword";
+            }
         }
 
-        return await QueueSearchAsync(request.UserId, "url", request.Url!, null, cancellationToken, null, null);
+        return await QueueSearchAsync(request.UserId, searchType, request.Url!, null, cancellationToken, null, null);
     }
 
     [HttpGet("status/{searchId:guid}")]

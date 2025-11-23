@@ -12,5 +12,7 @@ public class SearchStatusDto
     public string? Category { get; set; }
     public IReadOnlyCollection<ProductCandidateDto>? Lower { get; set; }
     public IReadOnlyCollection<ProductCandidateDto>? Higher { get; set; }
+    public string? Advice { get; set; }
+    public IReadOnlyCollection<string>? Warnings { get; set; }
 }
 

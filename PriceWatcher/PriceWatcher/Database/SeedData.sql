@@ -3,7 +3,7 @@
 -- Sample data for testing and development
 -- =============================================
 
-USE PriceWatcher;
+USE PriceWatcherDB;
 GO
 
 -- =============================================

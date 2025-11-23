@@ -2,6 +2,7 @@ namespace PriceWatcher.Dtos;
 
 public class ProductCandidateDto
 {
+    public int? ProductId { get; set; }
     public string Platform { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
     public decimal Price { get; set; }
@@ -21,5 +22,8 @@ public class ProductCandidateDto
     public double? DiscountPercent { get; set; }
     public int? SoldCount { get; set; }
     public string? SellerType { get; set; }
+    public bool? IsFreeShip { get; set; }
+    public string? PromotionSummary { get; set; }
+    public bool? IsOutOfStock { get; set; }
 }
 

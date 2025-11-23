@@ -38,6 +38,8 @@ public class ShopeeScraperStub : IProductScraper
             req.Headers.Referrer = new Uri($"https://shopee.vn/search?keyword={Uri.EscapeDataString(keyword)}");
             req.Headers.Add("x-api-source", "pc");
             req.Headers.Add("x-shopee-language", "vi");
+            req.Headers.Add("x-requested-with", "XMLHttpRequest");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
             var res = await _http.SendAsync(req, cancellationToken);
             var list = new List<ProductCandidateDto>();
             if (res.IsSuccessStatusCode)
@@ -119,59 +121,94 @@ public class ShopeeScraperStub : IProductScraper
         if (parts.Length != 3) return null;
         if (!long.TryParse(parts[1], out var shopId)) return null;
         if (!long.TryParse(parts[2], out var itemId)) return null;
-        var preflightUrl = query.CanonicalUrl ?? $"https://shopee.vn/product/{shopId}/{itemId}";
-        var preflight = new HttpRequestMessage(HttpMethod.Get, preflightUrl);
-        preflight.Headers.Referrer = new Uri("https://shopee.vn/");
-        try { await _http.SendAsync(preflight, cancellationToken); } catch { }
 
-        var url = $"https://shopee.vn/api/v4/item/get?itemid={itemId}&shopid={shopId}";
-        var req = new HttpRequestMessage(HttpMethod.Get, url);
-        req.Headers.Referrer = new Uri(preflightUrl);
-        req.Headers.Add("x-api-source", "pc");
-        req.Headers.Add("x-shopee-language", "vi");
-        req.Headers.Accept.ParseAdd("application/json");
-        var res = await _http.SendAsync(req, cancellationToken);
-        if (res.IsSuccessStatusCode)
+        var preflightUrl = query.CanonicalUrl ?? $"https://shopee.vn/product/{shopId}/{itemId}";
+        
+        // 1. Try API first
+        try
         {
-            using var doc = await JsonDocument.ParseAsync(await res.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
-            if (doc.RootElement.TryGetProperty("data", out var data))
+            var apiUrl = $"https://shopee.vn/api/v4/item/get?itemid={itemId}&shopid={shopId}";
+            var req = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+            req.Headers.Referrer = new Uri(preflightUrl);
+            req.Headers.Add("x-api-source", "pc");
+            req.Headers.Add("x-shopee-language", "vi");
+            req.Headers.Add("x-requested-with", "XMLHttpRequest");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+            
+            var res = await _http.SendAsync(req, cancellationToken);
+            if (res.IsSuccessStatusCode)
             {
-                var title = data.TryGetProperty("name", out var nm) ? nm.GetString() ?? string.Empty : string.Empty;
-                var priceRaw = data.TryGetProperty("price", out var pr) ? pr.GetInt64() : 0;
-                var price = NormalizeShopeePrice(priceRaw);
-                var image = data.TryGetProperty("image", out var im) ? im.GetString() ?? string.Empty : string.Empty;
-                var sold = data.TryGetProperty("historical_sold", out var hs) ? hs.GetInt32() : (data.TryGetProperty("sold", out var sd) ? sd.GetInt32() : 0);
-                var pbd = data.TryGetProperty("price_before_discount", out var pbdEl) ? pbdEl.GetInt64() : 0;
-                var rating = data.TryGetProperty("item_rating", out var ir) && ir.TryGetProperty("rating_star", out var rs) ? rs.GetDouble() : 0;
-                decimal? originalPrice = null; double? discountPct = null;
-                if (pbd > 0) { var before = NormalizeShopeePrice(pbd); originalPrice = before; if (before > 0 && price > 0) discountPct = (double)((before - price) / before); }
-                var thumb = string.IsNullOrWhiteSpace(image) ? string.Empty : $"https://cf.shopee.vn/file/{image}";
-                return new ProductCandidateDto
+                using var doc = await JsonDocument.ParseAsync(await res.Content.ReadAsStreamAsync(cancellationToken), cancellationToken: cancellationToken);
+                if (doc.RootElement.TryGetProperty("data", out var data) && data.ValueKind == JsonValueKind.Object)
                 {
-                    Platform = Platform,
-                    Title = title,
-                    Price = price,
-                    ShippingCost = 0,
-                    ShopName = $"Shop {shopId}",
-                    ShopRating = rating,
-                    ShopSales = sold,
-                    ProductUrl = query.CanonicalUrl ?? $"https://shopee.vn/product/{shopId}/{itemId}",
-                    ThumbnailUrl = thumb,
-                    SoldCount = sold,
-                    OriginalPrice = originalPrice,
-                    DiscountPercent = discountPct,
-                    SellerType = null
-                };
+                    var title = data.TryGetProperty("name", out var nm) ? nm.GetString() ?? string.Empty : string.Empty;
+                    var priceRaw = data.TryGetProperty("price", out var pr) ? pr.GetInt64() : 0;
+                    var price = NormalizeShopeePrice(priceRaw);
+                    var image = data.TryGetProperty("image", out var im) ? im.GetString() ?? string.Empty : string.Empty;
+                    var sold = data.TryGetProperty("historical_sold", out var hs) ? hs.GetInt32() : (data.TryGetProperty("sold", out var sd) ? sd.GetInt32() : 0);
+                    var pbd = data.TryGetProperty("price_before_discount", out var pbdEl) ? pbdEl.GetInt64() : 0;
+                    var rating = data.TryGetProperty("item_rating", out var ir) && ir.TryGetProperty("rating_star", out var rs) ? rs.GetDouble() : 0;
+                    
+                    decimal? originalPrice = null; 
+                    double? discountPct = null;
+                    if (pbd > 0) 
+                    { 
+                        var before = NormalizeShopeePrice(pbd); 
+                        originalPrice = before; 
+                        if (before > 0 && price > 0) discountPct = (double)((before - price) / before); 
+                    }
+                    
+                    var thumb = string.IsNullOrWhiteSpace(image) ? string.Empty : $"https://cf.shopee.vn/file/{image}";
+                    
+                    if (!string.IsNullOrWhiteSpace(title) && price > 0)
+                    {
+                        return new ProductCandidateDto
+                        {
+                            Platform = Platform,
+                            Title = title,
+                            Price = price,
+                            ShippingCost = 0,
+                            ShopName = $"Shop {shopId}",
+                            ShopRating = rating,
+                            ShopSales = sold,
+                            ProductUrl = preflightUrl,
+                            ThumbnailUrl = thumb,
+                            SoldCount = sold,
+                            OriginalPrice = originalPrice,
+                            DiscountPercent = discountPct,
+                            SellerType = null
+                        };
+                    }
+                }
             }
         }
+        catch (Exception ex) 
+        {
+            _logger.LogWarning(ex, "Shopee API failed for {ItemId}", itemId);
+        }
+
+        // 2. Fallback to HTML parsing if API failed or returned incomplete data
         try
         {
             var html = await _http.GetStringAsync(preflightUrl, cancellationToken);
+            
+            // Title
+            var title = string.Empty;
             var mTitle = System.Text.RegularExpressions.Regex.Match(html, @"<title>(.*?)</title>", System.Text.RegularExpressions.RegexOptions.Singleline);
-            var title = mTitle.Success ? System.Net.WebUtility.HtmlDecode(mTitle.Groups[1].Value).Replace("| Shopee", string.Empty, StringComparison.OrdinalIgnoreCase).Trim() : string.Empty;
+            if (mTitle.Success) 
+            {
+                title = System.Net.WebUtility.HtmlDecode(mTitle.Groups[1].Value);
+                title = System.Text.RegularExpressions.Regex.Replace(title, @"\| Shopee.*$", string.Empty).Trim();
+            }
+
+            // Image
+            var thumb = string.Empty;
             var mImg = System.Text.RegularExpressions.Regex.Match(html, "<meta property=\"og:image\" content=\"(.*?)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-            var thumb = mImg.Success ? mImg.Groups[1].Value : string.Empty;
-            decimal price = 0m; decimal? originalPrice = null; double? discountPct = null; double rating = 0; int sold = 0;
+            if (mImg.Success) thumb = mImg.Groups[1].Value;
+
+            decimal price = 0m;
+            
+            // Try JSON-LD first
             var scripts = System.Text.RegularExpressions.Regex.Matches(html, "<script type=\"application/ld\\+json\">([\\s\\S]*?)</script>", System.Text.RegularExpressions.RegexOptions.Singleline);
             foreach (System.Text.RegularExpressions.Match mx in scripts)
             {
@@ -181,10 +218,12 @@ public class ShopeeScraperStub : IProductScraper
                     var root = jd.RootElement;
                     if (root.ValueKind == JsonValueKind.Object)
                     {
-                        if (string.IsNullOrWhiteSpace(title)) title = root.TryGetProperty("name", out var nm2) ? nm2.GetString() ?? title : title;
+                        if (string.IsNullOrWhiteSpace(title)) 
+                            title = root.TryGetProperty("name", out var nm2) ? nm2.GetString() ?? title : title;
+                            
                         if (root.TryGetProperty("offers", out var offers))
                         {
-                            if (offers.ValueKind == JsonValueKind.Object && offers.TryGetProperty("price", out var p) && (p.ValueKind == JsonValueKind.Number || p.ValueKind == JsonValueKind.String))
+                            if (offers.ValueKind == JsonValueKind.Object && offers.TryGetProperty("price", out var p))
                             {
                                 price = p.ValueKind == JsonValueKind.Number ? p.GetDecimal() : (decimal.TryParse(p.GetString(), out var dp) ? dp : 0m);
                             }
@@ -193,6 +232,21 @@ public class ShopeeScraperStub : IProductScraper
                 }
                 catch { }
             }
+
+            // Fallback price from meta tags
+            if (price == 0)
+            {
+                var mPrice = System.Text.RegularExpressions.Regex.Match(html, @"<meta property=""product:price:amount"" content=""([\d\.]+)""", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                if (mPrice.Success && decimal.TryParse(mPrice.Groups[1].Value, out var mp)) price = mp;
+            }
+
+            // If we still have no title, try og:title
+            if (string.IsNullOrWhiteSpace(title))
+            {
+                 var mOgTitle = System.Text.RegularExpressions.Regex.Match(html, "<meta property=\"og:title\" content=\"(.*?)\"", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                 if (mOgTitle.Success) title = System.Net.WebUtility.HtmlDecode(mOgTitle.Groups[1].Value);
+            }
+
             return new ProductCandidateDto
             {
                 Platform = Platform,
@@ -200,17 +254,21 @@ public class ShopeeScraperStub : IProductScraper
                 Price = price,
                 ShippingCost = 0,
                 ShopName = $"Shop {shopId}",
-                ShopRating = rating,
-                ShopSales = sold,
-                ProductUrl = query.CanonicalUrl ?? $"https://shopee.vn/product/{shopId}/{itemId}",
+                ShopRating = 0,
+                ShopSales = 0,
+                ProductUrl = preflightUrl,
                 ThumbnailUrl = thumb,
-                SoldCount = sold,
-                OriginalPrice = originalPrice,
-                DiscountPercent = discountPct,
+                SoldCount = 0,
+                OriginalPrice = null,
+                DiscountPercent = null,
                 SellerType = null
             };
         }
-        catch { }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Shopee HTML fallback failed for {Url}", preflightUrl);
+        }
+        
         return null;
     }
 

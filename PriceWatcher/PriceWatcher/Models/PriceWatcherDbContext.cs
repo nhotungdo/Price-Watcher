@@ -25,6 +25,8 @@ public partial class PriceWatcherDbContext : DbContext
 
     public virtual DbSet<SystemLog> SystemLogs { get; set; }
 
+    public virtual DbSet<ProductMapping> ProductMappings { get; set; }
+
     public virtual DbSet<User> Users { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -40,6 +40,7 @@ public class LinkProcessor : ILinkProcessor
 
     private static ProductQuery ProcessShopee(Uri uri)
     {
+        // Case 1: Standard format i.shopId.itemId
         var match = ShopeeRegex.Match(uri.PathAndQuery);
         if (match.Success)
         {
@@ -54,6 +55,26 @@ public class LinkProcessor : ILinkProcessor
                 TitleHint = ExtractTitleFromPath(uri)
             };
         }
+
+        // Case 2: /product/shopId/itemId
+        var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length >= 3 && string.Equals(segments[^3], "product", StringComparison.OrdinalIgnoreCase))
+        {
+             if (long.TryParse(segments[^2], out var shopId) && long.TryParse(segments[^1], out var itemId))
+             {
+                 return new ProductQuery
+                 {
+                     Platform = "shopee",
+                     ProductId = $"i.{shopId}.{itemId}",
+                     CanonicalUrl = $"https://{uri.Host}/product/{shopId}/{itemId}",
+                     TitleHint = null // Title is not in the URL path for this format usually
+                 };
+             }
+        }
+        
+        // Case 3: /universal-link/product/shopId/itemId (sometimes used in deep links)
+        // ... (can add if needed)
+
         return new ProductQuery
         {
             Platform = "shopee",

@@ -46,11 +46,30 @@ public class SearchHistoryService : ISearchHistoryService
         }
     }
 
-    public async Task<IReadOnlyCollection<SearchHistoryDto>> GetUserHistoryAsync(int userId, int page, int pageSize, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyCollection<SearchHistoryDto>> GetUserHistoryAsync(int userId, int page, int pageSize, string? keyword = null, DateTime? startDate = null, DateTime? endDate = null, CancellationToken cancellationToken = default)
     {
         var query = _dbContext.SearchHistories
-            .Where(h => h.UserId == userId)
-            .OrderByDescending(h => h.SearchTime)
+            .Where(h => h.UserId == userId);
+
+        if (!string.IsNullOrWhiteSpace(keyword))
+        {
+            var k = keyword.Trim();
+            query = query.Where(h => h.InputContent.Contains(k) || (h.DetectedKeyword != null && h.DetectedKeyword.Contains(k)));
+        }
+
+        if (startDate.HasValue)
+        {
+            query = query.Where(h => h.SearchTime >= startDate.Value);
+        }
+
+        if (endDate.HasValue)
+        {
+            // Ensure we include the whole end day
+            var end = endDate.Value.Date.AddDays(1).AddTicks(-1);
+            query = query.Where(h => h.SearchTime <= end);
+        }
+
+        query = query.OrderByDescending(h => h.SearchTime)
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
 
