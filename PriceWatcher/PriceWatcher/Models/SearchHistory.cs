@@ -1,23 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriceWatcher.Models;
-
-public partial class SearchHistory
+namespace PriceWatcher.Models
 {
-    public int HistoryId { get; set; }
+    public class SearchHistory
+    {
+        [Key]
+        public int HistoryId { get; set; }
 
-    public int? UserId { get; set; }
+        public int? UserId { get; set; }
 
-    public string? SearchType { get; set; }
+        [StringLength(20)]
+        public string SearchType { get; set; }
 
-    public string? InputContent { get; set; }
+        public string InputContent { get; set; }
 
-    public string? DetectedKeyword { get; set; }
+        [StringLength(200)]
+        public string DetectedKeyword { get; set; }
 
-    public decimal? BestPriceFound { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? BestPriceFound { get; set; }
 
-    public DateTime? SearchTime { get; set; }
+        public DateTime? SearchTime { get; set; } = DateTime.Now;
 
-    public virtual User? User { get; set; }
+        [ForeignKey("UserId")]
+        public virtual User User { get; set; }
+    }
 }

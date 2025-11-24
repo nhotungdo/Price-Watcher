@@ -46,6 +46,22 @@ IF OBJECT_ID('SystemLogs', 'U') IS NOT NULL
     DROP TABLE SystemLogs;
 GO
 
+IF OBJECT_ID('PriceAlerts', 'U') IS NOT NULL
+    DROP TABLE PriceAlerts;
+GO
+
+IF OBJECT_ID('Categories', 'U') IS NOT NULL
+    DROP TABLE Categories;
+GO
+
+IF OBJECT_ID('Reviews', 'U') IS NOT NULL
+    DROP TABLE Reviews;
+GO
+
+IF OBJECT_ID('CrawlJobs', 'U') IS NOT NULL
+    DROP TABLE CrawlJobs;
+GO
+
 -- =============================================
 -- Create Tables
 -- =============================================
@@ -81,6 +97,8 @@ CREATE TABLE Products (
     ProductName NVARCHAR(500) NOT NULL,
     OriginalUrl NVARCHAR(MAX) NOT NULL,
     AffiliateUrl NVARCHAR(MAX) NULL,
+    AffiliateProvider NVARCHAR(50) NULL,
+    AffiliateExpiry DATETIME NULL,
     ImageUrl NVARCHAR(MAX) NULL,
     CurrentPrice DECIMAL(18,2) NULL,
     Rating FLOAT NULL,
@@ -136,6 +154,66 @@ CREATE TABLE SystemLogs (
 );
 GO
 
+-- Categories Table
+CREATE TABLE Categories (
+    CategoryId INT IDENTITY(1,1) PRIMARY KEY,
+    CategoryName NVARCHAR(200) NOT NULL,
+    ParentCategoryId INT NULL,
+    IconUrl NVARCHAR(500) NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_Categories_Parent FOREIGN KEY (ParentCategoryId) 
+        REFERENCES Categories(CategoryId)
+);
+GO
+
+-- PriceAlerts Table
+CREATE TABLE PriceAlerts (
+    AlertId INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    ProductId INT NOT NULL,
+    TargetPrice DECIMAL(18,2) NOT NULL,
+    IsActive BIT DEFAULT 1,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    LastNotifiedAt DATETIME NULL,
+    CONSTRAINT FK_PriceAlerts_Users FOREIGN KEY (UserId) 
+        REFERENCES Users(UserId) ON DELETE CASCADE,
+    CONSTRAINT FK_PriceAlerts_Products FOREIGN KEY (ProductId) 
+        REFERENCES Products(ProductId) ON DELETE CASCADE
+);
+GO
+
+-- CrawlJobs Table
+CREATE TABLE CrawlJobs (
+    JobId INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NOT NULL,
+    PlatformId INT NOT NULL,
+    Status NVARCHAR(50) NOT NULL, -- 'Pending', 'Processing', 'Completed', 'Failed'
+    LastTriedAt DATETIME NULL,
+    RetryCount INT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_CrawlJobs_Products FOREIGN KEY (ProductId) 
+        REFERENCES Products(ProductId) ON DELETE CASCADE,
+    CONSTRAINT FK_CrawlJobs_Platforms FOREIGN KEY (PlatformId) 
+        REFERENCES Platforms(PlatformId)
+);
+GO
+
+-- Reviews Table
+CREATE TABLE Reviews (
+    ReviewId INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NOT NULL,
+    UserId INT NOT NULL,
+    Stars INT NOT NULL CHECK (Stars >= 1 AND Stars <= 5),
+    Content NVARCHAR(MAX) NULL,
+    IsVerifiedPurchase BIT DEFAULT 0,
+    CreatedAt DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_Reviews_Products FOREIGN KEY (ProductId) 
+        REFERENCES Products(ProductId) ON DELETE CASCADE,
+    CONSTRAINT FK_Reviews_Users FOREIGN KEY (UserId) 
+        REFERENCES Users(UserId) ON DELETE CASCADE
+);
+GO
+
 -- =============================================
 -- Create Indexes
 -- =============================================
@@ -180,6 +258,26 @@ GO
 CREATE NONCLUSTERED INDEX IX_ProductMappings_SourceUrl ON ProductMappings(SourceUrl);
 GO
 
+-- Index on Categories.ParentCategoryId
+CREATE NONCLUSTERED INDEX IX_Categories_ParentCategoryId ON Categories(ParentCategoryId);
+GO
+
+-- Index on PriceAlerts.UserId
+CREATE NONCLUSTERED INDEX IX_PriceAlerts_UserId ON PriceAlerts(UserId);
+GO
+
+-- Index on PriceAlerts.ProductId
+CREATE NONCLUSTERED INDEX IX_PriceAlerts_ProductId ON PriceAlerts(ProductId);
+GO
+
+-- Index on CrawlJobs.Status
+CREATE NONCLUSTERED INDEX IX_CrawlJobs_Status ON CrawlJobs(Status);
+GO
+
+-- Index on Reviews.ProductId
+CREATE NONCLUSTERED INDEX IX_Reviews_ProductId ON Reviews(ProductId);
+GO
+
 -- =============================================
 -- Insert Seed Data
 -- =============================================
@@ -189,6 +287,23 @@ INSERT INTO Platforms (PlatformName, Domain, ColorCode) VALUES
     (N'Shopee', 'shopee.vn', '#EE4D2D'),
     (N'Lazada', 'lazada.vn', '#0F146D'),
     (N'Tiki', 'tiki.vn', '#189EFF');
+GO
+
+-- Insert default categories
+INSERT INTO Categories (CategoryName, IconUrl) VALUES
+    (N'Nhà Sách Tiki', 'https://img.icons8.com/3d-fluency/94/books.png'),
+    (N'Nhà Cửa - Đời Sống', 'https://img.icons8.com/3d-fluency/94/home.png'),
+    (N'Điện Thoại - Máy Tính Bảng', 'https://img.icons8.com/3d-fluency/94/iphone.png'),
+    (N'Đồ Chơi - Mẹ & Bé', 'https://img.icons8.com/3d-fluency/94/teddy-bear.png'),
+    (N'Thiết Bị Số - Phụ Kiện Số', 'https://img.icons8.com/3d-fluency/94/headphones.png'),
+    (N'Điện Gia Dụng', 'https://img.icons8.com/3d-fluency/94/washing-machine.png'),
+    (N'Làm Đẹp - Sức Khỏe', 'https://img.icons8.com/3d-fluency/94/lipstick.png'),
+    (N'Ô Tô - Xe Máy - Xe Đạp', 'https://img.icons8.com/3d-fluency/94/car.png'),
+    (N'Thời Trang Nam', 'https://img.icons8.com/3d-fluency/94/t-shirt.png'),
+    (N'Thời Trang Nữ', 'https://img.icons8.com/3d-fluency/94/dress.png'),
+    (N'Giày - Dép Nam', 'https://img.icons8.com/3d-fluency/94/sneakers.png'),
+    (N'Giày - Dép Nữ', 'https://img.icons8.com/3d-fluency/94/womens-shoe.png'),
+    (N'Túi Thời Trang', 'https://img.icons8.com/3d-fluency/94/handbag.png');
 GO
 
 -- =============================================
@@ -304,7 +419,7 @@ GO
 -- Script completed successfully
 -- =============================================
 PRINT 'Database PriceWatcherDB created successfully!';
-PRINT 'Tables created: Platforms, Users, Products, PriceSnapshots, SearchHistories, SystemLogs';
+PRINT 'Tables created: Platforms, Users, Products, PriceSnapshots, SearchHistories, SystemLogs, Categories, PriceAlerts, CrawlJobs, Reviews';
 PRINT 'Indexes created for performance optimization';
 PRINT 'Seed data inserted for Platforms';
 PRINT 'Views and Stored Procedures created';

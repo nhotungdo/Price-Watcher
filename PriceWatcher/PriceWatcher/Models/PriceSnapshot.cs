@@ -1,17 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriceWatcher.Models;
-
-public partial class PriceSnapshot
+namespace PriceWatcher.Models
 {
-    public int SnapshotId { get; set; }
+    public class PriceSnapshot
+    {
+        [Key]
+        public int SnapshotId { get; set; }
 
-    public int? ProductId { get; set; }
+        public int? ProductId { get; set; }
 
-    public decimal Price { get; set; }
+        [Required]
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal Price { get; set; }
 
-    public DateTime? RecordedAt { get; set; }
+        [Column(TypeName = "decimal(18,2)")]
+        public decimal? OriginalPrice { get; set; }
 
-    public virtual Product? Product { get; set; }
+        public string ShippingInfo { get; set; }
+
+        public DateTime? RecordedAt { get; set; } = DateTime.Now;
+
+        [ForeignKey("ProductId")]
+        public virtual Product Product { get; set; }
+    }
 }

@@ -1,21 +1,23 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriceWatcher.Models;
-
-public class ProductMapping
+namespace PriceWatcher.Models
 {
-    [Key]
-    public int Id { get; set; }
+    public class ProductMapping
+    {
+        [Key]
+        public int Id { get; set; }
 
-    [Required]
-    public string SourceUrl { get; set; } = string.Empty;
+        [Required]
+        [StringLength(1000)]
+        public string SourceUrl { get; set; }
 
-    public string SourceProductId { get; set; } = string.Empty;
+        [StringLength(200)]
+        public string SourceProductId { get; set; }
 
-    public string MatchedCandidatesJson { get; set; } = string.Empty;
+        public string MatchedCandidatesJson { get; set; }
 
-    public DateTime LastSeen { get; set; }
+        public DateTime LastSeen { get; set; } = DateTime.Now;
+    }
 }

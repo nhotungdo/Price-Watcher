@@ -1,0 +1,188 @@
+@page
+@model PriceWatcher.Pages.CartModel
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<div class="cart-page">
+    <div class="container">
+        <div class="cart-header">
+            <h1>Giỏ hàng của bạn</h1>
+        </div>
+
+        <div class="row">
+            <!-- Cart Items -->
+            <div class="col-lg-8">
+                <div id="cartItemsContainer">
+                    <!-- Items will be loaded here by JavaScript -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Đang tải...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Summary -->
+            <div class="col-lg-4">
+                <div class="cart-summary" id="cartSummary">
+                    <h3>Tóm tắt đơn hàng</h3>
+                    <div class="summary-row">
+                        <span>Tạm tính:</span>
+                        <span id="subtotal">0₫</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Giảm giá:</span>
+                        <span id="discount" class="text-success">0₫</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Phí vận chuyển:</span>
+                        <span id="shipping">Miễn phí</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Tổng cộng:</span>
+                        <span id="total" class="text-danger">0₫</span>
+                    </div>
+                    <button class="checkout-btn" id="checkoutBtn" disabled>
+                        Tiến hành thanh toán
+                    </button>
+                    <div class="text-center mt-3">
+                        <a href="/" class="text-decoration-none">
+                            <small>← Tiếp tục mua sắm</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        // Render cart items
+        function renderCart() {
+            const container = document.getElementById('cartItemsContainer');
+            const items = window.cart.getItems();
+
+            if (items.length === 0) {
+                container.innerHTML = `
+                    <div class="cart-empty">
+                        <div class="cart-empty-icon">🛒</div>
+                        <h3>Giỏ hàng trống</h3>
+                        <p>Bạn chưa có sản phẩm nào trong giỏ hàng</p>
+                        <a href="/" class="btn btn-primary">Khám phá sản phẩm</a>
+                    </div>
+                `;
+                updateSummary();
+                return;
+            }
+
+            container.innerHTML = items.map(item => `
+                <div class="cart-item" data-product-id="${item.productId}" data-platform-id="${item.platformId}">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-image">
+                        </div>
+                        <div class="col">
+                            <div class="cart-item-details">
+                                <span class="cart-item-platform">${item.platformName}</span>
+                                <h5 class="cart-item-name">${item.name}</h5>
+                                <div class="cart-item-price">
+                                    ${formatCurrency(item.price)}
+                                    ${item.originalPrice ? `<span class="cart-item-original-price">${formatCurrency(item.originalPrice)}</span>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex flex-column align-items-end gap-3">
+                                <div class="quantity-control">
+                                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
+                                        −
+                                    </button>
+                                    <input type="number" 
+                                           class="quantity-input" 
+                                           value="${item.quantity}" 
+                                           min="1" 
+                                           max="99"
+                                           onchange="updateQuantity(${item.productId}, ${item.platformId}, this.value)">
+                                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId}, ${item.quantity + 1})" ${item.quantity >= 99 ? 'disabled' : ''}>
+                                        +
+                                    </button>
+                                </div>
+                                <button class="remove-item-btn" onclick="removeItem(${item.productId}, ${item.platformId})">
+                                    Xóa
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            updateSummary();
+        }
+
+        // Update cart summary
+        function updateSummary() {
+            const items = window.cart.getItems();
+            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const discount = items.reduce((sum, item) => {
+                if (item.originalPrice) {
+                    return sum + ((item.originalPrice - item.price) * item.quantity);
+                }
+                return sum;
+            }, 0);
+            const shipping = 0; // Free shipping
+            const total = subtotal;
+
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('discount').textContent = discount > 0 ? `-${formatCurrency(discount)}` : '0₫';
+            document.getElementById('shipping').textContent = shipping === 0 ? 'Miễn phí' : formatCurrency(shipping);
+            document.getElementById('total').textContent = formatCurrency(total);
+
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            checkoutBtn.disabled = items.length === 0;
+        }
+
+        // Update quantity
+        function updateQuantity(productId, platformId, quantity) {
+            window.cart.updateQuantity(productId, platformId, quantity);
+            renderCart();
+        }
+
+        // Remove item
+        function removeItem(productId, platformId) {
+            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+                window.cart.removeItem(productId, platformId);
+                renderCart();
+            }
+        }
+
+        // Checkout
+        document.getElementById('checkoutBtn')?.addEventListener('click', function() {
+            const items = window.cart.getItems();
+            if (items.length === 0) return;
+
+            // Redirect to checkout page or show checkout modal
+            alert('Chức năng thanh toán đang được phát triển');
+            // window.location.href = '/checkout';
+        });
+
+        // Listen for cart updates
+        window.addEventListener('cartUpdated', function() {
+            renderCart();
+        });
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCart();
+        });
+    </script>
+}

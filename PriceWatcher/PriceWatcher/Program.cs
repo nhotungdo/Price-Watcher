@@ -90,6 +90,24 @@ builder.Services.AddScoped<IProductScraper, ShopeeScraperStub>();
 builder.Services.AddScoped<IProductScraper, LazadaScraperStub>();
 builder.Services.AddScoped<IProductScraper, TikiScraperStub>();
 
+// Register new feature services
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<IProductComparisonService, ProductComparisonService>();
+builder.Services.AddScoped<IPriceAnalyticsService, PriceAnalyticsService>();
+
+// Crawler Services
+builder.Services.AddHttpClient("tiki", c =>
+{
+    c.BaseAddress = new Uri("https://tiki.vn");
+    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+    c.DefaultRequestHeaders.Accept.ParseAdd("application/json,text/html");
+    c.DefaultRequestHeaders.Add("x-api-source", "pc");
+});
+
+builder.Services.AddScoped<ITikiCrawler, TikiCrawler>();
+builder.Services.AddSingleton<ICrawlQueue, CrawlQueue>();
+builder.Services.AddHostedService<TikiCrawlWorker>();
+
 builder.Services.AddHttpClient("shopee", c =>
 {
     c.BaseAddress = new Uri("https://shopee.vn");
@@ -114,18 +132,7 @@ builder.Services.AddHttpClient("lazada", c =>
     CookieContainer = new System.Net.CookieContainer(),
     AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
 }).AddPolicyHandler(CreateRetryPolicy());
-builder.Services.AddHttpClient("tiki", c =>
-{
-    c.BaseAddress = new Uri("https://tiki.vn");
-    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
-    c.DefaultRequestHeaders.Accept.ParseAdd("application/json,text/html");
-    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
-    c.DefaultRequestHeaders.Referrer = new Uri("https://tiki.vn");
-}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-{
-    CookieContainer = new System.Net.CookieContainer(),
-    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-}).AddPolicyHandler(CreateRetryPolicy());
+
 
 builder.Services.AddSingleton(Channel.CreateUnbounded<SearchJob>());
 builder.Services.AddSingleton<ISearchJobQueue, SearchJobQueue>();

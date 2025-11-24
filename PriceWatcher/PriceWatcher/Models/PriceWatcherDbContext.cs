@@ -29,6 +29,15 @@ public partial class PriceWatcherDbContext : DbContext
 
     public virtual DbSet<User> Users { get; set; }
 
+    public virtual DbSet<Category> Categories { get; set; }
+
+    public virtual DbSet<PriceAlert> PriceAlerts { get; set; }
+
+    public virtual DbSet<CrawlJob> CrawlJobs { get; set; }
+
+    public virtual DbSet<Review> Reviews { get; set; }
+
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)

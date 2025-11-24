@@ -1,373 +1,325 @@
 @page
-@model PriceWatcher.Pages.IndexModel
+@model IndexModel
 @{
-    ViewData["Title"] = "AI Price Watcher";
+    ViewData["Title"] = "Săn Sale Tốt - So sánh giá tốt nhất";
 }
 
-<div class="hero-section">
-    <div class="container">
-        <div class="row align-items-center justify-content-center">
-            <div class="col-lg-10 text-center">
-                <h1 class="hero-title">
-                    <span class="text-gradient">AI Price Watcher</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Tìm kiếm, so sánh và theo dõi giá sản phẩm từ Shopee, Lazada, Tiki bằng trí tuệ nhân tạo.
-                    <br class="d-none d-md-block" />
-                    Mua sắm thông minh hơn, tiết kiệm hơn ngay hôm nay.
-                </p>
+<div class="tiki-homepage">
+    <div class="container-fluid px-3">
+        <div class="row g-3">
+            <!-- Left Sidebar - Categories -->
+            <div class="col-lg-2 d-none d-lg-block">
+                <aside class="sidebar-categories">
+                    <div class="category-menu">
+                        <h6 class="category-menu-title">Danh Mục</h6>
+                        <ul class="category-list">
+                            <li class="category-item">
+                                <a href="/category/electronics" class="category-link">
+                                    <i class="category-icon">📱</i>
+                                    <span>Điện Thoại - MTB</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/laptop" class="category-link">
+                                    <i class="category-icon">💻</i>
+                                    <span>Laptop - IT</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/camera" class="category-link">
+                                    <i class="category-icon">📷</i>
+                                    <span>Máy Ảnh</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/audio" class="category-link">
+                                    <i class="category-icon">🎧</i>
+                                    <span>Âm Thanh</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/watch" class="category-link">
+                                    <i class="category-icon">⌚</i>
+                                    <span>Đồng Hồ</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/home" class="category-link">
+                                    <i class="category-icon">🏠</i>
+                                    <span>Nhà Cửa</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/books" class="category-link">
+                                    <i class="category-icon">📚</i>
+                                    <span>Sách</span>
+                                </a>
+                            </li>
+                            <li class="category-item">
+                                <a href="/category/fashion" class="category-link">
+                                    <i class="category-icon">👕</i>
+                                    <span>Thời Trang</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </aside>
+            </div>
 
-                <div class="search-card">
-                    <form id="priceAnalysisForm" method="post" novalidate aria-label="Price analysis form">
-                        <div class="search-input-group">
-                            <div class="input-wrapper">
-                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="11" cy="11" r="8"></circle>
-                                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                </svg>
-                                <input type="text" class="form-control search-input" id="productLink" name="productLink"
-                                    placeholder="Dán link sản phẩm hoặc nhập tên sản phẩm (VD: iPhone 15)..." aria-label="Product link or name" />
-                            </div>
-                            <button type="button" class="btn-image-upload" id="btnToggleImage" title="Tìm bằng hình ảnh">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                                    <polyline points="21 15 16 10 5 21"></polyline>
-                                </svg>
-                            </button>
-                            <button type="submit" class="btn-search">
-                                <span>Phân tích ngay</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M5 12h14M12 5l7 7-7 7"/>
-                                </svg>
-                            </button>
+            <!-- Main Content Area -->
+            <div class="col-lg-10">
+                <!-- Hero Carousel -->
+                <section class="hero-section mb-3">
+                    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-indicators">
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
                         </div>
-
-                        <div class="image-upload-area collapsed" id="imageUploadArea" style="display:none;">
-                            <input type="file" id="productImage" name="productImage"
-                                accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" style="display: none;" />
-                            <div class="upload-content">
-                                <div class="upload-icon-large">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                        <polyline points="17 8 12 3 7 8"/>
-                                        <line x1="12" y1="3" x2="12" y2="15"/>
-                                    </svg>
-                                </div>
-                                <div class="upload-text">
-                                    <strong>Kéo thả ảnh vào đây</strong> hoặc click để tải lên
-                                    <div class="small text-muted">Hỗ trợ PNG, JPG, WEBP (Max 5MB)</div>
-                                </div>
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="https://salt.tikicdn.com/cache/w1080/ts/tikimsp/f9/26/5d/42491106824968c9276435c25603893c.png" class="d-block w-100" alt="Khuyến mãi lớn" loading="eager">
                             </div>
-                            <div id="imagePreview" class="image-preview" style="display: none;">
-                                <img id="previewImg" src="" alt="Preview" />
-                                <button type="button" class="remove-image" id="removeImage">×</button>
+                            <div class="carousel-item">
+                                <img src="https://salt.tikicdn.com/cache/w1080/ts/tikimsp/57/5a/2f/575a2f89106824968c9276435c25603893c.png" class="d-block w-100" alt="Giảm giá sốc" loading="lazy">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="https://salt.tikicdn.com/cache/w1080/ts/tikimsp/89/10/68/24968c9276435c25603893c.png" class="d-block w-100" alt="Ưu đãi đặc biệt" loading="lazy">
                             </div>
                         </div>
-                    </form>
-                    
-                    <div id="analysisResults" class="analysis-results"></div>
-                    <div id="exportShareBar" class="action-bar" style="display:none;">
-                        <button type="button" id="btnExportPdf" class="btn btn-outline-light btn-sm">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Xuất PDF
+                        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
                         </button>
-                        <button type="button" id="btnShare" class="btn btn-outline-light btn-sm">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="me-1"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg> Chia sẻ
+                        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                </section>
 
-<div class="features-section">
-    <div class="container">
-        <div class="section-header text-center mb-5">
-            <h2 class="section-title">Tại sao chọn PriceWatcher?</h2>
-            <p class="section-desc">Công cụ hỗ trợ mua sắm trực tuyến thông minh nhất dành cho bạn</p>
-        </div>
-        
-        <div class="row g-4">
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon bg-blue">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+                <!-- Crawl Input Section -->
+                <section class="crawl-section mb-3">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">Theo dõi giá sản phẩm Tiki</h5>
+                            <div class="input-group mb-3">
+                                <input type="text" id="crawlUrlInput" class="form-control" placeholder="Dán link sản phẩm Tiki vào đây (ví dụ: https://tiki.vn/iphone-15-p271966088.html)" aria-label="Tiki URL">
+                                <button class="btn btn-primary" type="button" id="btnCrawl">
+                                    <span id="crawlSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                    Theo dõi ngay
+                                </button>
+                            </div>
+                            <div id="crawlResult" class="d-none">
+                                <div class="alert alert-success d-flex align-items-center" role="alert">
+                                    <img id="previewImage" src="" alt="Preview" class="me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                    <div>
+                                        <h6 id="previewTitle" class="mb-0"></h6>
+                                        <div class="small">
+                                            <span id="previewPrice" class="fw-bold text-danger"></span>
+                                            <span id="previewMessage" class="text-muted ms-2"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="crawlError" class="alert alert-danger d-none" role="alert"></div>
+                        </div>
                     </div>
-                    <h3>Tìm kiếm đa nền tảng</h3>
-                    <p>Chỉ cần nhập tên sản phẩm, chúng tôi sẽ tìm kiếm trên Shopee, Lazada và Tiki cùng lúc.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon bg-purple">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                        </svg>
-                    </div>
-                    <h3>So sánh giá thông minh</h3>
-                    <p>Tự động phân tích và đề xuất nơi bán có giá tốt nhất, uy tín nhất cho bạn.</p>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="feature-card">
-                    <div class="feature-icon bg-orange">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
-                        </svg>
-                    </div>
-                    <h3>Theo dõi lịch sử giá</h3>
-                    <p>Biểu đồ biến động giá giúp bạn quyết định thời điểm mua hàng hợp lý nhất.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+                </section>
 
-<div class="platforms-section">
-    <div class="container">
-        <div class="text-center mb-4">
-            <h2 class="section-title">Đối tác hỗ trợ</h2>
-        </div>
-        <div class="row justify-content-center g-4">
-            <div class="col-6 col-md-3">
-                <a href="https://shopee.vn" target="_blank" class="platform-card">
-                    <div class="platform-logo shopee">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 7.5C16 9.43 14.43 11 12.5 11C10.57 11 9 9.43 9 7.5" stroke="white" stroke-width="1.6" stroke-linecap="round"/><rect x="5" y="8" width="14" height="10" rx="3" fill="white" opacity="0.2"/><path d="M7 9.5H17V16.5C17 17.33 16.33 18 15.5 18H8.5C7.67 18 7 17.33 7 16.5V9.5Z" fill="white"/></svg>
+                <!-- Flash Deal Section -->
+                <section class="flash-deal-section-wrapper mb-3">
+                    <div class="flash-deal-section">
+                        <div class="flash-deal-header">
+                            <h2 class="flash-deal-title">
+                                <span class="flash-icon">⚡</span>
+                                Flash Sale Hôm Nay
+                            </h2>
+                            <div class="countdown-timer">
+                                <span class="countdown-label">Kết thúc sau:</span>
+                                <div class="countdown-item">
+                                    <span class="countdown-value" id="hours">02</span>
+                                    <span class="countdown-unit">Giờ</span>
+                                </div>
+                                <div class="countdown-item">
+                                    <span class="countdown-value" id="minutes">30</span>
+                                    <span class="countdown-unit">Phút</span>
+                                </div>
+                                <div class="countdown-item">
+                                    <span class="countdown-value" id="seconds">45</span>
+                                    <span class="countdown-unit">Giây</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="deal-products">
+                            <!-- Deal products will be loaded here -->
+                        </div>
                     </div>
-                    <span>Shopee</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="https://lazada.vn" target="_blank" class="platform-card">
-                    <div class="platform-logo lazada">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 6L16.5 8.6V13.8L12 16.4L7.5 13.8V8.6L12 6Z" fill="white"/></svg>
+                </section>
+
+                <!-- Product Showcase -->
+                <section class="product-showcase">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                            Gợi Ý Hôm Nay
+                        </h2>
+                        <a href="/products" class="view-all-link">
+                            Xem tất cả
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </a>
                     </div>
-                    <span>Lazada</span>
-                </a>
-            </div>
-            <div class="col-6 col-md-3">
-                <a href="https://tiki.vn" target="_blank" class="platform-card">
-                    <div class="platform-logo tiki">
-                        <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="10" r="2" fill="white"/><circle cx="16" cy="10" r="2" fill="white"/><rect x="6" y="14" width="12" height="2" rx="1" fill="white"/></svg>
+
+                    <div class="row g-3" id="featuredProductsContainer">
+                        <!-- Products will be loaded here via JS -->
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
                     </div>
-                    <span>Tiki</span>
-                </a>
+                </section>
             </div>
         </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="~/js/cart.js" asp-append-version="true"></script>
     <script>
-        const imageUploadArea = document.getElementById('imageUploadArea');
-        const productImageInput = document.getElementById('productImage');
-        const imagePreview = document.getElementById('imagePreview');
-        const previewImg = document.getElementById('previewImg');
-        const removeImageBtn = document.getElementById('removeImage');
-        const btnToggleImage = document.getElementById('btnToggleImage');
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFeaturedProducts();
 
-        btnToggleImage.addEventListener('click', () => {
-            if (imageUploadArea.style.display === 'none') {
-                imageUploadArea.style.display = 'flex';
-                imageUploadArea.classList.remove('collapsed');
-            } else {
-                imageUploadArea.style.display = 'none';
-                imageUploadArea.classList.add('collapsed');
-            }
-        });
+            const btnCrawl = document.getElementById('btnCrawl');
+            const inputUrl = document.getElementById('crawlUrlInput');
+            const crawlResult = document.getElementById('crawlResult');
+            const crawlError = document.getElementById('crawlError');
+            const spinner = document.getElementById('crawlSpinner');
 
-        imageUploadArea.addEventListener('click', (e) => {
-            if (e.target !== removeImageBtn) productImageInput.click();
-        });
-
-        imageUploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.add('drag-over');
-        });
-
-        imageUploadArea.addEventListener('dragleave', () => {
-            imageUploadArea.classList.remove('drag-over');
-        });
-
-        imageUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            imageUploadArea.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) handleImageFile(files[0]);
-        });
-
-        productImageInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) handleImageFile(e.target.files[0]);
-        });
-
-        function supportsWebP() {
-            try {
-                const canvas = document.createElement('canvas');
-                return canvas.toDataURL('image/webp').indexOf('data:image/webp') === 0;
-            } catch { return false; }
-        }
-
-        function handleImageFile(file) {
-            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
-            if (!validTypes.includes(file.type)) {
-                alert('Vui lòng chọn file ảnh hợp lệ (PNG, JPG, GIF, WEBP)');
-                return;
-            }
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Kích thước file không được vượt quá 5MB');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const dataUrl = e.target.result;
-                if (file.type === 'image/webp' && !supportsWebP()) {
-                    imagePreview.style.display = 'none';
-                    previewImg.src = '';
-                    alert('Trình duyệt không hỗ trợ xem trước ảnh WebP.');
-                } else {
-                    previewImg.src = dataUrl;
-                    imagePreview.style.display = 'block';
-                    imageUploadArea.querySelector('.upload-content').style.display = 'none';
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-
-        removeImageBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            productImageInput.value = '';
-            imagePreview.style.display = 'none';
-            previewImg.src = '';
-            imageUploadArea.querySelector('.upload-content').style.display = 'block';
-        });
-
-        function isSupportedProductUrl(url) {
-            try {
-                const u = new URL(url);
-                const h = u.hostname.toLowerCase();
-                return h.includes('shopee') || h.includes('lazada') || h.includes('tiki');
-            } catch { return false; }
-        }
-
-        document.getElementById('priceAnalysisForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const link = document.getElementById('productLink').value.trim();
-            const fileInput = document.getElementById('productImage');
-            const uid = parseInt(document.body.getAttribute('data-uid') || '0', 10);
-            const formData = new FormData();
-            formData.append('userId', String(uid));
-            const resultsEl = document.getElementById('analysisResults');
-            
-            if (link) {
-                if (link.startsWith('http://') || link.startsWith('https://')) {
-                    if (!isSupportedProductUrl(link)) {
-                        resultsEl.innerHTML = '<div class="alert alert-danger">URL sản phẩm không hợp lệ hoặc không thuộc nền tảng hỗ trợ (Shopee/Lazada/Tiki).</div>';
-                        return;
-                    }
-                }
-                formData.append('url', link);
-            }
-            if (fileInput.files && fileInput.files.length > 0) {
-                formData.append('image', fileInput.files[0]);
-            }
-
-            if (!link && (!fileInput.files || fileInput.files.length === 0)) {
-                 resultsEl.innerHTML = '<div class="alert alert-warning">Vui lòng nhập link, tên sản phẩm hoặc tải ảnh lên.</div>';
-                 return;
-            }
-
-            let searchId;
-            try {
-                resultsEl.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><div class="mt-2">Đang phân tích...</div></div>';
-                const res = await fetch('/search/submit', { method: 'POST', body: formData });
-                if (!res.ok) {
-                    const txt = await res.text();
-                    resultsEl.innerHTML = `<div class="alert alert-danger">${txt || 'Gửi yêu cầu phân tích thất bại'}</div>`;
+            btnCrawl.addEventListener('click', async function() {
+                const url = inputUrl.value.trim();
+                
+                if (!url) {
+                    showError('Vui lòng nhập URL sản phẩm Tiki');
                     return;
                 }
-                ({ searchId } = await res.json());
-            } catch (err) {
-                resultsEl.innerHTML = '<div class="alert alert-danger">Không thể kết nối tới máy chủ.</div>';
-                return;
-            }
 
-            let status = null;
-            for (let i = 0; i < 30; i++) {
-                const sres = await fetch(`/search/status/${searchId}`);
-                if (sres.ok) {
-                    status = await sres.json();
-                    if (status.status === 'Completed' || status.status === 'Failed') break;
+                // Show loading
+                spinner.classList.remove('d-none');
+                btnCrawl.disabled = true;
+                crawlResult.classList.add('d-none');
+                crawlError.classList.add('d-none');
+
+                try {
+                    const response = await fetch('/api/crawl/tiki', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ url: url })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        // Show preview
+                        document.getElementById('previewImage').src = data.imageUrl || '';
+                        document.getElementById('previewTitle').textContent = data.name || '';
+                        document.getElementById('previewPrice').textContent = formatPrice(data.price);
+                        document.getElementById('previewMessage').textContent = data.message || 'Đã thêm vào theo dõi';
+                        crawlResult.classList.remove('d-none');
+
+                        // Reload products after a delay
+                        setTimeout(() => loadFeaturedProducts(), 2000);
+                    } else {
+                        showError(data.message || 'Không thể xử lý URL này');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showError('Đã xảy ra lỗi khi xử lý yêu cầu');
+                } finally {
+                    spinner.classList.add('d-none');
+                    btnCrawl.disabled = false;
                 }
-                await new Promise(r => setTimeout(r, 1000));
+            });
+
+            function showError(message) {
+                crawlError.textContent = message;
+                crawlError.classList.remove('d-none');
+                crawlResult.classList.add('d-none');
             }
 
-            if (!status) {
-                resultsEl.innerHTML = '<div class="alert alert-warning">Không nhận được kết quả, vui lòng thử lại.</div>';
-                return;
+            function formatPrice(price) {
+                if (!price) return '';
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
             }
-            if (status.status === 'Failed') {
-                resultsEl.innerHTML = `<div class="alert alert-danger">${status.message || 'Phân tích thất bại.'}</div>`;
-                return;
-            }
-
-            const items = status.results || [];
-            if (items.length === 0) {
-                resultsEl.innerHTML = '<div class="alert alert-info">Không tìm thấy đề xuất phù hợp.</div>';
-                return;
-            }
-
-            // Render results
-            resultsEl.innerHTML = ''; // Clear loading
-            
-            const renderList = (title, list) => {
-                if (!list || list.length === 0) return;
-                const block = document.createElement('div');
-                block.className = 'result-group';
-                block.innerHTML = `<h3 class="result-group-title">${title}</h3>`;
-                const grid = document.createElement('div');
-                grid.className = 'result-grid';
-                
-                for (const it of list) {
-                    const total = (it.totalCost || 0).toLocaleString('vi-VN');
-                    const price = (it.price || 0).toLocaleString('vi-VN');
-                    const card = document.createElement('div');
-                    card.className = 'product-card';
-                    card.innerHTML = `
-                        <div class="product-thumb">
-                            <img src="${it.thumbnailUrl}" alt="${it.title}" loading="lazy" />
-                            <span class="platform-badge ${it.platform.toLowerCase()}">${it.platform}</span>
-                            ${it.discountPercent ? `<span class="discount-badge">-${Math.round(it.discountPercent * 100)}%</span>` : ''}
-                        </div>
-                        <div class="product-info">
-                            <h4 class="product-title" title="${it.title}">${it.title}</h4>
-                            <div class="product-price">
-                                <span class="current-price">${price}₫</span>
-                                ${it.originalPrice ? `<span class="original-price">${Number(it.originalPrice).toLocaleString('vi-VN')}₫</span>` : ''}
-                            </div>
-                            <div class="product-meta">
-                                <span>⭐ ${it.shopRating ? it.shopRating.toFixed(1) : 'N/A'}</span>
-                                <span>• Đã bán ${it.soldCount || 0}</span>
-                            </div>
-                            <div class="product-actions">
-                                <a href="${it.productUrl}" target="_blank" class="btn btn-primary btn-sm w-100">Xem ngay</a>
-                                ${it.productId ? `<a href="/ProductDetail/${it.productId}" class="btn btn-outline-secondary btn-sm w-100 mt-1">Lịch sử giá</a>` : ''}
-                            </div>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                }
-                block.appendChild(grid);
-                resultsEl.appendChild(block);
-            };
-
-            // Simple render for now, can be expanded
-            renderList('Kết quả tìm kiếm', items);
-            
-            document.getElementById('exportShareBar').style.display = 'flex';
         });
+
+        async function loadFeaturedProducts() {
+            const container = document.getElementById('featuredProductsContainer');
+            try {
+                const response = await fetch('/api/home/featured?limit=12');
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+                const text = await response.text();
+                const trimmed = text.trim();
+                if (!trimmed || trimmed[0] === '<') throw new Error('Non-JSON response');
+                const products = JSON.parse(trimmed);
+
+                if (!Array.isArray(products) || products.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center text-muted">Chưa có sản phẩm nào. Hãy thử thêm link Tiki ở trên!</div>';
+                    return;
+                }
+
+                container.innerHTML = products.map(p => `
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <div class="product-card" 
+                             data-product-id="${p.productId}"
+                             data-platform-id="${p.platformId || 1}"
+                             data-platform-name="${p.platformName || 'Tiki'}"
+                             data-product-name="${p.productName || ''}"
+                             data-product-price="${p.currentPrice || 0}"
+                             data-product-image="${p.imageUrl || ''}"
+                             data-product-url="${p.originalUrl || ''}">
+                            <div class="product-image-wrapper">
+                                <img src="${p.imageUrl || '/images/placeholder.png'}" alt="${p.productName || ''}" class="product-image" loading="lazy">
+                                ${p.discountRate ? `<span class="product-badge">-${p.discountRate}%</span>` : ''}
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">${p.productName || ''}</div>
+                                ${p.rating ? `
+                                <div class="product-rating">
+                                    <span class="rating-stars">${'⭐'.repeat(Math.round(p.rating))}</span>
+                                    <span class="rating-count">(${p.reviewCount || 0})</span>
+                                </div>
+                                ` : ''}
+                                <div class="product-price-block">
+                                    <span class="product-price">${formatPrice(p.currentPrice)}</span>
+                                </div>
+                                <button class="add-to-cart-btn">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="9" cy="21" r="1"></circle>
+                                        <circle cx="20" cy="21" r="1"></circle>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    </svg>
+                                    Thêm vào giỏ
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading products:', error);
+                container.innerHTML = '<div class="col-12 text-center text-danger">Không thể tải sản phẩm</div>';
+            }
+        }
+
+        function formatPrice(price) {
+            if (!price) return '0₫';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
     </script>
 }

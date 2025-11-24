@@ -1,15 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace PriceWatcher.Models;
-
-public partial class SystemLog
+namespace PriceWatcher.Models
 {
-    public int LogId { get; set; }
+    public class SystemLog
+    {
+        [Key]
+        public int LogId { get; set; }
 
-    public string? Level { get; set; }
+        [StringLength(20)]
+        public string Level { get; set; }
 
-    public string? Message { get; set; }
+        public string Message { get; set; }
 
-    public DateTime? CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+    }
 }
