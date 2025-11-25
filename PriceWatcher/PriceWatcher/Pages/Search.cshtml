@@ -1,0 +1,179 @@
+@page "/search/results"
+@model PriceWatcher.Pages.SearchModel
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Tìm kiếm sản phẩm";
+}
+
+<div class="search-page container-fluid px-3 py-4">
+    <div class="card shadow-sm mb-3 search-hero">
+        <div class="card-body">
+            <form id="searchForm" class="search-form row g-2 align-items-center" autocomplete="off">
+                <div class="col-12 col-md">
+                    <label for="searchInput" class="form-label fw-semibold text-muted small mb-1">Nhập từ khóa hoặc dán URL sản phẩm</label>
+                    <input type="text"
+                           class="form-control form-control-lg"
+                           id="searchInput"
+                           name="q"
+                           value="@Model.Query"
+                           placeholder="Ví dụ: iPhone 15 Pro Max hoặc https://..." />
+                </div>
+                <div class="col-12 col-md-auto">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <span class="me-1">Tìm kiếm</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+            <div class="search-mode-hint mt-2 text-muted small">
+                @if (string.Equals(Model.Response.SearchMode, "url", StringComparison.OrdinalIgnoreCase))
+                {
+                    <span>🔗 Đang tìm theo URL sản phẩm</span>
+                }
+                else
+                {
+                    <span>🔍 Đang tìm theo từ khóa</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    
+    <div id="searchAlerts">
+        @foreach (var notice in Model.Response.Notices)
+        {
+            var alertClass = notice.Type switch
+            {
+                "error" => "alert-danger",
+                "warning" => "alert-warning",
+                "info" => "alert-info",
+                "success" => "alert-success",
+                _ => "alert-secondary"
+            };
+            <div class="alert @alertClass d-flex align-items-center" role="alert">
+                <span class="me-2">ℹ️</span>
+                <span>@notice.Message</span>
+            </div>
+        }
+    </div>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 search-meta">
+        <div>
+            <strong>@Model.Response.TotalItems</strong> kết quả
+            @if (Model.Response.DurationMs > 0)
+            {
+                <span class="text-muted ms-2">(~@Model.Response.DurationMs ms)</span>
+            }
+        </div>
+        <div class="text-muted small">
+            Trang @Model.Response.Page / @Math.Max(1, (int)Math.Ceiling(Math.Max(1, Model.Response.TotalItems) / (double)Math.Max(1, Model.Response.PageSize)))
+        </div>
+    </div>
+
+    @if (Model.Response.Suggestions.Any())
+    {
+        <div class="search-suggestions mb-3">
+            <span class="text-muted small me-2">Gợi ý:</span>
+            @foreach (var suggestion in Model.Response.Suggestions)
+            {
+                <button type="button" class="btn btn-outline-secondary btn-sm search-suggestion" data-value="@suggestion">@suggestion</button>
+            }
+        </div>
+    }
+
+    <div id="searchResultGrid" class="row g-3">
+        @if (Model.Response.Items.Count == 0)
+        {
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center py-5">
+                        <p class="mb-0">Chưa có kết quả nào phù hợp. Thử từ khóa khác nhé!</p>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            foreach (var item in Model.Response.Items)
+            {
+                <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                    <div class="search-card h-100">
+                        <div class="search-card__media">
+                            <img src="@(!string.IsNullOrWhiteSpace(item.ImageUrl) ? item.ImageUrl : "/images/placeholder.png")" alt="@item.Title" loading="lazy" />
+                            @if (item.IsExactMatch)
+                            {
+                                <span class="badge bg-success position-absolute top-0 start-0 m-2">Khớp chính xác</span>
+                            }
+                        </div>
+                        <div class="search-card__body">
+                            <div class="search-card__platform text-uppercase small text-muted">@item.Platform</div>
+                            <h3 class="search-card__title">@Html.Raw(string.IsNullOrWhiteSpace(item.HighlightedTitle) ? item.Title : item.HighlightedTitle)</h3>
+                            <div class="search-card__price">
+                                @if (item.Price.HasValue)
+                                {
+                                    <span>@item.Price.Value.ToString("N0") ₫</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Liên hệ shop</span>
+                                }
+                            </div>
+                            @if (item.Rating.HasValue)
+                            {
+                                <div class="search-card__rating text-muted small">
+                                    ⭐ @item.Rating.Value.ToString("0.0") | @item.ReviewCount?.ToString("N0") đánh giá
+                                </div>
+                            }
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge bg-light text-dark">Score @item.MatchScore.ToString("P0")</span>
+                                @if (!string.IsNullOrWhiteSpace(item.ProductUrl))
+                                {
+                                    <a class="btn btn-outline-primary btn-sm" href="@item.ProductUrl" target="_blank" rel="noopener">Tới nơi bán</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (Model.Response.TotalItems > Model.Response.PageSize)
+    {
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                @{
+                    var prevDisabled = Model.Response.Page <= 1 ? "disabled" : string.Empty;
+                    var nextDisabled = Model.Response.Page >= Math.Ceiling((double)Model.Response.TotalItems / Model.Response.PageSize) ? "disabled" : string.Empty;
+                    var nextPage = Math.Min((int)Math.Ceiling((double)Model.Response.TotalItems / Model.Response.PageSize), Model.Response.Page + 1);
+                }
+                <li class="page-item @prevDisabled">
+                    <button class="page-link" data-page="@Math.Max(1, Model.Response.Page - 1)">Trước</button>
+                </li>
+                <li class="page-item @nextDisabled">
+                    <button class="page-link" data-page="@nextPage">Sau</button>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/search.css" asp-append-version="true" />
+}
+
+@section Scripts {
+    <script>
+        window.__initialSearchState = @Html.Raw(JsonSerializer.Serialize(new {
+            query = Model.Query ?? string.Empty,
+            page = Model.Response.Page,
+            total = Model.Response.TotalItems,
+            pageSize = Model.Response.PageSize
+        }));
+    </script>
+    <script src="~/js/search.js" asp-append-version="true"></script>
+}
+

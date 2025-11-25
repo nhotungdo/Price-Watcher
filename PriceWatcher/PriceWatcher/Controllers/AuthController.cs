@@ -14,10 +14,12 @@ namespace PriceWatcher.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly ICartSessionService _cartSessionService;
 
-    public AuthController(IUserService userService)
+    public AuthController(IUserService userService, ICartSessionService cartSessionService)
     {
         _userService = userService;
+        _cartSessionService = cartSessionService;
     }
 
     [HttpGet("google")]
@@ -33,6 +35,7 @@ public class AuthController : ControllerBase
     [HttpGet("logout")]
     public async Task<IActionResult> Logout()
     {
+        _cartSessionService.HandleLogout(HttpContext);
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return Redirect("/");
     }

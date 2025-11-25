@@ -3,15 +3,15 @@
   "WorkspaceRootPath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\pages\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|solutionrelative:pricewatcher\\properties\\launchsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{CD750136-9AFF-4058-AC94-BDB40129958F}|PriceWatcher\\PriceWatcher.csproj|f:\\ojt-review\\pricewatcher\\price-watcher\\pricewatcher\\pricewatcher\\pages\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -117,22 +117,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Microsoft.Common.CurrentVersion.targets",
-              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
-              "ViewState": "AgIAAPoUAAAAAAAAAAAcwBEVAAAEAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
-              "WhenOpened": "2025-11-24T12:50:11.177Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 2,
               "Title": "_Layout.cshtml",
               "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
               "RelativeDocumentMoniker": "PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
@@ -140,8 +129,7 @@
               "RelativeToolTip": "PriceWatcher\\Pages\\Shared\\_Layout.cshtml",
               "ViewState": "AgIAAO0AAAAAAAAAAAAowAgBAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-21T02:21:54.07Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-21T02:21:54.07Z"
             },
             {
               "$type": "Document",
@@ -153,8 +141,7 @@
               "RelativeToolTip": "PriceWatcher\\Pages\\Index.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAEAAAAGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-11-20T08:27:00.911Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T08:27:00.911Z"
             },
             {
               "$type": "Document",
@@ -202,8 +189,30 @@
               "RelativeToolTip": "PriceWatcher\\Services\\Scrapers\\TikiScraperStub.cs",
               "ViewState": "AgIAACYAAAAAAAAAAAAAwCcAAABkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T08:16:31.566Z",
+              "WhenOpened": "2025-11-20T08:16:31.566Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "launchSettings.json",
+              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Properties\\launchSettings.json",
+              "RelativeDocumentMoniker": "PriceWatcher\\Properties\\launchSettings.json",
+              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Properties\\launchSettings.json",
+              "RelativeToolTip": "PriceWatcher\\Properties\\launchSettings.json",
+              "ViewState": "AgIAABIAAAAAAAAAAAAAACUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-11-19T02:18:38.091Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Microsoft.Common.CurrentVersion.targets",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\amd64\\Microsoft.Common.CurrentVersion.targets",
+              "ViewState": "AgIAAAYVAAAAAAAAAAAcwBUVAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003801|",
+              "WhenOpened": "2025-11-24T12:50:11.177Z"
             },
             {
               "$type": "Document",
@@ -216,19 +225,6 @@
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-11-21T02:23:20.345Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "launchSettings.json",
-              "DocumentMoniker": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Properties\\launchSettings.json",
-              "RelativeDocumentMoniker": "PriceWatcher\\Properties\\launchSettings.json",
-              "ToolTip": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\Properties\\launchSettings.json",
-              "RelativeToolTip": "PriceWatcher\\Properties\\launchSettings.json",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAAAA8AAAAwAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-11-19T02:18:38.091Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -443,8 +439,7 @@
               "RelativeToolTip": "PriceWatcher\\PriceWatcher.csproj",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAB0AAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
-              "WhenOpened": "2025-11-18T16:07:33.464Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-18T16:07:33.464Z"
             }
           ]
         }

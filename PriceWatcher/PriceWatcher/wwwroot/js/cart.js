@@ -1,180 +1,107 @@
-// Shopping Cart Manager - Client-side cart functionality
-class ShoppingCart {
+class CartClient {
     constructor() {
-        this.storageKey = 'pricewatcher_cart';
-        this.items = this.loadCart();
+        this.items = [];
+        this.summary = { subtotal: 0, discount: 0, total: 0, itemCount: 0 };
+        this.readyPromise = this.refresh();
+    }
+
+    async refresh() {
+        try {
+            const res = await fetch('/api/cart', { credentials: 'same-origin' });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            this.consume(data, { silent: true });
+        } catch (error) {
+            console.error('Unable to load cart:', error);
+        } finally {
+            window.dispatchEvent(new CustomEvent('cart:ready'));
+        }
+    }
+
+    async addItem(product) {
+        await this.readyPromise;
+        const payload = {
+            productId: product.productId,
+            platformId: product.platformId,
+            platformName: product.platformName,
+            name: product.name,
+            price: product.price,
+            originalPrice: product.originalPrice,
+            imageUrl: product.imageUrl,
+            productUrl: product.url,
+            quantity: product.quantity || 1
+        };
+        return this.send('/api/cart/items', 'POST', payload, `Đã thêm vào giỏ hàng: ${product.name}`);
+    }
+
+    async updateQuantity(productId, platformId, quantity) {
+        await this.readyPromise;
+        const route = this.buildItemRoute(productId, platformId);
+        return this.send(route, 'PATCH', { quantity }, 'Đã cập nhật số lượng');
+    }
+
+    async removeItem(productId, platformId) {
+        await this.readyPromise;
+        const route = this.buildItemRoute(productId, platformId);
+        return this.send(route, 'DELETE', null, 'Đã xóa sản phẩm');
+    }
+
+    buildItemRoute(productId, platformId) {
+        const params = new URLSearchParams();
+        if (typeof platformId === 'number' && !Number.isNaN(platformId)) {
+            params.set('platformId', platformId);
+        }
+        const qs = params.toString();
+        return qs ? `/api/cart/items/${productId}?${qs}` : `/api/cart/items/${productId}`;
+    }
+
+    async send(url, method, body, successMessage) {
+        try {
+            const res = await fetch(url, {
+                method,
+                headers: body ? { 'Content-Type': 'application/json' } : undefined,
+                body: body ? JSON.stringify(body) : null,
+                credentials: 'same-origin'
+            });
+            if (!res.ok) {
+                const message = await res.text();
+                throw new Error(message || `HTTP ${res.status}`);
+            }
+            const data = await res.json();
+            this.consume(data);
+            if (successMessage) {
+                this.showNotification(successMessage, 'success');
+            }
+            return data;
+        } catch (error) {
+            console.error('Cart action failed:', error);
+            this.showNotification('Không thể cập nhật giỏ hàng', 'error');
+            throw error;
+        }
+    }
+
+    consume(data, options = { silent: false }) {
+        if (!data) return;
+        this.items = data.items || [];
+        this.summary = data.summary || { subtotal: 0, discount: 0, total: 0, itemCount: 0 };
         this.updateCartBadge();
-    }
-
-    // Load cart from localStorage
-    loadCart() {
-        try {
-            const cartData = localStorage.getItem(this.storageKey);
-            return cartData ? JSON.parse(cartData) : [];
-        } catch (error) {
-            console.error('Error loading cart:', error);
-            return [];
+        if (!options.silent) {
+            window.dispatchEvent(new CustomEvent('cart:updated', {
+                detail: { items: this.items, summary: this.summary }
+            }));
         }
     }
 
-    // Save cart to localStorage
-    saveCart() {
-        try {
-            localStorage.setItem(this.storageKey, JSON.stringify(this.items));
-            this.updateCartBadge();
-            this.triggerCartUpdate();
-        } catch (error) {
-            console.error('Error saving cart:', error);
-            this.showNotification('Không thể lưu giỏ hàng', 'error');
-        }
-    }
-
-    // Add item to cart
-    addItem(product) {
-        // Validate product data
-        if (!this.validateProduct(product)) {
-            this.showNotification('Thông tin sản phẩm không hợp lệ', 'error');
-            return false;
-        }
-
-        // Check if product already exists
-        const existingIndex = this.items.findIndex(item =>
-            item.productId === product.productId &&
-            item.platformId === product.platformId
-        );
-
-        if (existingIndex !== -1) {
-            // Product exists - increase quantity
-            const newQuantity = this.items[existingIndex].quantity + (product.quantity || 1);
-
-            // Check max quantity limit (default 99)
-            if (newQuantity > 99) {
-                this.showNotification('Số lượng tối đa là 99', 'warning');
-                return false;
-            }
-
-            this.items[existingIndex].quantity = newQuantity;
-            this.showNotification(`Đã cập nhật số lượng: ${this.items[existingIndex].name}`, 'success');
-        } else {
-            // New product - add to cart
-            const cartItem = {
-                productId: product.productId,
-                platformId: product.platformId || 1,
-                platformName: product.platformName || 'Tiki',
-                name: product.name,
-                price: parseFloat(product.price),
-                originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
-                imageUrl: product.imageUrl,
-                url: product.url,
-                quantity: product.quantity || 1,
-                addedAt: new Date().toISOString()
-            };
-
-            this.items.push(cartItem);
-            this.showNotification(`Đã thêm vào giỏ hàng: ${product.name}`, 'success');
-        }
-
-        this.saveCart();
-        return true;
-    }
-
-    // Remove item from cart
-    removeItem(productId, platformId) {
-        const index = this.items.findIndex(item =>
-            item.productId === productId && item.platformId === platformId
-        );
-
-        if (index !== -1) {
-            const removedItem = this.items.splice(index, 1)[0];
-            this.saveCart();
-            this.showNotification(`Đã xóa: ${removedItem.name}`, 'info');
-            return true;
-        }
-        return false;
-    }
-
-    // Update item quantity
-    updateQuantity(productId, platformId, quantity) {
-        const item = this.items.find(item =>
-            item.productId === productId && item.platformId === platformId
-        );
-
-        if (item) {
-            const newQuantity = parseInt(quantity);
-
-            if (newQuantity < 1) {
-                this.removeItem(productId, platformId);
-                return;
-            }
-
-            if (newQuantity > 99) {
-                this.showNotification('Số lượng tối đa là 99', 'warning');
-                return;
-            }
-
-            item.quantity = newQuantity;
-            this.saveCart();
-        }
-    }
-
-    // Clear entire cart
-    clearCart() {
-        if (confirm('Bạn có chắc muốn xóa toàn bộ giỏ hàng?')) {
-            this.items = [];
-            this.saveCart();
-            this.showNotification('Đã xóa toàn bộ giỏ hàng', 'info');
-        }
-    }
-
-    // Get cart items
-    getItems() {
-        return this.items;
-    }
-
-    // Get cart count
-    getCount() {
-        return this.items.reduce((total, item) => total + item.quantity, 0);
-    }
-
-    // Get cart total
-    getTotal() {
-        return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-    }
-
-    // Validate product data
-    validateProduct(product) {
-        if (!product) return false;
-        if (!product.productId) return false;
-        if (!product.name || product.name.trim() === '') return false;
-        if (!product.price || isNaN(product.price) || product.price <= 0) return false;
-        return true;
-    }
-
-    // Update cart badge in header
     updateCartBadge() {
         const badge = document.getElementById('cartCount');
         if (badge) {
-            const count = this.getCount();
+            const count = this.summary.itemCount || 0;
             badge.textContent = count;
             badge.style.display = count > 0 ? 'flex' : 'none';
         }
     }
 
-    // Trigger custom event for cart updates
-    triggerCartUpdate() {
-        const event = new CustomEvent('cartUpdated', {
-            detail: {
-                items: this.items,
-                count: this.getCount(),
-                total: this.getTotal()
-            }
-        });
-        window.dispatchEvent(event);
-    }
-
-    // Show notification
     showNotification(message, type = 'info') {
-        // Create toast notification
         const toast = document.createElement('div');
         toast.className = `cart-toast cart-toast-${type}`;
         toast.innerHTML = `
@@ -183,79 +110,53 @@ class ShoppingCart {
                 <span class="cart-toast-message">${message}</span>
             </div>
         `;
-
-        // Add to body
         document.body.appendChild(toast);
-
-        // Animate in
         setTimeout(() => toast.classList.add('show'), 10);
-
-        // Remove after 3 seconds
         setTimeout(() => {
             toast.classList.remove('show');
             setTimeout(() => toast.remove(), 300);
         }, 3000);
     }
 
-    // Get icon for toast type
     getToastIcon(type) {
-        const icons = {
-            success: '✓',
-            error: '✕',
-            warning: '⚠',
-            info: 'ℹ'
-        };
+        const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
         return icons[type] || icons.info;
     }
 }
 
-// Initialize cart globally
-window.cart = new ShoppingCart();
+window.cartClient = new CartClient();
 
-// Add to cart button handler
 document.addEventListener('click', function (e) {
     const addToCartBtn = e.target.closest('.add-to-cart-btn');
-    if (addToCartBtn) {
-        e.preventDefault();
+    if (!addToCartBtn) return;
+    e.preventDefault();
 
-        // Get product data from button's parent card
-        const productCard = addToCartBtn.closest('[data-product-id]');
-        if (!productCard) return;
+    const productCard = addToCartBtn.closest('[data-product-id]');
+    if (!productCard) return;
 
-        const product = {
-            productId: parseInt(productCard.dataset.productId),
-            platformId: parseInt(productCard.dataset.platformId || '1'),
-            platformName: productCard.dataset.platformName || 'Tiki',
-            name: productCard.dataset.productName || productCard.querySelector('.product-name')?.textContent,
-            price: parseFloat(productCard.dataset.productPrice || productCard.querySelector('.product-price')?.dataset.price || '0'),
-            originalPrice: parseFloat(productCard.dataset.productOriginalPrice || '0') || null,
-            imageUrl: productCard.dataset.productImage || productCard.querySelector('.product-image')?.src,
-            url: productCard.dataset.productUrl || window.location.href,
-            quantity: 1
-        };
+    const product = {
+        productId: parseInt(productCard.dataset.productId),
+        platformId: productCard.dataset.platformId ? parseInt(productCard.dataset.platformId) : null,
+        platformName: productCard.dataset.platformName || 'Tiki',
+        name: productCard.dataset.productName || productCard.querySelector('.product-name')?.textContent,
+        price: parseFloat(productCard.dataset.productPrice || productCard.querySelector('.product-price')?.dataset.price || '0'),
+        originalPrice: productCard.dataset.productOriginalPrice ? parseFloat(productCard.dataset.productOriginalPrice) : null,
+        imageUrl: productCard.dataset.productImage || productCard.querySelector('.product-image')?.src,
+        url: productCard.dataset.productUrl || window.location.href,
+        quantity: 1
+    };
 
-        // Add visual feedback
-        addToCartBtn.disabled = true;
-        const originalText = addToCartBtn.innerHTML;
-        addToCartBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang thêm...';
+    addToCartBtn.disabled = true;
+    const originalText = addToCartBtn.innerHTML;
+    addToCartBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Đang thêm...';
 
-        // Simulate async operation
-        setTimeout(() => {
-            const success = window.cart.addItem(product);
-
+    window.cartClient.addItem(product)
+        .then(() => {
+            addToCartBtn.classList.add('btn-success');
+            setTimeout(() => addToCartBtn.classList.remove('btn-success'), 1000);
+        })
+        .finally(() => {
             addToCartBtn.disabled = false;
             addToCartBtn.innerHTML = originalText;
-
-            // Add success animation
-            if (success) {
-                addToCartBtn.classList.add('btn-success');
-                setTimeout(() => addToCartBtn.classList.remove('btn-success'), 1000);
-            }
-        }, 300);
-    }
-});
-
-// Listen for cart updates
-window.addEventListener('cartUpdated', function (e) {
-    console.log('Cart updated:', e.detail);
+        });
 });

@@ -1,0 +1,128 @@
+@page
+@model PriceWatcher.Pages.TrackingModel
+@{
+    ViewData["Title"] = "Theo dõi của tôi";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4">Theo dõi giá</h1>
+        <div class="d-flex gap-2">
+            <input type="text" class="form-control" id="searchInput" placeholder="Tìm nhanh..." style="width:280px;">
+            <select class="form-select" id="filterSelect" style="width:180px;">
+                <option value="all">Tất cả</option>
+                <option value="active">Đang hoạt động</option>
+                <option value="inactive">Tạm tắt</option>
+                <option value="best">Giá tốt</option>
+            </select>
+            <select class="form-select" id="sortSelect" style="width:200px;">
+                <option value="updated">Mới cập nhật</option>
+                <option value="priceAsc">Giá tăng dần</option>
+                <option value="priceDesc">Giá giảm dần</option>
+                <option value="target">Gần chạm mục tiêu</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="alertsContainer" class="list-group"></div>
+    <div id="emptyState" class="text-center text-muted py-5 d-none">Chưa có mục theo dõi</div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const currentUserId = @Model.CurrentUserId.GetValueOrDefault(0);
+
+        async function loadAlerts() {
+            const container = document.getElementById('alertsContainer');
+            const empty = document.getElementById('emptyState');
+            if (!currentUserId) { container.innerHTML = ''; empty.classList.remove('d-none'); return; }
+            try {
+                const res = await fetch(`/api/users/${currentUserId}/alerts`);
+                if (!res.ok) throw new Error();
+                const alerts = await res.json();
+                renderAlerts(alerts);
+            } catch {
+                container.innerHTML = '';
+                empty.classList.remove('d-none');
+            }
+        }
+
+        function renderAlerts(items) {
+            const container = document.getElementById('alertsContainer');
+            const search = document.getElementById('searchInput').value.trim().toLowerCase();
+            const filter = document.getElementById('filterSelect').value;
+            const sort = document.getElementById('sortSelect').value;
+
+            let data = items.slice();
+            if (search) data = data.filter(x => (x.productName||'').toLowerCase().includes(search));
+            if (filter === 'active') data = data.filter(x => x.isActive);
+            if (filter === 'inactive') data = data.filter(x => !x.isActive);
+            if (filter === 'best') data = data.filter(x => x.currentPrice && x.targetPrice && x.currentPrice <= x.targetPrice);
+
+            if (sort === 'updated') data.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt));
+            if (sort === 'priceAsc') data.sort((a,b) => (a.currentPrice||0) - (b.currentPrice||0));
+            if (sort === 'priceDesc') data.sort((a,b) => (b.currentPrice||0) - (a.currentPrice||0));
+            if (sort === 'target') data.sort((a,b) => Math.abs((a.currentPrice||0)-(a.targetPrice||0)) - Math.abs((b.currentPrice||0)-(b.targetPrice||0)));
+
+            container.innerHTML = data.map(a => `
+                <div class="list-group-item py-3">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <img src="${a.productImageUrl || '/images/placeholder.png'}" alt="${a.productName || ''}" class="rounded" style="width:64px;height:64px;object-fit:cover;">
+                        </div>
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2 mb-1">
+                                <span class="badge ${a.currentPrice && a.targetPrice && a.currentPrice <= a.targetPrice ? 'bg-success' : 'bg-secondary'}">${a.currentPrice && a.targetPrice && a.currentPrice <= a.targetPrice ? 'Best Deal' : 'Theo dõi'}</span>
+                                <span class="text-muted small">#${a.productId}</span>
+                            </div>
+                            <div class="fw-semibold" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${a.productName || ''}</div>
+                            <div class="text-danger fw-bold">${formatPrice(a.currentPrice)}</div>
+                            <div class="small text-muted">Mục tiêu: ${formatPrice(a.targetPrice)}</div>
+                        </div>
+                        <div class="col-md-4">
+                            <canvas id="spark_${a.productId}" height="60"></canvas>
+                        </div>
+                        <div class="col-auto">
+                            <a href="/ProductDetail/${a.productId}" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            data.forEach(drawSparkline);
+        }
+
+        async function drawSparkline(a) {
+            const el = document.getElementById(`spark_${a.productId}`);
+            if (!el) return;
+            try {
+                const res = await fetch(`/api/products/${a.productId}/price-history?days=30&granularity=daily`);
+                const json = await res.json();
+                const hist = json.history || [];
+                const labels = hist.map(h => new Date(h.timestamp).toLocaleDateString('vi-VN'));
+                const data = hist.map(h => h.price);
+                new Chart(el.getContext('2d'), {
+                    type: 'line',
+                    data: { labels, datasets: [{ data, borderColor: '#1a94ff', tension: 0.3, pointRadius: 0, borderWidth: 2 }] },
+                    options: { responsive: true, plugins: { legend: { display:false } }, scales: { x: { display:false }, y: { display:false } } }
+                });
+            } catch {}
+        }
+
+        function formatPrice(p) {
+            if (!p) return '0₫';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+        }
+
+        document.getElementById('searchInput').addEventListener('input', debounce(loadAlerts, 300));
+        document.getElementById('filterSelect').addEventListener('change', loadAlerts);
+        document.getElementById('sortSelect').addEventListener('change', loadAlerts);
+
+        function debounce(fn, ms) {
+            let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this,args), ms); };
+        }
+
+        document.addEventListener('DOMContentLoaded', loadAlerts);
+    </script>
+}

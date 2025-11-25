@@ -9,55 +9,75 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = PriceWatcher
 build_property.RootNamespace = PriceWatcher
-build_property.ProjectDir = f:\OJT-Review\PriceWatcher\Price-Watcher\PriceWatcher\PriceWatcher\
+build_property.ProjectDir = F:\OJT-Review\PriceWatcher\Price-Watcher\PriceWatcher\PriceWatcher\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = f:\OJT-Review\PriceWatcher\Price-Watcher\PriceWatcher\PriceWatcher
+build_property.MSBuildProjectDirectory = F:\OJT-Review\PriceWatcher\Price-Watcher\PriceWatcher\PriceWatcher
 build_property._RazorSourceGeneratorDebug = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Cart.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Admin/Products/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cUHJvZHVjdHNcQ3JlYXRlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Admin/Products/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cUHJvZHVjdHNcRWRpdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Admin/Products/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWRtaW5cUHJvZHVjdHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Cart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/History.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/History.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSGlzdG9yeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Index.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Login.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Privacy.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJpdmFjeS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/ProductDetail.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/ProductDetail.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUHJvZHVjdERldGFpbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Register.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2VhcmNoLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/_ViewImports.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Tracking.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVHJhY2tpbmcuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/_ViewStart.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[f:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Shared/_Layout.cshtml]
+[F:/OJT-Review/PriceWatcher/Price-Watcher/PriceWatcher/PriceWatcher/Pages/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-onk7bu4gq1

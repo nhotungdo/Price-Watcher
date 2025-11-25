@@ -85,6 +85,6 @@ namespace PriceWatcher.Controllers
 
     public class CrawlRequest
     {
-        public string Url { get; set; }
+        public required string Url { get; set; }
     }
 }

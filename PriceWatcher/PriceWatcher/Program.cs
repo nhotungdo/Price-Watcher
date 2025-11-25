@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Options;
 using Polly;
 using Polly.Extensions.Http;
@@ -60,6 +61,7 @@ builder.Services.AddAuthentication(options =>
             OnCreatingTicket = async ctx =>
             {
                 var userService = ctx.HttpContext.RequestServices.GetRequiredService<IUserService>();
+                var cartSession = ctx.HttpContext.RequestServices.GetRequiredService<ICartSessionService>();
                 var googleInfo = new PriceWatcher.Dtos.GoogleUserInfo
                 {
                     GoogleId = ctx.Principal?.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier) ?? string.Empty,
@@ -71,6 +73,7 @@ builder.Services.AddAuthentication(options =>
                 var user = await userService.GetOrCreateUserFromGoogleAsync(googleInfo);
                 await userService.OnLoginSuccessAsync(user, ctx.HttpContext.Request);
                 ctx.Identity?.AddClaim(new Claim("uid", user.UserId.ToString()));
+                await cartSession.MergeOnLoginAsync(ctx.HttpContext, user.UserId);
             }
         };
     });
@@ -82,6 +85,7 @@ builder.Services.AddScoped<IImageSearchService, ImageSearchServiceStub>();
 builder.Services.AddSingleton<IImageEmbeddingService, ImageEmbeddingService>();
 builder.Services.AddSingleton<IMetricsService, MetricsService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
+builder.Services.AddScoped<IProductSearchService, ProductSearchService>();
 builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
 builder.Services.AddScoped<ITelegramNotifier, TelegramNotifier>();
 builder.Services.AddSingleton<ISearchStatusService, SearchStatusService>();
@@ -89,6 +93,9 @@ builder.Services.AddScoped<ISearchProcessingService, SearchProcessingService>();
 builder.Services.AddScoped<IProductScraper, ShopeeScraperStub>();
 builder.Services.AddScoped<IProductScraper, LazadaScraperStub>();
 builder.Services.AddScoped<IProductScraper, TikiScraperStub>();
+builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICartSessionService, CartSessionService>();
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Register new feature services
 builder.Services.AddMemoryCache();
@@ -146,8 +153,62 @@ using (var scope = app.Services.CreateScope())
     db.Database.EnsureCreated();
     try
     {
+        var creator = (Microsoft.EntityFrameworkCore.Storage.RelationalDatabaseCreator)scope.ServiceProvider.GetRequiredService<Microsoft.EntityFrameworkCore.Storage.IDatabaseCreator>();
+        if (!creator.Exists())
+        {
+            creator.Create();
+        }
+        creator.CreateTables();
+    }
+    catch { }
+    try
+    {
         db.Database.ExecuteSqlRaw(@"IF COL_LENGTH('Users','PasswordHash') IS NULL ALTER TABLE Users ADD PasswordHash VARBINARY(64) NULL;
 IF COL_LENGTH('Users','PasswordSalt') IS NULL ALTER TABLE Users ADD PasswordSalt VARBINARY(16) NULL;");
+    }
+    catch { }
+
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"
+IF OBJECT_ID('dbo.Carts','U') IS NULL
+BEGIN
+    CREATE TABLE dbo.Carts (
+        CartId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        UserId INT NULL,
+        AnonymousId UNIQUEIDENTIFIER NULL,
+        IsActive BIT NOT NULL DEFAULT(1),
+        CreatedAt DATETIME NOT NULL DEFAULT(getutcdate()),
+        UpdatedAt DATETIME NOT NULL DEFAULT(getutcdate()),
+        ExpiresAt DATETIME NULL
+    );
+    CREATE INDEX IX_Carts_UserId ON dbo.Carts(UserId);
+    CREATE INDEX IX_Carts_AnonymousId ON dbo.Carts(AnonymousId);
+END;
+
+IF OBJECT_ID('dbo.CartItems','U') IS NULL
+BEGIN
+    CREATE TABLE dbo.CartItems (
+        CartItemId INT IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        CartId INT NOT NULL,
+        ProductId INT NULL,
+        ProductName NVARCHAR(500) NOT NULL DEFAULT(''),
+        PlatformId INT NULL,
+        PlatformName NVARCHAR(100) NULL,
+        ImageUrl NVARCHAR(1000) NULL,
+        ProductUrl NVARCHAR(1000) NULL,
+        Price DECIMAL(18,2) NOT NULL,
+        OriginalPrice DECIMAL(18,2) NULL,
+        Quantity INT NOT NULL DEFAULT(1),
+        AddedAt DATETIME NOT NULL DEFAULT(getutcdate()),
+        UpdatedAt DATETIME NOT NULL DEFAULT(getutcdate()),
+        MetadataJson NVARCHAR(MAX) NULL
+    );
+    CREATE INDEX IX_CartItems_Cart_Product ON dbo.CartItems(CartId, ProductId, PlatformId);
+    ALTER TABLE dbo.CartItems WITH CHECK ADD CONSTRAINT FK_CartItems_Carts_CartId FOREIGN KEY(CartId) REFERENCES dbo.Carts(CartId) ON DELETE CASCADE;
+END;
+
+");
     }
     catch { }
 }
@@ -172,6 +233,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthentication();
+app.UseMiddleware<PriceWatcher.Middlewares.AnonymousCartMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -34,6 +34,36 @@
             </div>
         </div>
     </div>
+
+    <div class="row mt-4">
+        <div class="col-lg-8">
+            <h4>Bảng so sánh giá</h4>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle" id="comparisonTable">
+                    <thead>
+                        <tr>
+                            <th>Nền tảng</th>
+                            <th>Shop</th>
+                            <th>Giá</th>
+                            <th>Đánh giá</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <h4>Lịch sử đánh giá</h4>
+            <div id="ratingDistribution" class="mb-3"></div>
+            <div id="reviewsContainer"></div>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h4>Sản phẩm liên quan</h4>
+        <div class="row g-3" id="relatedProducts"></div>
+    </div>
 </div>
 
 @section Scripts {
@@ -64,6 +94,110 @@
                     }
                 }
             }
+        });
+
+        async function loadComparisons() {
+            const productId = @Model.Product.ProductId;
+            const tableBody = document.querySelector('#comparisonTable tbody');
+            try {
+                const res = await fetch(`/api/products/compare/${productId}`);
+                if (!res.ok) throw new Error();
+                const items = await res.json();
+                tableBody.innerHTML = items.map(i => `
+                    <tr>
+                        <td>${i.platformName ?? ''}</td>
+                        <td>${i.shopName ?? ''}</td>
+                        <td class="text-danger fw-bold">${formatPrice(i.price)}</td>
+                        <td>${i.rating ? `${i.rating.toFixed(1)} ★ (${i.reviewCount ?? 0})` : ''}</td>
+                        <td>
+                            <a href="${i.affiliateUrl || i.originalUrl || '#'}" target="_blank" class="btn btn-sm btn-outline-primary">Mua</a>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-muted">Không có dữ liệu so sánh</td></tr>';
+            }
+        }
+
+        async function loadReviews() {
+            const productId = @Model.Product.ProductId;
+            const container = document.getElementById('reviewsContainer');
+            const dist = document.getElementById('ratingDistribution');
+            try {
+                const res = await fetch(`/api/products/${productId}/reviews?page=1&pageSize=10`);
+                if (!res.ok) throw new Error();
+                const reviews = await res.json();
+                const counts = [0,0,0,0,0];
+                reviews.forEach(r => { if (r.stars >=1 && r.stars <=5) counts[r.stars-1]++; });
+                const total = reviews.length;
+                dist.innerHTML = counts.map((c, idx) => {
+                    const pct = total ? Math.round((c/total)*100) : 0;
+                    return `
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">${idx+1} ★</div>
+                            <div class="flex-grow-1 bg-light rounded" style="height:8px;">
+                                <div style="width:${pct}%;height:8px;background:#1a94ff;border-radius:8px;"></div>
+                            </div>
+                            <div class="ms-2 small text-muted">${pct}%</div>
+                        </div>
+                    `;
+                }).join('');
+                container.innerHTML = reviews.map(r => `
+                    <div class="card border-0 shadow-sm mb-3">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <img src="${r.userAvatarUrl || '/favicon.ico'}" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;" alt="${r.userName || ''}">
+                                <div>
+                                    <div class="fw-semibold">${r.userName || ''}</div>
+                                    <div class="small text-muted">${new Date(r.createdAt).toLocaleString('vi-VN')}</div>
+                                </div>
+                            </div>
+                            <div class="mb-2">${'★'.repeat(r.stars)}${'☆'.repeat(5-r.stars)}</div>
+                            <div>${r.content || ''}</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch {
+                dist.innerHTML = '';
+                container.innerHTML = '<div class="text-muted">Chưa có đánh giá</div>';
+            }
+        }
+
+        async function loadRelated() {
+            const productId = @Model.Product.ProductId;
+            const container = document.getElementById('relatedProducts');
+            try {
+                const res = await fetch(`/api/products/compare/${productId}`);
+                if (!res.ok) throw new Error();
+                const items = await res.json();
+                container.innerHTML = items.slice(0,8).map(i => `
+                    <div class="col-6 col-md-3">
+                        <a href="/ProductDetail/${i.productId}" class="text-decoration-none">
+                            <div class="card h-100 border-0 shadow-sm">
+                                <img src="${i.imageUrl || '/images/placeholder.png'}" class="card-img-top" alt="${i.productName || ''}" style="height:160px;object-fit:cover;">
+                                <div class="card-body">
+                                    <div class="small text-muted">${i.platformName ?? ''}</div>
+                                    <div class="fw-semibold mb-1" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${i.productName || ''}</div>
+                                    <div class="text-danger fw-bold">${formatPrice(i.price)}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                `).join('');
+            } catch {
+                container.innerHTML = '';
+            }
+        }
+
+        function formatPrice(p) {
+            if (!p) return '';
+            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadComparisons();
+            loadReviews();
+            loadRelated();
         });
     </script>
 }

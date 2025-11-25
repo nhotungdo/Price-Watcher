@@ -6,25 +6,74 @@
 
 <div class="cart-page">
     <div class="container">
-        <div class="cart-header">
-            <h1>Giỏ hàng của bạn</h1>
+        <!-- Header: Tiki style title and actions -->
+        <div class="cart-header d-flex align-items-center justify-content-between">
+            <h1 class="m-0" style="color:#1a94ff;">Giỏ hàng</h1>
+            <div class="d-flex gap-2">
+                <a href="/" class="btn btn-link text-decoration-none">← Tiếp tục mua sắm</a>
+                <button id="updateCartBtn" class="btn btn-outline-primary d-none">Cập nhật giỏ hàng</button>
+            </div>
+        </div>
+
+        <!-- Mobile Summary Accordion -->
+        <div class="d-lg-none mb-3">
+            <div class="accordion" id="summaryAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="summaryHeading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#summaryCollapse" aria-expanded="false" aria-controls="summaryCollapse">
+                            Tóm tắt đơn hàng
+                        </button>
+                    </h2>
+                    <div id="summaryCollapse" class="accordion-collapse collapse" aria-labelledby="summaryHeading" data-bs-parent="#summaryAccordion">
+                        <div class="accordion-body">
+                            <div class="summary-row">
+                                <span>Tạm tính:</span>
+                                <span id="m-subtotal">0₫</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Giảm giá:</span>
+                                <span id="m-discount" class="text-success">0₫</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Phí vận chuyển:</span>
+                                <span id="m-shipping">Miễn phí</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Tổng cộng:</span>
+                                <span id="m-total" class="text-danger">0₫</span>
+                            </div>
+                            <button class="checkout-btn w-100" id="m-checkoutBtn" disabled>Tiến hành thanh toán</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="row">
             <!-- Cart Items -->
             <div class="col-lg-8">
+                <div class="bg-white rounded-3 p-3 mb-3 shadow-sm d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-3">
+                        <input type="checkbox" id="selectAll" class="form-check-input">
+                        <label for="selectAll" class="form-check-label fw-semibold">Chọn tất cả</label>
+                    </div>
+                    <button id="removeSelectedBtn" class="btn btn-outline-danger btn-sm" disabled>
+                        Xóa đã chọn
+                    </button>
+                </div>
+
                 <div id="cartItemsContainer">
-                    <!-- Items will be loaded here by JavaScript -->
-                    <div class="text-center py-5">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Đang tải...</span>
-                        </div>
+                    <!-- Skeletons while loading -->
+                    <div class="cart-skeleton-list">
+                        <div class="cart-skeleton-item"></div>
+                        <div class="cart-skeleton-item"></div>
+                        <div class="cart-skeleton-item"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Cart Summary -->
-            <div class="col-lg-4">
+            <!-- Cart Summary Desktop -->
+            <div class="col-lg-4 d-none d-lg-block">
                 <div class="cart-summary" id="cartSummary">
                     <h3>Tóm tắt đơn hàng</h3>
                     <div class="summary-row">
@@ -39,18 +88,37 @@
                         <span>Phí vận chuyển:</span>
                         <span id="shipping">Miễn phí</span>
                     </div>
+                    <div class="summary-row">
+                        <span>Tiết kiệm:</span>
+                        <span id="saving" class="text-success">0₫</span>
+                    </div>
                     <div class="summary-row total">
                         <span>Tổng cộng:</span>
                         <span id="total" class="text-danger">0₫</span>
                     </div>
-                    <button class="checkout-btn" id="checkoutBtn" disabled>
-                        Tiến hành thanh toán
-                    </button>
+                    <button class="checkout-btn" id="checkoutBtn" disabled>Tiến hành thanh toán</button>
                     <div class="text-center mt-3">
-                        <a href="/" class="text-decoration-none">
-                            <small>← Tiếp tục mua sắm</small>
-                        </a>
+                        <a href="/" class="text-decoration-none"><small>← Tiếp tục mua sắm</small></a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove Confirmation Modal -->
+    <div class="modal fade" id="removeConfirmModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xóa sản phẩm</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    Bạn có chắc muốn xóa <span id="removeItemName" class="fw-semibold"></span> khỏi giỏ hàng?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger" id="confirmRemoveBtn">Xóa</button>
                 </div>
             </div>
         </div>
@@ -59,19 +127,38 @@
 
 @section Scripts {
     <script>
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('vi-VN', {
-                style: 'currency',
-                currency: 'VND'
-            }).format(amount);
+        // Định dạng tiền tệ VND
+        const currencyFormatter = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' });
+        function formatCurrency(amount) { return currencyFormatter.format(amount || 0); }
+
+        const selectedKeys = new Set();
+        const getKey = (item) => `${item.productId}:${item.platformId ?? 'null'}`;
+
+        // Cập nhật số lượng sản phẩm
+        async function updateQuantity(productId, platformId, quantity) {
+            if (!window.cartClient) return;
+            await window.cartClient.updateQuantity(productId, platformId, Number(quantity));
         }
 
-        // Render cart items
-        function renderCart() {
-            const container = document.getElementById('cartItemsContainer');
-            const items = window.cart.getItems();
+        // Mở modal xác nhận xóa sản phẩm
+        let pendingRemove = null;
+        async function removeItem(productId, platformId, name) {
+            if (!window.cartClient) return;
+            pendingRemove = { productId, platformId };
+            const nameEl = document.getElementById('removeItemName');
+            if (nameEl) nameEl.textContent = name || '';
+            const modal = new bootstrap.Modal(document.getElementById('removeConfirmModal'));
+            modal.show();
+        }
 
+        // Render giao diện giỏ hàng và tóm tắt
+        function renderCart(state) {
+            const cartState = state || { items: window.cartClient?.items ?? [], summary: window.cartClient?.summary ?? {} };
+            const items = cartState.items || [];
+            const container = document.getElementById('cartItemsContainer');
+            if (!container) return;
+
+            // Trạng thái giỏ hàng trống
             if (items.length === 0) {
                 container.innerHTML = `
                     <div class="cart-empty">
@@ -81,108 +168,158 @@
                         <a href="/" class="btn btn-primary">Khám phá sản phẩm</a>
                     </div>
                 `;
-                updateSummary();
-                return;
+            } else {
+                // Hiển thị từng item với hình ảnh, giá, số lượng, và nút xóa
+                container.innerHTML = items.map((item, idx) => {
+                    const key = getKey(item);
+                    const hasDiscount = item.originalPrice && item.originalPrice > item.price;
+                    const discountPercent = hasDiscount ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100) : 0;
+                    const subtotal = (item.price || 0) * (item.quantity || 0);
+                    return `
+                    <div class="cart-item animate-in" data-product-id="${item.productId}" data-platform-id="${item.platformId}">
+                        <div class="row align-items-center g-3">
+                            <div class="col-auto d-flex align-items-center gap-3">
+                                <input type="checkbox" class="form-check-input item-select" data-index="${idx}" data-key="${key}" ${selectedKeys.has(key) ? 'checked' : ''}>
+                                <img src="${item.imageUrl || '/images/placeholder.png'}" alt="${item.name}" class="cart-item-image" loading="lazy">
+                            </div>
+                            <div class="col">
+                                <div class="cart-item-details">
+                                    <span class="cart-item-platform">${item.platformName || ''}</span>
+                                    <h5 class="cart-item-name">${item.name}</h5>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="cart-item-price">
+                                            ${formatCurrency(item.price)}
+                                            ${item.originalPrice ? `<span class=\"cart-item-original-price\">${formatCurrency(item.originalPrice)}</span>` : ''}
+                                        </div>
+                                        ${hasDiscount ? `<span class=\"discount-badge\">-${discountPercent}%</span>` : ''}
+                                    </div>
+                                    <div class="item-subtotal">Tạm tính: <span>${formatCurrency(subtotal)}</span></div>
+                                    <div class="text-muted small">Vận chuyển: Miễn phí</div>
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <div class="d-flex flex-column align-items-end gap-3">
+                                    <div class="quantity-control">
+                                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                                        <input type="number" class="quantity-input" value="${item.quantity}" min="1" max="99"
+                                               oninput="document.getElementById('updateCartBtn')?.classList.remove('d-none')"
+                                               onchange="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, this.value)">
+                                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, ${item.quantity + 1})" ${item.quantity >= 99 ? 'disabled' : ''}>+</button>
+                                    </div>
+                                    <button class="remove-item-btn" onclick="removeItem(${item.productId}, ${item.platformId ?? 'null'}, '${item.name.replace(/"/g, '&quot;')}')">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
+                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                                            <path d="M10 11v6"></path>
+                                            <path d="M14 11v6"></path>
+                                            <path d="M9 6V4a2 2 0 0 1 2-2h2a 2 2 0 0 1 2 2v2"></path>
+                                        </svg>
+                                        Xóa
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                // Gán sự kiện cho checkbox item
+                document.querySelectorAll('.item-select').forEach(cb => {
+                    cb.addEventListener('change', (e) => {
+                        const k = e.target.getAttribute('data-key');
+                        if (e.target.checked) selectedKeys.add(k); else selectedKeys.delete(k);
+                        const removeSelectedBtn = document.getElementById('removeSelectedBtn');
+                        if (removeSelectedBtn) removeSelectedBtn.disabled = selectedKeys.size === 0;
+                        const selectAllEl = document.getElementById('selectAll');
+                        if (selectAllEl) {
+                            const total = document.querySelectorAll('.item-select').length;
+                            const checked = document.querySelectorAll('.item-select:checked').length;
+                            selectAllEl.checked = total > 0 && total === checked;
+                            selectAllEl.indeterminate = checked > 0 && checked < total;
+                        }
+                    });
+                });
             }
 
-            container.innerHTML = items.map(item => `
-                <div class="cart-item" data-product-id="${item.productId}" data-platform-id="${item.platformId}">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <img src="${item.imageUrl}" alt="${item.name}" class="cart-item-image">
-                        </div>
-                        <div class="col">
-                            <div class="cart-item-details">
-                                <span class="cart-item-platform">${item.platformName}</span>
-                                <h5 class="cart-item-name">${item.name}</h5>
-                                <div class="cart-item-price">
-                                    ${formatCurrency(item.price)}
-                                    ${item.originalPrice ? `<span class="cart-item-original-price">${formatCurrency(item.originalPrice)}</span>` : ''}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <div class="d-flex flex-column align-items-end gap-3">
-                                <div class="quantity-control">
-                                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
-                                        −
-                                    </button>
-                                    <input type="number" 
-                                           class="quantity-input" 
-                                           value="${item.quantity}" 
-                                           min="1" 
-                                           max="99"
-                                           onchange="updateQuantity(${item.productId}, ${item.platformId}, this.value)">
-                                    <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId}, ${item.quantity + 1})" ${item.quantity >= 99 ? 'disabled' : ''}>
-                                        +
-                                    </button>
-                                </div>
-                                <button class="remove-item-btn" onclick="removeItem(${item.productId}, ${item.platformId})">
-                                    Xóa
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            const summary = cartState.summary || { subtotal: 0, discount: 0, total: 0, itemCount: 0 };
+            document.getElementById('subtotal').textContent = formatCurrency(summary.subtotal);
+            document.getElementById('discount').textContent = summary.discount > 0 ? `-${formatCurrency(summary.discount)}` : '0₫';
+            document.getElementById('saving').textContent = summary.discount > 0 ? `-${formatCurrency(summary.discount)}` : '0₫';
+            document.getElementById('shipping').textContent = 'Miễn phí';
+            document.getElementById('total').textContent = formatCurrency(summary.total);
+            document.getElementById('m-subtotal')?.replaceChildren(document.createTextNode(formatCurrency(summary.subtotal)));
+            document.getElementById('m-discount')?.replaceChildren(document.createTextNode(summary.discount > 0 ? `-${formatCurrency(summary.discount)}` : '0₫'));
+            document.getElementById('m-shipping')?.replaceChildren(document.createTextNode('Miễn phí'));
+            document.getElementById('m-total')?.replaceChildren(document.createTextNode(formatCurrency(summary.total)));
 
-            updateSummary();
-        }
-
-        // Update cart summary
-        function updateSummary() {
-            const items = window.cart.getItems();
-            const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            const discount = items.reduce((sum, item) => {
-                if (item.originalPrice) {
-                    return sum + ((item.originalPrice - item.price) * item.quantity);
-                }
-                return sum;
-            }, 0);
-            const shipping = 0; // Free shipping
-            const total = subtotal;
-
-            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
-            document.getElementById('discount').textContent = discount > 0 ? `-${formatCurrency(discount)}` : '0₫';
-            document.getElementById('shipping').textContent = shipping === 0 ? 'Miễn phí' : formatCurrency(shipping);
-            document.getElementById('total').textContent = formatCurrency(total);
-
+            // Bật/tắt nút thanh toán theo số lượng item
             const checkoutBtn = document.getElementById('checkoutBtn');
-            checkoutBtn.disabled = items.length === 0;
-        }
+            if (checkoutBtn) checkoutBtn.disabled = items.length === 0;
+            const mCheckoutBtn = document.getElementById('m-checkoutBtn');
+            if (mCheckoutBtn) mCheckoutBtn.disabled = items.length === 0;
 
-        // Update quantity
-        function updateQuantity(productId, platformId, quantity) {
-            window.cart.updateQuantity(productId, platformId, quantity);
-            renderCart();
-        }
-
-        // Remove item
-        function removeItem(productId, platformId) {
-            if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
-                window.cart.removeItem(productId, platformId);
-                renderCart();
+            // Đồng bộ chọn tất cả và nút xóa đã chọn
+            const validKeys = new Set(items.map(getKey));
+            for (const k of Array.from(selectedKeys)) { if (!validKeys.has(k)) selectedKeys.delete(k); }
+            const removeSelectedBtn = document.getElementById('removeSelectedBtn');
+            if (removeSelectedBtn) removeSelectedBtn.disabled = selectedKeys.size === 0;
+            const selectAllEl = document.getElementById('selectAll');
+            if (selectAllEl) {
+                selectAllEl.checked = items.length > 0 && selectedKeys.size === items.length;
+                selectAllEl.indeterminate = selectedKeys.size > 0 && selectedKeys.size < items.length;
             }
         }
 
-        // Checkout
-        document.getElementById('checkoutBtn')?.addEventListener('click', function() {
-            const items = window.cart.getItems();
-            if (items.length === 0) return;
-
-            // Redirect to checkout page or show checkout modal
+        // Sự kiện click thanh toán (placeholder)
+        document.getElementById('checkoutBtn')?.addEventListener('click', () => {
             alert('Chức năng thanh toán đang được phát triển');
-            // window.location.href = '/checkout';
         });
 
-        // Listen for cart updates
-        window.addEventListener('cartUpdated', function() {
+        // Lắng nghe sự kiện cập nhật từ cart client
+        window.addEventListener('cart:ready', () => renderCart());
+        window.addEventListener('cart:updated', (e) => renderCart(e.detail));
+
+        document.addEventListener('DOMContentLoaded', () => {
             renderCart();
+            const selectAll = document.getElementById('selectAll');
+            selectAll?.addEventListener('change', () => {
+                const items = window.cartClient?.items || [];
+                if (selectAll.checked) {
+                    selectedKeys.clear();
+                    items.forEach(it => selectedKeys.add(getKey(it)));
+                } else {
+                    selectedKeys.clear();
+                }
+                renderCart();
+            });
+            document.getElementById('removeSelectedBtn')?.addEventListener('click', async () => {
+                const items = window.cartClient?.items || [];
+                for (const it of items) {
+                    const key = getKey(it);
+                    if (selectedKeys.has(key)) {
+                        await window.cartClient.removeItem(it.productId, it.platformId);
+                    }
+                }
+                selectedKeys.clear();
+            });
         });
 
-        // Initial render
-        document.addEventListener('DOMContentLoaded', function() {
+        // Xác nhận xóa sản phẩm
+        document.getElementById('confirmRemoveBtn')?.addEventListener('click', async () => {
+            if (!pendingRemove) return;
+            try {
+                await window.cartClient.removeItem(pendingRemove.productId, pendingRemove.platformId);
+            } finally {
+                const modalEl = document.getElementById('removeConfirmModal');
+                const modal = bootstrap.Modal.getInstance(modalEl);
+                modal?.hide();
+                pendingRemove = null;
+            }
+        });
+
+        // Ẩn nút "Cập nhật giỏ hàng" sau khi render lại
+        document.getElementById('updateCartBtn')?.addEventListener('click', () => {
             renderCart();
+            document.getElementById('updateCartBtn')?.classList.add('d-none');
         });
     </script>
 }

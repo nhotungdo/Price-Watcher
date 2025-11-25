@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -30,6 +30,8 @@ namespace PriceWatcher.Models
         public DateTime? AffiliateExpiry { get; set; }
 
         public string? ImageUrl { get; set; }
+
+        public string? Description { get; set; }
 
         [Column(TypeName = "decimal(18,2)")]
         public decimal? CurrentPrice { get; set; }

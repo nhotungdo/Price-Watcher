@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets\\css\\layout.css"
     },
     {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\search.css",
+      "PackagePath": "staticwebassets\\css\\search.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
@@ -35,6 +39,10 @@
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\homepage.js",
       "PackagePath": "staticwebassets\\js\\homepage.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\search.js",
+      "PackagePath": "staticwebassets\\js\\search.js"
     },
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\site.js",

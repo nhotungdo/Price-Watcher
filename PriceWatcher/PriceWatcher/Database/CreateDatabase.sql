@@ -18,6 +18,14 @@ GO
 -- =============================================
 -- Drop existing tables if they exist (in reverse order of dependencies)
 -- =============================================
+IF OBJECT_ID('CartItems', 'U') IS NOT NULL
+    DROP TABLE CartItems;
+GO
+
+IF OBJECT_ID('Carts', 'U') IS NOT NULL
+    DROP TABLE Carts;
+GO
+
 IF OBJECT_ID('PriceSnapshots', 'U') IS NOT NULL
     DROP TABLE PriceSnapshots;
 GO
@@ -100,10 +108,16 @@ CREATE TABLE Products (
     AffiliateProvider NVARCHAR(50) NULL,
     AffiliateExpiry DATETIME NULL,
     ImageUrl NVARCHAR(MAX) NULL,
+    Description NVARCHAR(MAX) NULL,
     CurrentPrice DECIMAL(18,2) NULL,
+    OriginalPrice DECIMAL(18,2) NULL,
+    DiscountRate INT NULL,
+    StockStatus NVARCHAR(50) NULL,
     Rating FLOAT NULL,
     ReviewCount INT NULL,
+    SoldQuantity INT NULL,
     ShopName NVARCHAR(200) NULL,
+    ShippingInfo NVARCHAR(200) NULL,
     LastUpdated DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Products_Platforms FOREIGN KEY (PlatformId) 
         REFERENCES Platforms(PlatformId)
@@ -115,6 +129,8 @@ CREATE TABLE PriceSnapshots (
     SnapshotId INT IDENTITY(1,1) PRIMARY KEY,
     ProductId INT NULL,
     Price DECIMAL(18,2) NOT NULL,
+    OriginalPrice DECIMAL(18,2) NULL,
+    ShippingInfo NVARCHAR(200) NULL,
     RecordedAt DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_PriceSnapshots_Products FOREIGN KEY (ProductId) 
         REFERENCES Products(ProductId) ON DELETE CASCADE
@@ -196,6 +212,49 @@ CREATE TABLE CrawlJobs (
     CONSTRAINT FK_CrawlJobs_Platforms FOREIGN KEY (PlatformId) 
         REFERENCES Platforms(PlatformId)
 );
+GO
+
+-- Carts Table
+CREATE TABLE Carts (
+    CartId INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NULL,
+    AnonymousId UNIQUEIDENTIFIER NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    ExpiresAt DATETIME NULL,
+    CONSTRAINT FK_Carts_Users FOREIGN KEY (UserId)
+        REFERENCES Users(UserId) ON DELETE CASCADE
+);
+GO
+
+CREATE UNIQUE INDEX IX_Carts_UserId ON Carts(UserId) WHERE UserId IS NOT NULL;
+CREATE UNIQUE INDEX IX_Carts_AnonymousId ON Carts(AnonymousId) WHERE AnonymousId IS NOT NULL;
+GO
+
+-- CartItems Table
+CREATE TABLE CartItems (
+    CartItemId INT IDENTITY(1,1) PRIMARY KEY,
+    CartId INT NOT NULL,
+    ProductId INT NULL,
+    ProductName NVARCHAR(500) NOT NULL,
+    PlatformId INT NULL,
+    PlatformName NVARCHAR(100) NULL,
+    ImageUrl NVARCHAR(1000) NULL,
+    ProductUrl NVARCHAR(1000) NULL,
+    Price DECIMAL(18,2) NOT NULL,
+    OriginalPrice DECIMAL(18,2) NULL,
+    Quantity INT NOT NULL DEFAULT 1,
+    AddedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    UpdatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    MetadataJson NVARCHAR(MAX) NULL,
+    CONSTRAINT FK_CartItems_Carts FOREIGN KEY (CartId)
+        REFERENCES Carts(CartId) ON DELETE CASCADE
+);
+GO
+
+CREATE INDEX IX_CartItems_CartId ON CartItems(CartId);
+CREATE INDEX IX_CartItems_Cart_Product ON CartItems(CartId, ProductId, PlatformId);
 GO
 
 -- Reviews Table

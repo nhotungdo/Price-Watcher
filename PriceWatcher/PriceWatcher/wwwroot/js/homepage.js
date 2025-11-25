@@ -40,7 +40,7 @@
 
     async function fetchAutocomplete(query) {
         try {
-            const response = await fetch(`/api/search/autocomplete?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`/search/autocomplete?q=${encodeURIComponent(query)}`);
             const data = await response.json();
 
             if (data && data.length > 0) {
@@ -116,122 +116,11 @@
     }
 
     // ========================================
-    // 3. SHOPPING CART
+    // 3. SHOPPING CART (synced via server cart client)
     // ========================================
-    class ShoppingCart {
-        constructor() {
-            this.items = this.loadCart();
-            this.updateCartUI();
-        }
-
-        loadCart() {
-            const saved = localStorage.getItem('cart');
-            return saved ? JSON.parse(saved) : [];
-        }
-
-        saveCart() {
-            localStorage.setItem('cart', JSON.stringify(this.items));
-        }
-
-        addItem(product) {
-            const existingItem = this.items.find(item => item.id === product.id);
-
-            if (existingItem) {
-                existingItem.quantity += 1;
-            } else {
-                this.items.push({
-                    id: product.id,
-                    name: product.name,
-                    price: product.price,
-                    image: product.image,
-                    quantity: 1
-                });
-            }
-
-            this.saveCart();
-            this.updateCartUI();
-            this.showNotification('Đã thêm vào giỏ hàng');
-        }
-
-        removeItem(productId) {
-            this.items = this.items.filter(item => item.id !== productId);
-            this.saveCart();
-            this.updateCartUI();
-        }
-
-        updateQuantity(productId, quantity) {
-            const item = this.items.find(item => item.id === productId);
-            if (item) {
-                item.quantity = quantity;
-                if (item.quantity <= 0) {
-                    this.removeItem(productId);
-                } else {
-                    this.saveCart();
-                    this.updateCartUI();
-                }
-            }
-        }
-
-        getTotal() {
-            return this.items.reduce((total, item) => total + (item.price * item.quantity), 0);
-        }
-
-        getItemCount() {
-            return this.items.reduce((count, item) => count + item.quantity, 0);
-        }
-
-        updateCartUI() {
-            const cartCount = document.getElementById('cartCount');
-            if (cartCount) {
-                const count = this.getItemCount();
-                cartCount.textContent = count;
-                cartCount.style.display = count > 0 ? 'block' : 'none';
-            }
-        }
-
-        showNotification(message) {
-            // Create toast notification
-            const toast = document.createElement('div');
-            toast.className = 'cart-toast';
-            toast.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-                <span>${message}</span>
-            `;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-    }
-
-    // Initialize cart
-    const cart = new ShoppingCart();
-
-    // Add to cart buttons
-    document.addEventListener('click', function (e) {
-        if (e.target.closest('.add-to-cart-btn')) {
-            e.preventDefault();
-            const btn = e.target.closest('.add-to-cart-btn');
-            const productCard = btn.closest('[data-product-id]');
-
-            if (productCard) {
-                const product = {
-                    id: productCard.dataset.productId,
-                    name: productCard.dataset.productName,
-                    price: parseFloat(productCard.dataset.productPrice),
-                    image: productCard.dataset.productImage
-                };
-                cart.addItem(product);
-            }
+    window.addEventListener('cart:ready', () => {
+        if (window.cartClient) {
+            window.cartClient.updateCartBadge();
         }
     });
 
@@ -278,6 +167,16 @@
             pause: 'hover',
             wrap: true
         });
+
+        const indicator = document.getElementById('heroSlideIndicator');
+        function updateIndicator() {
+            const items = carousel.querySelectorAll('.carousel-item');
+            const active = carousel.querySelector('.carousel-item.active');
+            const index = Array.from(items).indexOf(active) + 1;
+            if (indicator) indicator.textContent = `${index}/${items.length}`;
+        }
+        carousel.addEventListener('slid.bs.carousel', updateIndicator);
+        updateIndicator();
 
         // Touch/swipe support
         let touchStartX = 0;
@@ -385,8 +284,10 @@
         console.log('Homepage initialized successfully');
     });
 
-    // Make cart available globally
-    window.ShoppingCart = cart;
+    // Make cart client available globally
+    if (window.cartClient) {
+        window.ShoppingCart = window.cartClient;
+    }
 
 })();
 

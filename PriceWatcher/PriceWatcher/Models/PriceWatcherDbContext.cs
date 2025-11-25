@@ -37,6 +37,10 @@ public partial class PriceWatcherDbContext : DbContext
 
     public virtual DbSet<Review> Reviews { get; set; }
 
+    public virtual DbSet<Cart> Carts { get; set; }
+
+    public virtual DbSet<CartItem> CartItems { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -146,6 +150,53 @@ public partial class PriceWatcherDbContext : DbContext
             entity.Property(e => e.LastLogin).HasColumnType("datetime");
             entity.Property(e => e.PasswordHash).HasColumnType("varbinary(64)");
             entity.Property(e => e.PasswordSalt).HasColumnType("varbinary(16)");
+        });
+
+        modelBuilder.Entity<Cart>(entity =>
+        {
+            entity.HasKey(e => e.CartId);
+
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+
+            entity.Property(e => e.ExpiresAt)
+                .HasColumnType("datetime");
+
+            entity.HasIndex(e => e.UserId).HasDatabaseName("IX_Carts_UserId");
+            entity.HasIndex(e => e.AnonymousId).HasDatabaseName("IX_Carts_AnonymousId");
+
+            entity.HasOne(d => d.User)
+                .WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<CartItem>(entity =>
+        {
+            entity.HasKey(e => e.CartItemId);
+
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.AddedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+
+            entity.HasIndex(e => new { e.CartId, e.ProductId, e.PlatformId })
+                .HasDatabaseName("IX_CartItems_Cart_Product")
+                .IsUnique(false);
+
+            entity.HasOne(d => d.Cart)
+                .WithMany(c => c.Items)
+                .HasForeignKey(d => d.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         OnModelCreatingPartial(modelBuilder);

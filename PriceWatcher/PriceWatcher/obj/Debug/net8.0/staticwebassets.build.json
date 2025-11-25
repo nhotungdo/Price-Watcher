@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "mio0z1z8khZwQ6+VdCPe+uHGV2xJvnHvJ5hdqlbKkgc=",
+  "Hash": "BaFhlGjFEE8QGOl12llJkk5qECdEphipA67ndc+CkQk=",
   "Source": "PriceWatcher",
   "BasePath": "_content/PriceWatcher",
   "Mode": "Default",
@@ -131,6 +131,25 @@
       "OriginalItemSpec": "wwwroot\\css\\layout.css"
     },
     {
+      "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\search.css",
+      "SourceId": "PriceWatcher",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\",
+      "BasePath": "_content/PriceWatcher",
+      "RelativePath": "css/search.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\search.css"
+    },
+    {
       "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\site.css",
       "SourceId": "PriceWatcher",
       "SourceType": "Discovered",
@@ -205,6 +224,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\homepage.js"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\search.js",
+      "SourceId": "PriceWatcher",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\",
+      "BasePath": "_content/PriceWatcher",
+      "RelativePath": "js/search.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\search.js"
     },
     {
       "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\site.js",

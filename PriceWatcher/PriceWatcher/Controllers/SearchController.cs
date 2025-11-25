@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using PriceWatcher.Dtos;
+using Microsoft.EntityFrameworkCore;
+using PriceWatcher.Models;
 using PriceWatcher.Services;
 using PriceWatcher.Services.Interfaces;
 
@@ -12,17 +14,32 @@ namespace PriceWatcher.Controllers;
 public class SearchController : ControllerBase
 {
     private const long MaxImageBytes = 5 * 1024 * 1024;
-    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" , "image/webp"};
+    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" , "image/webp", "image/gif"};
 
     private readonly ISearchJobQueue _jobQueue;
     private readonly ISearchStatusService _statusService;
     private readonly ILogger<SearchController> _logger;
+    private readonly PriceWatcherDbContext _dbContext;
+    private readonly IRecommendationService _recommendationService;
+    private readonly IProductSearchService _productSearchService;
+    private readonly ISearchHistoryService _searchHistoryService;
 
-    public SearchController(ISearchJobQueue jobQueue, ISearchStatusService statusService, ILogger<SearchController> logger)
+    public SearchController(
+        ISearchJobQueue jobQueue,
+        ISearchStatusService statusService,
+        ILogger<SearchController> logger,
+        PriceWatcherDbContext dbContext,
+        IRecommendationService recommendationService,
+        IProductSearchService productSearchService,
+        ISearchHistoryService searchHistoryService)
     {
         _jobQueue = jobQueue;
         _statusService = statusService;
         _logger = logger;
+        _dbContext = dbContext;
+        _recommendationService = recommendationService;
+        _productSearchService = productSearchService;
+        _searchHistoryService = searchHistoryService;
     }
 
     [HttpPost("submit")]
@@ -102,6 +119,63 @@ public class SearchController : ControllerBase
         return await QueueSearchAsync(request.UserId, searchType, request.Url!, null, cancellationToken, null, null);
     }
 
+    [HttpGet("autocomplete")]
+    public async Task<IActionResult> Autocomplete([FromQuery] string q, [FromQuery] int limit = 8, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            return Ok(Array.Empty<object>());
+        }
+        var suggestions = await _productSearchService.SuggestAsync(q, limit, cancellationToken);
+        if (suggestions.Count == 0)
+        {
+            _logger.LogInformation("Autocomplete no result for {Query}", q);
+        }
+        return Ok(suggestions.Select(x => new { id = x.productId, name = x.name }));
+    }
+
+    [HttpGet("preview")]
+    public async Task<IActionResult> Preview([FromQuery] string q, [FromQuery] int top = 5, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            return BadRequest("Query is required");
+        }
+        ProductQuery query;
+        if (Uri.TryCreate(q, UriKind.Absolute, out var uri) && IsSupportedProductUrl(q))
+        {
+            var platform = uri.Host.Contains("shopee", StringComparison.OrdinalIgnoreCase) ? "shopee"
+                : uri.Host.Contains("lazada", StringComparison.OrdinalIgnoreCase) ? "lazada"
+                : uri.Host.Contains("tiki", StringComparison.OrdinalIgnoreCase) ? "tiki" : null;
+            query = new ProductQuery { CanonicalUrl = q, Platform = platform };
+        }
+        else
+        {
+            query = new ProductQuery { TitleHint = q };
+        }
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(TimeSpan.FromMilliseconds(450));
+        var res = await _recommendationService.RecommendAsync(query, top, cts.Token);
+        if (!res.Any())
+        {
+            _logger.LogWarning("Preview no candidates for {Query}", q);
+        }
+        return Ok(res);
+    }
+
+    [HttpGet("products")]
+    public async Task<IActionResult> SearchProducts([FromQuery] string q, [FromQuery] int page = 1, [FromQuery] int pageSize = 12, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            return BadRequest("Query is required.");
+        }
+
+        var response = await _productSearchService.SearchAsync(q, page, pageSize, cancellationToken);
+        await PersistHistoryAsync(response, cancellationToken);
+        return Ok(response);
+    }
+
     [HttpGet("status/{searchId:guid}")]
     public IActionResult GetStatus(Guid searchId)
     {
@@ -173,6 +247,58 @@ public class SearchController : ControllerBase
             if (uc != System.Globalization.UnicodeCategory.NonSpacingMark) sb.Append(ch);
         }
         return sb.ToString().Normalize(NormalizationForm.FormC);
+    }
+
+    private static decimal ComputeScore(string a, string b)
+    {
+        if (string.IsNullOrWhiteSpace(a) || string.IsNullOrWhiteSpace(b)) return 0;
+        var ta = a.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Distinct().ToArray();
+        var tb = b.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Distinct().ToArray();
+        var inter = ta.Intersect(tb).Count();
+        var union = ta.Union(tb).Count();
+        var jaccard = union == 0 ? 0 : (decimal)inter / union;
+        var prefix = b.StartsWith(a, StringComparison.Ordinal) ? 0.3m : 0m;
+        var contains = b.Contains(a, StringComparison.Ordinal) ? 0.2m : 0m;
+        return Math.Min(1m, jaccard + prefix + contains);
+    }
+
+    private async Task PersistHistoryAsync(ProductSearchResponse response, CancellationToken cancellationToken)
+    {
+        var userId = ResolveUserId();
+        if (userId == null || response.HistoryPayload.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            var query = response.SearchMode == "url"
+                ? new ProductQuery { CanonicalUrl = response.Items.FirstOrDefault()?.ProductUrl ?? response.Query, TitleHint = response.Query }
+                : new ProductQuery { TitleHint = response.Query };
+
+            await _searchHistoryService.SaveSearchHistoryAsync(
+                Guid.NewGuid(),
+                userId.Value,
+                response.SearchMode,
+                response.Query,
+                query,
+                response.HistoryPayload,
+                cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to persist search history");
+        }
+    }
+
+    private int? ResolveUserId()
+    {
+        var userIdClaim = User?.FindFirst("uid")?.Value ?? User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (int.TryParse(userIdClaim, out var userId))
+        {
+            return userId;
+        }
+        return null;
     }
 }
 

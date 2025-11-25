@@ -1,0 +1,71 @@
+@page
+@model PriceWatcher.Pages.Admin.Products.IndexModel
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+}
+
+<div class="container py-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="m-0">Quản lý sản phẩm</h2>
+        <a asp-page="Create" class="btn btn-primary">Thêm sản phẩm</a>
+    </div>
+
+    <form method="get" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="q" value="@Model.Query" class="form-control" placeholder="Tìm theo tên hoặc URL">
+            <button class="btn btn-outline-secondary" type="submit">Tìm</button>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Ảnh</th>
+                    <th>Tên</th>
+                    <th>Giá</th>
+                    <th>Shop</th>
+                    <th>Link Tiki</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Products)
+                {
+                    <tr>
+                        <td>@p.ProductId</td>
+                        <td><img src="@p.ImageUrl" alt="@p.ProductName" style="width:60px;height:60px;object-fit:cover;border-radius:8px;"></td>
+                        <td>
+                            <div class="fw-semibold">@p.ProductName</div>
+                            <div class="text-muted small" style="max-width:420px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">@p.Description</div>
+                        </td>
+                        <td class="text-danger fw-bold">@p.CurrentPrice?.ToString("N0") ₫</td>
+                        <td>@p.ShopName</td>
+                        <td>
+                            <a href="@p.OriginalUrl" target="_blank" rel="noopener" class="text-decoration-none">Mở</a>
+                        </td>
+                        <td class="text-end">
+                            <a asp-page="Edit" asp-route-id="@p.ProductId" class="btn btn-sm btn-outline-secondary">Sửa</a>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@p.ProductId" class="d-inline">
+                                <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa sản phẩm?');">Xóa</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Pagination">
+        <ul class="pagination">
+            <li class="page-item @(Model.Page <= 1 ? "disabled" : null)">
+                <a class="page-link" asp-route-page="@(Model.Page-1)" asp-route-q="@Model.Query">«</a>
+            </li>
+            <li class="page-item active"><span class="page-link">@Model.Page</span></li>
+            <li class="page-item @(Model.HasMore ? null : "disabled")">
+                <a class="page-link" asp-route-page="@(Model.Page+1)" asp-route-q="@Model.Query">»</a>
+            </li>
+        </ul>
+    </nav>
+</div>

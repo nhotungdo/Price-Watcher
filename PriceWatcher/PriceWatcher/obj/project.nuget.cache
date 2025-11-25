@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "ThbVPVGVtf4=",
+  "dgSpecHash": "X3lZwm1/Tnw=",
   "success": true,
   "projectFilePath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
   "expectedPackageFiles": [
@@ -68,7 +68,7 @@
     "C:\\Users\\MY PC\\.nuget\\packages\\polly\\8.4.1\\polly.8.4.1.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\polly.core\\8.4.1\\polly.core.8.4.1.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\polly.extensions.http\\3.0.0\\polly.extensions.http.3.0.0.nupkg.sha512",
-    "C:\\Users\\MY PC\\.nuget\\packages\\sixlabors.imagesharp\\3.1.9\\sixlabors.imagesharp.3.1.9.nupkg.sha512",
+    "C:\\Users\\MY PC\\.nuget\\packages\\sixlabors.imagesharp\\3.1.11\\sixlabors.imagesharp.3.1.11.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\stackexchange.redis\\2.7.27\\stackexchange.redis.2.7.27.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\swashbuckle.aspnetcore\\6.5.0\\swashbuckle.aspnetcore.6.5.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.5.0\\swashbuckle.aspnetcore.swagger.6.5.0.nupkg.sha512",
@@ -110,18 +110,5 @@
     "C:\\Users\\MY PC\\.nuget\\packages\\system.windows.extensions\\6.0.0\\system.windows.extensions.6.0.0.nupkg.sha512",
     "C:\\Users\\MY PC\\.nuget\\packages\\telegram.bot\\19.0.0\\telegram.bot.19.0.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1902",
-      "level": "Warning",
-      "message": "Package 'SixLabors.ImageSharp' 3.1.9 has a known moderate severity vulnerability, https://github.com/advisories/GHSA-rxmq-m78w-7wmc",
-      "projectPath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
-      "warningLevel": 1,
-      "filePath": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\PriceWatcher.csproj",
-      "libraryId": "SixLabors.ImageSharp",
-      "targetGraphs": [
-        "net8.0"
-      ]
-    }
-  ]
+  "logs": []
 }

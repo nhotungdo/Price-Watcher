@@ -2,11 +2,10 @@
     border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow: var(--shadow-md);
-    height: 400px;
+    height: 307px;
 }
 
 #heroCarousel .carousel-inner {
-    height: 100%;
 }
 
 #heroCarousel .carousel-item {
@@ -17,6 +16,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    aspect-ratio: 545 / 307;
 }
 
 #heroCarousel .carousel-control-prev,
@@ -73,6 +73,44 @@
     width: 30px;
     border-radius: 5px;
     background: white;
+}
+
+#heroCarousel .slide-indicator {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    background: rgba(255,255,255,.9);
+    color: #0b74e5;
+    font-weight: 600;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.12);
+}
+
+.ad-sub-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.ad-sub-card {
+    display: block;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+.ad-sub-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.ad-sub-card img { width: 100%; aspect-ratio: 545 / 307; object-fit: cover; display: block; }
+
+@media (max-width: 991.98px) {
+    .ad-sub-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 575.98px) {
+    #heroCarousel { height: 240px; }
+    .ad-sub-grid { grid-template-columns: 1fr; }
 }
 
 /* ============ CRAWL SECTION ============ */
@@ -232,7 +270,8 @@
 
 .countdown-item {
     background: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
+    background-filter: blur(10px);
+    --webkit-backdrop-filter: blur(10px);
     border-radius: var(--radius-md);
     padding: 0.75rem 1rem;
     min-width: 60px;

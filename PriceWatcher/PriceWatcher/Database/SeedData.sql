@@ -47,6 +47,13 @@ BEGIN
         (@ShopeePlatformId, 'SP001', N'iPhone 15 Pro Max 256GB', 'https://shopee.vn/iphone-15-pro-max', 29990000, 4.8, 1250, N'Apple Store', GETDATE()),
         (@ShopeePlatformId, 'SP002', N'Samsung Galaxy S24 Ultra', 'https://shopee.vn/galaxy-s24-ultra', 27990000, 4.7, 890, N'Samsung Official', GETDATE()),
         (@ShopeePlatformId, 'SP003', N'MacBook Pro M3 14 inch', 'https://shopee.vn/macbook-pro-m3', 45990000, 4.9, 560, N'Apple Store', GETDATE());
+    UPDATE Products SET 
+        OriginalPrice = CurrentPrice,
+        DiscountRate = 0,
+        StockStatus = N'InStock',
+        SoldQuantity = COALESCE(SoldQuantity, 0),
+        ShippingInfo = N'Miễn phí'
+    WHERE ExternalId IN ('SP001','SP002','SP003');
 END
 GO
 
@@ -57,6 +64,13 @@ BEGIN
     VALUES 
         (@LazadaPlatformId, 'LZ001', N'AirPods Pro 2', 'https://lazada.vn/airpods-pro-2', 5990000, 4.6, 2340, N'Apple Store', GETDATE()),
         (@LazadaPlatformId, 'LZ002', N'Xiaomi Redmi Note 13 Pro', 'https://lazada.vn/redmi-note-13', 7990000, 4.5, 1560, N'Xiaomi Official', GETDATE());
+    UPDATE Products SET 
+        OriginalPrice = CurrentPrice,
+        DiscountRate = 0,
+        StockStatus = N'InStock',
+        SoldQuantity = COALESCE(SoldQuantity, 0),
+        ShippingInfo = N'Miễn phí'
+    WHERE ExternalId IN ('LZ001','LZ002');
 END
 GO
 
@@ -67,6 +81,13 @@ BEGIN
     VALUES 
         (@TikiPlatformId, 'TK001', N'Dell XPS 15 Laptop', 'https://tiki.vn/dell-xps-15', 32990000, 4.7, 780, N'Tiki Trading', GETDATE()),
         (@TikiPlatformId, 'TK002', N'Logitech MX Master 3S', 'https://tiki.vn/logitech-mx-master', 2490000, 4.8, 1200, N'Tiki Trading', GETDATE());
+    UPDATE Products SET 
+        OriginalPrice = CurrentPrice,
+        DiscountRate = 0,
+        StockStatus = N'InStock',
+        SoldQuantity = COALESCE(SoldQuantity, 0),
+        ShippingInfo = N'Miễn phí'
+    WHERE ExternalId IN ('TK001','TK002');
 END
 GO
 
@@ -86,6 +107,10 @@ BEGIN
         (@Product1, 30490000, DATEADD(DAY, -20, GETDATE())),
         (@Product1, 29990000, DATEADD(DAY, -10, GETDATE())),
         (@Product1, 29990000, GETDATE());
+    UPDATE PriceSnapshots SET 
+        OriginalPrice = Price,
+        ShippingInfo = N'Miễn phí'
+    WHERE ProductId = @Product1;
 END
 GO
 
@@ -98,6 +123,10 @@ BEGIN
         (@Product2, 28490000, DATEADD(DAY, -15, GETDATE())),
         (@Product2, 27990000, DATEADD(DAY, -5, GETDATE())),
         (@Product2, 27990000, GETDATE());
+    UPDATE PriceSnapshots SET 
+        OriginalPrice = Price,
+        ShippingInfo = N'Miễn phí'
+    WHERE ProductId = @Product2;
 END
 GO
 
