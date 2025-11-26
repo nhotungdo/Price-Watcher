@@ -34,5 +34,8 @@ namespace PriceWatcher.Models
         public virtual ICollection<SearchHistory>? SearchHistories { get; set; }
         public virtual ICollection<PriceAlert>? PriceAlerts { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }
+        public virtual ICollection<Favorite>? Favorites { get; set; }
+        public virtual ICollection<UserRole>? UserRoles { get; set; }
+        public virtual UserPreference? UserPreference { get; set; }
     }
 }

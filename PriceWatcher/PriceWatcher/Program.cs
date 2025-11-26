@@ -15,6 +15,7 @@ using PriceWatcher.Services;
 using PriceWatcher.Services.Interfaces;
 using PriceWatcher.Services.Scrapers;
 using Telegram.Bot;
+using Microsoft.Extensions.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<PriceWatcherDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DBDefault")));
 
 builder.Services.Configure<RecommendationOptions>(builder.Configuration.GetSection("Recommendation"));
 builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection("Telegram"));
@@ -101,6 +102,12 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<IProductComparisonService, ProductComparisonService>();
 builder.Services.AddScoped<IPriceAnalyticsService, PriceAnalyticsService>();
+builder.Services.AddScoped<ISuggestedProductsService, SuggestedProductsService>();
+
+// Advanced Search & Favorites
+builder.Services.AddScoped<IAdvancedSearchService, AdvancedSearchService>();
+builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IStoreListingService, StoreListingService>();
 
 // Crawler Services
 builder.Services.AddHttpClient("tiki", c =>
@@ -150,17 +157,15 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<PriceWatcherDbContext>();
-    db.Database.EnsureCreated();
     try
     {
-        var creator = (Microsoft.EntityFrameworkCore.Storage.RelationalDatabaseCreator)scope.ServiceProvider.GetRequiredService<Microsoft.EntityFrameworkCore.Storage.IDatabaseCreator>();
-        if (!creator.Exists())
-        {
-            creator.Create();
-        }
-        creator.CreateTables();
+        db.Database.Migrate();
     }
-    catch { }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"An error occurred while migrating the database: {ex.Message}");
+    }
+
     try
     {
         db.Database.ExecuteSqlRaw(@"IF COL_LENGTH('Users','PasswordHash') IS NULL ALTER TABLE Users ADD PasswordHash VARBINARY(64) NULL;
@@ -237,6 +242,7 @@ app.UseMiddleware<PriceWatcher.Middlewares.AnonymousCartMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapRazorPages();
 app.MapRazorPages();
 
 app.Run();

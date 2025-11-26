@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -11,78 +12,79 @@
     <link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
+
 <body>
-    <header>
-        <!-- Top Bar -->
-        <div class="header-top">
-            <div class="container-fluid px-3">
-                <div class="d-flex justify-content-between align-items-center py-2">
-                    <div class="header-top-left">
-                        <span class="text-muted small">Chào mừng đến với Săn Sale Tốt</span>
-                    </div>
-                    <div class="header-top-right d-none d-md-flex gap-3">
-                        <a href="#" class="text-muted small text-decoration-none">Hỗ trợ</a>
-                        <a href="#" class="text-muted small text-decoration-none">Về chúng tôi</a>
-                    </div>
-                </div>
+    <div class="container-fluid px-3">
+        <div class="d-flex justify-content-between align-items-center py-2">
+            <div class="header-top-left">
+                <span class="text-muted small">Chào mừng đến với Săn Sale Tốt</span>
+            </div>
+            <div class="header-top-right d-none d-md-flex gap-3">
+                <a href="#" class="text-muted small text-decoration-none">Hỗ trợ</a>
+                <a href="#" class="text-muted small text-decoration-none">Về chúng tôi</a>
             </div>
         </div>
+    </div>
+    </div>
 
-        <!-- Main Header -->
-        <div class="header-main bg-white shadow-sm">
-            <div class="container-fluid px-3">
-                <div class="row align-items-center py-3">
-                    <!-- Logo -->
-                    <div class="col-auto">
-                        <a class="navbar-brand d-flex align-items-center" asp-page="/Index">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                                <rect width="40" height="40" rx="8" fill="#1a94ff"/>
-                                <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <span class="ms-2 fw-bold fs-4" style="color: #1a94ff;">Săn Sale Tốt</span>
-                        </a>
-                    </div>
+    <!-- Main Header -->
+    <div class="header-main bg-white shadow-sm">
+        <div class="container-fluid px-3">
+            <div class="row align-items-center py-3">
+                <!-- Logo -->
+                <div class="col-auto">
+                    <a class="navbar-brand d-flex align-items-center" asp-page="/Index">
+                        <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="8" fill="#1a94ff" />
+                            <path d="M12 20L18 26L28 14" stroke="white" stroke-width="3" stroke-linecap="round"
+                                stroke-linejoin="round" />
+                        </svg>
+                        <span class="ms-2 fw-bold fs-4" style="color: #1a94ff;">Săn Sale Tốt</span>
+                    </a>
+                </div>
 
-                    <!-- Search Bar -->
-                    <div class="col">
-                        <div class="header-search position-relative">
-                            <form class="search-form" action="javascript:void(0)" method="get">
-                                <div class="input-group" id="searchInputGroup">
-                                    <input type="text" 
-                                           class="form-control search-input" 
-                                           id="headerSearch"
-                                           name="q"
-                                           placeholder="Tìm kiếm, dán URL, hoặc kéo thả ảnh"
-                                           autocomplete="off"
-                                           aria-label="Tìm kiếm sản phẩm">
-                                    <button class="btn btn-primary search-btn" type="button" id="searchSubmitBtn" aria-label="Tìm kiếm">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <circle cx="11" cy="11" r="8"></circle>
-                                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                                        </svg>
-                                    </button>
+                <!-- Search Bar -->
+                <div class="col">
+                    <div class="header-search position-relative">
+                        <form class="search-form" action="javascript:void(0)" method="get">
+                            <div class="input-group" id="searchInputGroup">
+                                <input type="text" class="form-control search-input" id="headerSearch" name="q"
+                                    placeholder="Tìm kiếm, dán URL, hoặc kéo thả ảnh" autocomplete="off"
+                                    aria-label="Tìm kiếm sản phẩm">
+                                <button class="btn btn-primary search-btn" type="button" id="searchSubmitBtn"
+                                    aria-label="Tìm kiếm">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <circle cx="11" cy="11" r="8"></circle>
+                                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div id="searchAutocomplete" class="position-absolute bg-white shadow rounded"
+                                style="top:100%;left:0;right:0;z-index:1000;display:none;">
+                                <div class="p-2">
+                                    <div class="autocomplete-content"></div>
+                                    <div class="preview-content"></div>
                                 </div>
-                                <div id="searchAutocomplete" class="position-absolute bg-white shadow rounded" style="top:100%;left:0;right:0;z-index:1000;display:none;">
-                                    <div class="p-2">
-                                        <div class="autocomplete-content"></div>
-                                        <div class="preview-content"></div>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
+                </div>
 
-                    <!-- Header Actions -->
-                    <div class="col-auto">
-                        <div class="d-flex align-items-center gap-3">
-                            <!-- Shopping Cart -->
-                        <a asp-page="/Admin/Products/Index" class="header-action-btn" aria-label="Quản trị" title="Quản trị">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <!-- Header Actions -->
+                <div class="col-auto">
+                    <div class="d-flex align-items-center gap-3">
+                        <!-- Shopping Cart -->
+                        <a asp-page="/Admin/Products/Index" class="header-action-btn" aria-label="Quản trị"
+                            title="Quản trị">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <path d="M12 2l3 7 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z"></path>
                             </svg>
                         </a>
                         <a asp-page="/Cart" class="header-action-btn position-relative" aria-label="Giỏ hàng">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
                                 <circle cx="9" cy="21" r="1"></circle>
                                 <circle cx="20" cy="21" r="1"></circle>
                                 <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
@@ -90,85 +92,53 @@
                             <span class="cart-badge" id="cartCount">0</span>
                         </a>
 
-                            <!-- User Account -->
-                            @if (User?.Identity?.IsAuthenticated ?? false)
-                            {
-                                <div class="dropdown">
-                                    <button class="header-action-btn dropdown-toggle" type="button" id="userMenu" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
-                                        <span class="d-none d-md-inline ms-1">@User.Identity?.Name</span>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                                        <li><a class="dropdown-item" asp-page="/Profile">Tài khoản của tôi</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Orders">Đơn hàng</a></li>
-                                        <li><a class="dropdown-item" asp-page="/History">Lịch sử tìm kiếm</a></li>
-                                        <li><hr class="dropdown-divider"></li>
-                                        <li><a class="dropdown-item" href="/auth/logout">Đăng xuất</a></li>
-                                    </ul>
-                                </div>
-                            }
-                            else
-                            {
-                                <a class="btn btn-outline-primary btn-sm" asp-page="/Login">Đăng nhập</a>
-                                <a class="btn btn-primary btn-sm d-none d-md-inline" asp-page="/Register">Đăng ký</a>
-                            }
+                        <!-- User Account -->
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <div class="dropdown">
+                                <button class="header-action-btn dropdown-toggle" type="button" id="userMenu"
+                                    data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span class="d-none d-md-inline ms-1">@User.Identity?.Name</span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
+                                    <li><a class="dropdown-item" asp-page="/Profile">Tài khoản của tôi</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Orders">Đơn hàng</a></li>
+                                    <li><a class="dropdown-item" asp-page="/History">Lịch sử tìm kiếm</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="/auth/logout">Đăng xuất</a></li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-primary btn-sm" asp-page="/Login">Đăng nhập</a>
+                            <a class="btn btn-primary btn-sm d-none d-md-inline" asp-page="/Register">Đăng ký</a>
+                        }
 
-                            <!-- Mobile Menu Toggle -->
-                            <button class="btn btn-link d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Menu">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="3" y1="12" x2="21" y2="12"></line>
-                                    <line x1="3" y1="6" x2="21" y2="6"></line>
-                                    <line x1="3" y1="18" x2="21" y2="18"></line>
-                                </svg>
-                            </button>
-                        </div>
+                        <!-- Mobile Menu Toggle -->
+                        <button class="btn btn-link d-lg-none" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#mobileMenu" aria-controls="mobileMenu" aria-label="Menu">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Category Navigation -->
-        <div class="header-categories bg-white border-top">
-            <div class="container-fluid px-3">
-                <div class="category-nav">
-                    <a href="/category/books" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/books.png" alt="Sách">
-                        <span>Nhà Sách</span>
-                    </a>
-                    <a href="/category/electronics" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/iphone.png" alt="Điện thoại">
-                        <span>Điện Thoại</span>
-                    </a>
-                    <a href="/category/fashion" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/t-shirt.png" alt="Thời trang">
-                        <span>Thời Trang</span>
-                    </a>
-                    <a href="/category/beauty" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/lipstick.png" alt="Làm đẹp">
-                        <span>Làm Đẹp</span>
-                    </a>
-                    <a href="/category/home" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/home.png" alt="Nhà cửa">
-                        <span>Nhà Cửa</span>
-                    </a>
-                    <a href="/category/appliances" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/washing-machine.png" alt="Điện gia dụng">
-                        <span>Điện Gia Dụng</span>
-                    </a>
-                    <a href="/category/sports" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/sneakers.png" alt="Thể thao">
-                        <span>Thể Thao</span>
-                    </a>
-                    <a href="/category/toys" class="category-nav-item">
-                        <img src="https://img.icons8.com/3d-fluency/48/teddy-bear.png" alt="Đồ chơi">
-                        <span>Đồ Chơi</span>
-                    </a>
-                </div>
-            </div>
-        </div>
+
     </header>
 
     <!-- Mobile Menu Offcanvas -->
@@ -226,9 +196,15 @@
                     <div class="col-md-3">
                         <h6 class="footer-title">Phương Thức Thanh Toán</h6>
                         <div class="payment-methods">
-                            <div class="payment-icon" style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">💳</div>
-                            <div class="payment-icon" style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">🏦</div>
-                            <div class="payment-icon" style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">📱</div>
+                            <div class="payment-icon"
+                                style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">
+                                💳</div>
+                            <div class="payment-icon"
+                                style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">
+                                🏦</div>
+                            <div class="payment-icon"
+                                style="background: white; padding: 4px; border-radius: 4px; width: 50px; height: 32px;">
+                                📱</div>
                         </div>
                     </div>
 
@@ -238,12 +214,14 @@
                         <div class="social-links mb-3">
                             <a href="#" class="social-link" aria-label="Facebook">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                    <path
+                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                                 </svg>
                             </a>
                             <a href="#" class="social-link" aria-label="Instagram">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                                    <path
+                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                                 </svg>
                             </a>
                         </div>
@@ -273,124 +251,134 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cart.js" asp-append-version="true"></script>
     <script>
-        (function(){
+        (function () {
             const input = document.getElementById('headerSearch');
             const submitBtn = document.getElementById('searchSubmitBtn');
             const dropdown = document.getElementById('searchAutocomplete');
-            const content = dropdown?.querySelector('.autocomplete-content');
-            const preview = dropdown?.querySelector('.preview-content');
-            let timer;
+            const content = dropdown ? dropdown.querySelector('.autocomplete-content') : null;
+            const preview = dropdown ? dropdown.querySelector('.preview-content') : null;
 
-            function debounce(fn, ms){ let t; return (...args)=>{ clearTimeout(t); t=setTimeout(()=>fn.apply(this,args), ms); } }
+            function debounce(fn, ms) { let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), ms); }; }
 
-            async function fetchAutocomplete(q){
-                try{
+            async function fetchAutocomplete(q) {
+                try {
                     const res = await fetch(`/search/autocomplete?q=${encodeURIComponent(q)}`);
                     const data = await res.json();
-                    if(!data || data.length===0){ dropdown.style.display='none'; return; }
-                    content.innerHTML = data.map(x=>`<div class="p-2 autocomplete-item" data-id="${x.id}" data-name="${x.name}">${x.name}</div>`).join('');
-                    preview.innerHTML = '';
-                    dropdown.style.display='block';
-                    content.querySelectorAll('.autocomplete-item').forEach(el=>{
-                        el.addEventListener('click', ()=>{
-                            input.value = el.dataset.name || '';
-                            dropdown.style.display='none';
+                    if (!data || data.length === 0) { if (dropdown) dropdown.style.display = 'none'; return; }
+                    if (content) {
+                        content.innerHTML = data.map(x => `<div class="p-2 autocomplete-item" data-id="${x.id}" data-name="${x.name}">${x.name}</div>`).join('');
+                    }
+                    if (preview) { preview.innerHTML = ''; }
+                    if (dropdown) { dropdown.style.display = 'block'; }
+                    if (content) {
+                        content.querySelectorAll('.autocomplete-item').forEach(el => {
+                            el.addEventListener('click', () => {
+                                if (input) input.value = el.dataset.name || '';
+                                if (dropdown) dropdown.style.display = 'none';
+                            });
                         });
-                    });
-                }catch{ dropdown.style.display='none'; }
+                    }
+                } catch { if (dropdown) dropdown.style.display = 'none'; }
             }
 
-            async function fetchPreview(q){
-                try{
+            async function fetchPreview(q) {
+                try {
                     const res = await fetch(`/search/preview?q=${encodeURIComponent(q)}&top=5`);
                     const items = await res.json();
-                    if(!items || items.length===0){ dropdown.style.display='none'; return; }
-                    content.innerHTML = '';
-                    preview.innerHTML = items.map(i=>`
-                        <a href="/ProductDetail/${i.productId || ''}" class="text-decoration-none d-flex align-items-center gap-2 p-2">
-                            <img src="${i.thumbnailUrl || i.image || i.imageUrl || '/images/placeholder.png'}" style="width:40px;height:40px;object-fit:cover;" alt="">
-                            <div class="flex-grow-1">
-                                <div class="small">${i.platform || i.platformName || ''}</div>
-                                <div class="fw-semibold" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${i.title || i.productName || ''}</div>
-                                <div class="text-danger">${formatPrice(i.price || i.totalCost || 0)}</div>
-                            </div>
-                        </a>
-                    `).join('');
-                    dropdown.style.display='block';
-                }catch{ dropdown.style.display='none'; }
-            }
-
-            function formatPrice(p){ return new Intl.NumberFormat('vi-VN',{style:'currency',currency:'VND'}).format(p||0); }
-
-            function isUrlLike(text){ try{ const u=new URL(text); return ['shopee','lazada','tiki'].some(d=>u.host.includes(d)); } catch{ return false; } }
-
-            input?.addEventListener('input', debounce(async function(e){
-                const q = e.target.value.trim();
-                if(!q){ dropdown.style.display='none'; return; }
-                if(isUrlLike(q)){ await fetchPreview(q); return; }
-                await fetchAutocomplete(q);
-            }, 250));
-
-            document.addEventListener('click', function(e){ if(!dropdown.contains(e.target) && !input.contains(e.target)){ dropdown.style.display='none'; }});
-
-            function navigateToSearch(){
-                const q = input.value.trim();
-                if(!q) return;
-                const target = new URL(window.location.origin + '/search/results');
-                target.searchParams.set('q', q);
-                window.location.href = target.toString();
-            }
-
-            submitBtn?.addEventListener('click', function(){
-                navigateToSearch();
-            });
-
-            input?.addEventListener('keydown', function(e){
-                if(e.key === 'Enter'){
-                    e.preventDefault();
-                    navigateToSearch();
-                }
-            });
-
-            const inputGroup = document.getElementById('searchInputGroup');
-            inputGroup?.addEventListener('dragover', function(e){ e.preventDefault(); inputGroup.classList.add('border','border-primary'); });
-            inputGroup?.addEventListener('dragleave', function(){ inputGroup.classList.remove('border','border-primary'); });
-            inputGroup?.addEventListener('drop', async function(e){
-                e.preventDefault(); inputGroup.classList.remove('border','border-primary');
-                const file = e.dataTransfer?.files?.[0];
-                if(!file) return;
-                const ok = ['image/jpeg','image/png','image/gif','image/webp'].includes(file.type);
-                if(!ok) return;
-                const form = new FormData(); form.append('image', file, file.name);
-                const res = await fetch('/search/submit', { method:'POST', body: form });
-                const json = await res.json().catch(()=>null);
-                const id = json?.searchId;
-                if(!id){ return; }
-                const reader = new FileReader(); reader.onload = function(){ dropdown.style.display='block'; preview.innerHTML = `<img src="${reader.result}" style="max-height:120px;object-fit:contain;" alt="">`; };
-                reader.readAsDataURL(file);
-                let tries=0;
-                const poll = setInterval(async()=>{
-                    tries++; if(tries>20) { clearInterval(poll); return; }
-                    const s = await fetch(`/search/status/${id}`);
-                    const st = await s.json().catch(()=>null);
-                    const items = st?.results || [];
-                    if(items.length>0){
-                        clearInterval(poll);
-                        preview.innerHTML = items.slice(0,5).map(i=>`
+                    if (!items || items.length === 0) { if (dropdown) dropdown.style.display = 'none'; return; }
+                    if (content) { content.innerHTML = ''; }
+                    if (preview) {
+                        preview.innerHTML = items.map(i => `
                             <a href="/ProductDetail/${i.productId || ''}" class="text-decoration-none d-flex align-items-center gap-2 p-2">
                                 <img src="${i.thumbnailUrl || i.image || i.imageUrl || '/images/placeholder.png'}" style="width:40px;height:40px;object-fit:cover;" alt="">
                                 <div class="flex-grow-1">
                                     <div class="small">${i.platform || i.platformName || ''}</div>
                                     <div class="fw-semibold" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${i.title || i.productName || ''}</div>
-                                    <div class="text-danger">${formatPrice(i.price || i.totalCost || 0)}</div>
+                                    <div class="text-danger">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format((i.price || i.totalCost || 0))}</div>
                                 </div>
                             </a>
                         `).join('');
                     }
-                }, 500);
-            });
+                    if (dropdown) { dropdown.style.display = 'block'; }
+                } catch { if (dropdown) dropdown.style.display = 'none'; }
+            }
+
+            function isUrlLike(text) { try { const u = new URL(text); return ['shopee', 'lazada', 'tiki'].some(d => u.host.includes(d)); } catch { return false; } }
+
+            if (input) {
+                input.addEventListener('input', debounce(async function (e) {
+                    const q = e.target.value.trim();
+                    if (!q) { if (dropdown) dropdown.style.display = 'none'; return; }
+                    if (isUrlLike(q)) { await fetchPreview(q); return; }
+                    await fetchAutocomplete(q);
+                }, 250));
+            }
+
+            document.addEventListener('click', function (e) { if (dropdown && !dropdown.contains(e.target) && input && !input.contains(e.target)) { dropdown.style.display = 'none'; } });
+
+            function navigateToSearch() {
+                const q = input ? input.value.trim() : '';
+                if (!q) return;
+                const target = new URL(window.location.origin + '/search/results');
+                target.searchParams.set('q', q);
+                window.location.href = target.toString();
+            }
+
+            if (submitBtn) { submitBtn.addEventListener('click', function () { navigateToSearch(); }); }
+
+            if (input) {
+                input.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        navigateToSearch();
+                    }
+                });
+            }
+
+            const inputGroup = document.getElementById('searchInputGroup');
+            if (inputGroup) {
+                inputGroup.addEventListener('dragover', function (e) { e.preventDefault(); inputGroup.classList.add('border', 'border-primary'); });
+                inputGroup.addEventListener('dragleave', function () { inputGroup.classList.remove('border', 'border-primary'); });
+                inputGroup.addEventListener('drop', async function (e) {
+                    e.preventDefault(); inputGroup.classList.remove('border', 'border-primary');
+                    const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+                    if (!file) return;
+                    const ok = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type);
+                    if (!ok) return;
+                    const form = new FormData(); form.append('image', file, file.name);
+                    const res = await fetch('/search/submit', { method: 'POST', body: form });
+                    const json = await res.json().catch(() => null);
+                    const id = json && json.searchId;
+                    if (!id) { return; }
+                    const reader = new FileReader(); reader.onload = function () { if (dropdown && preview) { dropdown.style.display = 'block'; preview.innerHTML = `<img src="${reader.result}" style="max-height:120px;object-fit:contain;" alt="">`; } };
+                    reader.readAsDataURL(file);
+                    let tries = 0;
+                    const poll = setInterval(async () => {
+                        tries++; if (tries > 20) { clearInterval(poll); return; }
+                        const s = await fetch(`/search/status/${id}`);
+                        const st = await s.json().catch(() => null);
+                        const items = (st && st.results) || [];
+                        if (items.length > 0) {
+                            clearInterval(poll);
+                            if (preview) {
+                                preview.innerHTML = items.slice(0, 5).map(i => `
+                                    <a href="/ProductDetail/${i.productId || ''}" class="text-decoration-none d-flex align-items-center gap-2 p-2">
+                                        <img src="${i.thumbnailUrl || i.image || i.imageUrl || '/images/placeholder.png'}" style="width:40px;height:40px;object-fit:cover;" alt="">
+                                        <div class="flex-grow-1">
+                                            <div class="small">${i.platform || i.platformName || ''}</div>
+                                            <div class="fw-semibold" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;">${i.title || i.productName || ''}</div>
+                                            <div class="text-danger">${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format((i.price || i.totalCost || 0))}</div>
+                                        </div>
+                                    </a>
+                                `).join('');
+                            }
+                        }
+                    }, 500);
+                });
+            }
         })();
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+
 </html>

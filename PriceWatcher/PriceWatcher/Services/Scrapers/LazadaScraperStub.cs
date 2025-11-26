@@ -71,12 +71,14 @@ public class LazadaScraperStub : IProductScraper
                 catch { }
             }
             var safeKeyword = (keyword ?? string.Empty);
+            var page = 1;
+            if (query.Metadata != null && query.Metadata.TryGetValue("page", out var p) && int.TryParse(p, out var pv) && pv > 1) page = pv;
             var cacheKey = safeKeyword.Trim().ToLowerInvariant();
             if (_searchCache.TryGetValue(cacheKey, out var cached) && (DateTime.UtcNow - cached.ts).TotalSeconds < CacheTtlSeconds)
             {
                 return cached.items;
             }
-            var searchUrl = $"/search?q={Uri.EscapeDataString(safeKeyword)}";
+            var searchUrl = page > 1 ? $"/search?q={Uri.EscapeDataString(safeKeyword)}&page={page}" : $"/search?q={Uri.EscapeDataString(safeKeyword)}";
             if (!IsAllowed("/search")) return Array.Empty<ProductCandidateDto>();
             var req = new HttpRequestMessage(HttpMethod.Get, searchUrl);
             req.Headers.Referrer = new Uri("https://www.lazada.vn/");
@@ -499,4 +501,3 @@ public class LazadaScraperStub : IProductScraper
         return true;
     }
 }
-

@@ -163,6 +163,7 @@
                             </svg>
                             Gợi Ý Hôm Nay
                         </h2>
+                        <span id="personalBadge" class="badge badge-personal ms-2 d-none">Cá nhân hóa</span>
                         <a href="/products" class="view-all-link">
                             Xem tất cả
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -172,12 +173,72 @@
                         </a>
                     </div>
 
+                    <div id="personalFallback" class="alert alert-personal d-none small" role="alert">
+                        Hãy đăng nhập để nhận gợi ý theo lịch sử. Đang hiển thị gợi ý chung.
+                    </div>
+
+                    <!-- Platform Filter Tabs -->
+                    <div class="platform-tabs mb-3">
+                        <button class="platform-tab active" data-platform="personal">
+                            <span>Theo lịch sử</span>
+                        </button>
+                        <button class="platform-tab" data-platform="all">
+                            <span>Tất cả</span>
+                        </button>
+                        <button class="platform-tab" data-platform="tiki">
+                            <span>Tiki</span>
+                        </button>
+                        <button class="platform-tab" data-platform="shopee">
+                            <span>Shopee</span>
+                        </button>
+                        <button class="platform-tab" data-platform="lazada">
+                            <span>Lazada</span>
+                        </button>
+                    </div>
+
+
                     <div class="row g-3" id="featuredProductsContainer">
                         <!-- Products will be loaded here via JS -->
                         <div class="col-12 text-center py-5">
                             <div class="spinner-border text-primary" role="status">
                                 <span class="visually-hidden">Loading...</span>
                             </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="mt-4">
+                    <div class="section-header">
+                        <h2 class="section-title">Danh Mục Nổi Bật</h2>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6 col-md-3">
+                            <a href="/category/electronics"
+                                class="ad-sub-card d-flex align-items-center justify-content-center"
+                                style="height: 120px; font-size: 48px;">
+                                📱
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/category/laptop"
+                                class="ad-sub-card d-flex align-items-center justify-content-center"
+                                style="height: 120px; font-size: 48px;">
+                                💻
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/category/fashion"
+                                class="ad-sub-card d-flex align-items-center justify-content-center"
+                                style="height: 120px; font-size: 48px;">
+                                👕
+                            </a>
+                        </div>
+                        <div class="col-6 col-md-3">
+                            <a href="/category/home"
+                                class="ad-sub-card d-flex align-items-center justify-content-center"
+                                style="height: 120px; font-size: 48px;">
+                                🏠
+                            </a>
                         </div>
                     </div>
                 </section>
@@ -190,7 +251,7 @@
     <script src="~/js/homepage.js" asp-append-version="true"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            loadFeaturedProducts();
+            loadSuggestedProducts('personal');
 
             const btnCrawl = document.getElementById('btnCrawl');
             const inputUrl = document.getElementById('crawlUrlInput');
@@ -232,7 +293,7 @@
                         crawlResult.classList.remove('d-none');
 
                         // Reload products after a delay
-                        setTimeout(() => loadFeaturedProducts(), 2000);
+                        setTimeout(() => loadSuggestedProducts(), 2000);
                     } else {
                         showError(data.message || 'Không thể xử lý URL này');
                     }
@@ -257,51 +318,90 @@
             }
         });
 
-        async function loadFeaturedProducts() {
-            const container = document.getElementById('featuredProductsContainer');
-            try {
-                const response = await fetch('/api/home/featured?limit=12');
-                if (!response.ok) throw new Error('HTTP ' + response.status);
-                const text = await response.text();
-                const trimmed = text.trim();
-                if (!trimmed || trimmed[0] === '<') throw new Error('Non-JSON response');
-                const products = JSON.parse(trimmed);
+        // Platform filter tabs
+        let currentPlatform = 'personal';
+        document.querySelectorAll('.platform-tab').forEach(tab => {
+            tab.addEventListener('click', function () {
+                document.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentPlatform = this.dataset.platform;
+                loadSuggestedProducts(currentPlatform);
+            });
+        });
 
-                if (!Array.isArray(products) || products.length === 0) {
-                    container.innerHTML = '<div class="col-12 text-center text-muted">Chưa có sản phẩm nào. Hãy thử thêm link Tiki ở trên!</div>';
+        async function loadSuggestedProducts(platform = 'all') {
+            const container = document.getElementById('featuredProductsContainer');
+            container.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+
+            try {
+                const endpoint = platform === 'all'
+                    ? '/api/home/suggestions?limit=12'
+                    : (platform === 'personal' ? '/api/home/suggestions/personal?limit=12' : `/api/home/suggestions/${platform}?limit=12`);
+                console.time('home:suggestions');
+                const response = await fetch(endpoint);
+                if (!response.ok) throw new Error('HTTP ' + response.status);
+
+                const startRender = performance.now();
+                const data = await response.json();
+                const badge = document.getElementById('personalBadge');
+                const fallback = document.getElementById('personalFallback');
+                const showBadge = platform === 'personal' && data.source === 'personal';
+                const showFallback = platform === 'personal' && data.source === 'fallback';
+                if (badge) {
+                    badge.classList.toggle('d-none', !showBadge);
+                    badge.classList.toggle('fade-in-badge', showBadge);
+                }
+                if (fallback) {
+                    fallback.classList.toggle('d-none', !showFallback);
+                    fallback.classList.toggle('fade-in-alert', showFallback);
+                }
+
+                if (!data.success || !data.products || data.products.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center text-muted py-5">Chưa có sản phẩm nào. Hãy thử thêm link Tiki ở trên!</div>';
+                    console.timeEnd('home:suggestions');
                     return;
                 }
 
+                const products = data.products;
+
                 container.innerHTML = products.map(p => `
-                                                                    <div class="col-6 col-md-4 col-lg-2">
-                                                                        <div class="product-card" 
-                                                                             data-product-id="${p.productId}"
-                                                                             data-platform-id="${p.platformId || 1}"
-                                                                             data-platform-name="${p.platformName || 'Tiki'}"
-                                                                             data-product-name="${p.productName || ''}"
-                                                                             data-product-price="${p.currentPrice || 0}"
-                                                                             data-product-image="${p.imageUrl || ''}"
-                                                                             data-product-url="${p.originalUrl || ''}">
-                                                                            <div class="product-image-wrapper">
-                                                                                <img src="${p.imageUrl || '/images/placeholder.png'}" alt="${p.productName || ''}" class="product-image" loading="lazy">
-                                                                                ${p.discountRate ? `<span class="product-badge">-${p.discountRate}%</span>` : ''}
-                                                                            </div>
-                                                                            <div class="product-info">
-                                                                                <div class="product-name">${p.productName || ''}</div>
-                                                                                ${p.rating ? `
-                                                                                <div class="product-rating">
-                                                                                    <span class="rating-stars">${'⭐'.repeat(Math.round(p.rating))}</span>
-                                                                                    <span class="rating-count">(${p.reviewCount || 0})</span>
-                                                                                </div>
-                                                                                ` : ''}
-                                                                                <div class="product-price-block">
-                                                                                    <span class="product-price">${formatPrice(p.currentPrice)}</span>
-                                                                                </div>
-                                                                                <a class="add-to-cart-btn buy-btn" href="${p.originalUrl || '#'}" target="_blank" rel="noopener">Tới nơi bán</a>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                `).join('');
+                                        <div class="col-6 col-md-4 col-lg-2">
+                                            <div class="product-card" 
+                                                 data-product-id="${p.productId || ''}"
+                                                 data-platform-id="${p.platformId || 0}"
+                                                 data-platform-name="${p.platform || ''}"
+                                                 data-product-name="${escapeHtml(p.productName || '')}"
+                                                 data-product-price="${p.price || 0}"
+                                                 data-product-image="${p.imageUrl || ''}"
+                                                 data-product-url="${p.productUrl || ''}">
+                                                <div class="product-image-wrapper">
+                                                    <img src="${p.imageUrl || '/images/placeholder.png'}" alt="${escapeHtml(p.productName || '')}" class="product-image" loading="lazy">
+                                                    ${p.discountRate ? `<span class="product-badge">-${p.discountRate}%</span>` : ''}
+                                                    <span class="platform-badge platform-${p.platform.toLowerCase()}">${p.platform}</span>
+                                                </div>
+                                                <div class="product-info">
+                                                    <div class="product-name">${escapeHtml(p.productName || '')}</div>
+                                                    ${p.rating ? `
+                                                    <div class="product-rating">
+                                                        <span class="rating-stars">${'⭐'.repeat(Math.round(p.rating))}</span>
+                                                        <span class="rating-count">(${p.reviewCount || 0})</span>
+                                                    </div>
+                                                    ` : ''}
+                                                    <div class="product-price-block">
+                                                        ${p.originalPrice && p.originalPrice > p.price ? `<span class="product-price-old">${formatPrice(p.originalPrice)}</span>` : ''}
+                                                        <span class="product-price">${formatPrice(p.price)}</span>
+                                                    </div>
+                                                    ${p.isFreeShip ? '<div class="free-ship-badge">Miễn phí vận chuyển</div>' : ''}
+                                                    <a class="buy-btn" href="${p.productUrl || '#'}" target="_blank" rel="noopener">Tới nơi bán</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                            `).join('');
+                const endRender = performance.now();
+                console.timeEnd('home:suggestions');
+                console.log('home:suggestions:count', products.length, 'renderMs', Math.round(endRender - startRender));
+
+                // Add click handlers
                 try {
                     const cards = container.querySelectorAll('.product-card');
                     cards.forEach(card => {
@@ -316,16 +416,27 @@
                             buy.addEventListener('click', (e) => { e.stopPropagation(); });
                         }
                     });
-                } catch {}
+                } catch { }
             } catch (error) {
                 console.error('Error loading products:', error);
-                container.innerHTML = '<div class="col-12 text-center text-danger">Không thể tải sản phẩm</div>';
+                container.innerHTML = '<div class="col-12 text-center text-danger py-5">Không thể tải sản phẩm. Vui lòng thử lại sau.</div>';
             }
         }
 
         function formatPrice(price) {
             if (!price) return '0₫';
             return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
         }
     </script>
 }

@@ -18,6 +18,49 @@ GO
 -- =============================================
 -- Drop existing tables if they exist (in reverse order of dependencies)
 -- =============================================
+IF OBJECT_ID('RolePermissions', 'U') IS NOT NULL
+    DROP TABLE RolePermissions;
+GO
+
+IF OBJECT_ID('UserRoles', 'U') IS NOT NULL
+    DROP TABLE UserRoles;
+GO
+
+IF OBJECT_ID('Permissions', 'U') IS NOT NULL
+    DROP TABLE Permissions;
+GO
+
+IF OBJECT_ID('AdminRoles', 'U') IS NOT NULL
+    DROP TABLE AdminRoles;
+GO
+
+IF OBJECT_ID('UserPreferences', 'U') IS NOT NULL
+    DROP TABLE UserPreferences;
+GO
+
+IF OBJECT_ID('AffiliateLinks', 'U') IS NOT NULL
+    DROP TABLE AffiliateLinks;
+GO
+
+IF OBJECT_ID('StoreListings', 'U') IS NOT NULL
+    DROP TABLE StoreListings;
+GO
+
+IF OBJECT_ID('Stores', 'U') IS NOT NULL
+    DROP TABLE Stores;
+GO
+
+IF OBJECT_ID('Favorites', 'U') IS NOT NULL
+    DROP TABLE Favorites;
+GO
+
+IF OBJECT_ID('DiscountCodes', 'U') IS NOT NULL
+    DROP TABLE DiscountCodes;
+GO
+
+IF OBJECT_ID('ProductNews', 'U') IS NOT NULL
+    DROP TABLE ProductNews;
+GO
 IF OBJECT_ID('CartItems', 'U') IS NOT NULL
     DROP TABLE CartItems;
 GO
@@ -273,6 +316,193 @@ CREATE TABLE Reviews (
 );
 GO
 
+CREATE TABLE Stores (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(200) NOT NULL,
+    PlatformId INT NOT NULL,
+    Rating DECIMAL(18,2) NULL,
+    IsVerified BIT NOT NULL DEFAULT 0,
+    IsTrusted BIT NOT NULL DEFAULT 0,
+    IsOfficial BIT NOT NULL DEFAULT 0,
+    TotalSales INT NOT NULL DEFAULT 0,
+    ResponseRate DECIMAL(18,2) NULL,
+    ResponseTimeHours INT NULL,
+    StoreUrl NVARCHAR(MAX) NULL,
+    LogoUrl NVARCHAR(MAX) NULL,
+    Description NVARCHAR(MAX) NULL,
+    JoinedDate DATETIME NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    LastUpdated DATETIME NULL,
+    CONSTRAINT FK_Stores_Platforms FOREIGN KEY (PlatformId)
+        REFERENCES Platforms(PlatformId)
+);
+GO
+
+CREATE TABLE StoreListings (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NOT NULL,
+    PlatformId INT NOT NULL,
+    StoreName NVARCHAR(200) NOT NULL,
+    StoreRating DECIMAL(18,2) NULL,
+    IsVerified BIT NOT NULL DEFAULT 0,
+    IsTrusted BIT NOT NULL DEFAULT 0,
+    IsOfficial BIT NOT NULL DEFAULT 0,
+    Price DECIMAL(18,2) NOT NULL,
+    OriginalPrice DECIMAL(18,2) NULL,
+    ShippingCost DECIMAL(18,2) NULL,
+    DeliveryDays INT NULL,
+    Stock INT NULL,
+    IsFreeShipping BIT NOT NULL DEFAULT 0,
+    StoreUrl NVARCHAR(MAX) NULL,
+    TotalSales INT NULL,
+    LastUpdated DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    CONSTRAINT FK_StoreListings_Products FOREIGN KEY (ProductId)
+        REFERENCES Products(ProductId) ON DELETE CASCADE,
+    CONSTRAINT FK_StoreListings_Platforms FOREIGN KEY (PlatformId)
+        REFERENCES Platforms(PlatformId)
+);
+GO
+
+CREATE TABLE Favorites (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    UserId INT NOT NULL,
+    ProductId INT NOT NULL,
+    CollectionName NVARCHAR(200) NULL,
+    Notes NVARCHAR(MAX) NULL,
+    TargetPrice DECIMAL(18,2) NULL,
+    NotifyOnPriceDrop BIT NOT NULL DEFAULT 0,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    LastViewedAt DATETIME NULL,
+    CONSTRAINT FK_Favorites_Users FOREIGN KEY (UserId)
+        REFERENCES Users(UserId) ON DELETE CASCADE,
+    CONSTRAINT FK_Favorites_Products FOREIGN KEY (ProductId)
+        REFERENCES Products(ProductId) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE DiscountCodes (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Code NVARCHAR(100) NOT NULL,
+    PlatformId INT NULL,
+    ProductId INT NULL,
+    Description NVARCHAR(MAX) NULL,
+    DiscountType NVARCHAR(50) NOT NULL DEFAULT 'percentage',
+    DiscountValue DECIMAL(18,2) NULL,
+    MinPurchase DECIMAL(18,2) NULL,
+    MaxDiscount DECIMAL(18,2) NULL,
+    ExpiresAt DATETIME NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    SuccessCount INT NOT NULL DEFAULT 0,
+    TotalUses INT NOT NULL DEFAULT 0,
+    SubmittedByUserId INT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    LastVerifiedAt DATETIME NULL,
+    CONSTRAINT FK_DiscountCodes_Platforms FOREIGN KEY (PlatformId)
+        REFERENCES Platforms(PlatformId),
+    CONSTRAINT FK_DiscountCodes_Products FOREIGN KEY (ProductId)
+        REFERENCES Products(ProductId),
+    CONSTRAINT FK_DiscountCodes_Users FOREIGN KEY (SubmittedByUserId)
+        REFERENCES Users(UserId)
+);
+GO
+
+CREATE TABLE ProductNews (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NULL,
+    Title NVARCHAR(500) NOT NULL,
+    Content NVARCHAR(MAX) NULL,
+    SourceUrl NVARCHAR(MAX) NULL,
+    ImageUrl NVARCHAR(MAX) NULL,
+    Author NVARCHAR(200) NULL,
+    PublishedAt DATETIME NOT NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    IsActive BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_ProductNews_Products FOREIGN KEY (ProductId)
+        REFERENCES Products(ProductId) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE AdminRoles (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Description NVARCHAR(MAX) NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE()
+);
+GO
+
+CREATE TABLE Permissions (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    Name NVARCHAR(100) NOT NULL,
+    Resource NVARCHAR(100) NOT NULL,
+    Action NVARCHAR(50) NOT NULL,
+    Description NVARCHAR(MAX) NULL
+);
+GO
+
+CREATE TABLE RolePermissions (
+    RoleId INT NOT NULL,
+    PermissionId INT NOT NULL,
+    CONSTRAINT PK_RolePermissions PRIMARY KEY (RoleId, PermissionId),
+    CONSTRAINT FK_RolePermissions_Roles FOREIGN KEY (RoleId)
+        REFERENCES AdminRoles(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_RolePermissions_Permissions FOREIGN KEY (PermissionId)
+        REFERENCES Permissions(Id) ON DELETE CASCADE
+);
+GO
+
+CREATE TABLE UserRoles (
+    UserId INT NOT NULL,
+    RoleId INT NOT NULL,
+    AssignedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    AssignedByUserId INT NULL,
+    CONSTRAINT PK_UserRoles PRIMARY KEY (UserId, RoleId),
+    CONSTRAINT FK_UserRoles_Users FOREIGN KEY (UserId)
+        REFERENCES Users(UserId) ON DELETE CASCADE,
+    CONSTRAINT FK_UserRoles_AdminRoles FOREIGN KEY (RoleId)
+        REFERENCES AdminRoles(Id) ON DELETE CASCADE,
+    CONSTRAINT FK_UserRoles_AssignedBy FOREIGN KEY (AssignedByUserId)
+        REFERENCES Users(UserId)
+);
+GO
+
+CREATE TABLE AffiliateLinks (
+    Id INT IDENTITY(1,1) PRIMARY KEY,
+    ProductId INT NOT NULL,
+    PlatformId INT NOT NULL,
+    AffiliateUrl NVARCHAR(MAX) NOT NULL,
+    AffiliateCode NVARCHAR(100) NULL,
+    ClickCount INT NOT NULL DEFAULT 0,
+    ConversionCount INT NOT NULL DEFAULT 0,
+    Revenue DECIMAL(18,2) NOT NULL DEFAULT 0,
+    CommissionRate DECIMAL(18,2) NULL,
+    CreatedAt DATETIME NOT NULL DEFAULT GETUTCDATE(),
+    LastClickedAt DATETIME NULL,
+    IsActive BIT NOT NULL DEFAULT 1,
+    CONSTRAINT FK_AffiliateLinks_Products FOREIGN KEY (ProductId)
+        REFERENCES Products(ProductId) ON DELETE CASCADE,
+    CONSTRAINT FK_AffiliateLinks_Platforms FOREIGN KEY (PlatformId)
+        REFERENCES Platforms(PlatformId)
+);
+GO
+
+CREATE TABLE UserPreferences (
+    UserId INT NOT NULL PRIMARY KEY,
+    PreferredCategories NVARCHAR(MAX) NULL,
+    PreferredPlatforms NVARCHAR(MAX) NULL,
+    PriceRange NVARCHAR(MAX) NULL,
+    NotificationSettings NVARCHAR(MAX) NULL,
+    EmailNotifications BIT NOT NULL DEFAULT 1,
+    TelegramNotifications BIT NOT NULL DEFAULT 0,
+    PushNotifications BIT NOT NULL DEFAULT 0,
+    Language NVARCHAR(10) NULL DEFAULT 'vi',
+    Currency NVARCHAR(10) NULL DEFAULT 'VND',
+    LastUpdated DATETIME NULL,
+    CONSTRAINT FK_UserPreferences_Users FOREIGN KEY (UserId)
+        REFERENCES Users(UserId) ON DELETE CASCADE
+);
+GO
+
 -- =============================================
 -- Create Indexes
 -- =============================================
@@ -335,6 +565,48 @@ GO
 
 -- Index on Reviews.ProductId
 CREATE NONCLUSTERED INDEX IX_Reviews_ProductId ON Reviews(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_Stores_PlatformId ON Stores(PlatformId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_StoreListings_ProductId ON StoreListings(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_StoreListings_PlatformId ON StoreListings(PlatformId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_Favorites_UserId ON Favorites(UserId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_Favorites_ProductId ON Favorites(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_DiscountCodes_Code ON DiscountCodes(Code);
+GO
+
+CREATE NONCLUSTERED INDEX IX_DiscountCodes_ProductId ON DiscountCodes(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_DiscountCodes_PlatformId ON DiscountCodes(PlatformId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_ProductNews_ProductId ON ProductNews(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_ProductNews_PublishedAt ON ProductNews(PublishedAt);
+GO
+
+CREATE NONCLUSTERED INDEX IX_AffiliateLinks_ProductId ON AffiliateLinks(ProductId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_AffiliateLinks_PlatformId ON AffiliateLinks(PlatformId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_UserRoles_UserId ON UserRoles(UserId);
+GO
+
+CREATE NONCLUSTERED INDEX IX_RolePermissions_PermissionId ON RolePermissions(PermissionId);
 GO
 
 -- =============================================
@@ -478,9 +750,8 @@ GO
 -- Script completed successfully
 -- =============================================
 PRINT 'Database PriceWatcherDB created successfully!';
-PRINT 'Tables created: Platforms, Users, Products, PriceSnapshots, SearchHistories, SystemLogs, Categories, PriceAlerts, CrawlJobs, Reviews';
+PRINT 'Tables created: Platforms, Users, Products, PriceSnapshots, SearchHistories, SystemLogs, Categories, PriceAlerts, CrawlJobs, Reviews, Stores, StoreListings, Favorites, DiscountCodes, ProductNews, AdminRoles, Permissions, RolePermissions, UserRoles, AffiliateLinks, UserPreferences';
 PRINT 'Indexes created for performance optimization';
 PRINT 'Seed data inserted for Platforms';
 PRINT 'Views and Stored Procedures created';
 GO
-

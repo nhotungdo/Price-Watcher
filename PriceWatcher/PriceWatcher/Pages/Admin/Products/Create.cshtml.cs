@@ -25,57 +25,14 @@ namespace PriceWatcher.Pages.Admin.Products
         [BindProperty]
         public CreateInput Input { get; set; } = new();
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
+            return NotFound();
         }
 
-        public async Task<IActionResult> OnPostAsync(IFormFile? ImageFile)
+        public Task<IActionResult> OnPostAsync(IFormFile? ImageFile)
         {
-            if (!IsValidTikiUrl(Input.OriginalUrl))
-            {
-                ModelState.AddModelError(nameof(Input.OriginalUrl), "URL Tiki không hợp lệ");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                return Page();
-            }
-
-            string? imageUrl = Input.ImageUrl;
-            if (ImageFile != null && ImageFile.Length > 0)
-            {
-                var ext = Path.GetExtension(ImageFile.FileName).ToLowerInvariant();
-                var allowed = new[] { ".jpg", ".jpeg", ".png", ".webp" };
-                if (!allowed.Contains(ext))
-                {
-                    ModelState.AddModelError(string.Empty, "Định dạng ảnh không hỗ trợ");
-                    return Page();
-                }
-                var uploads = Path.Combine(_env.WebRootPath, "uploads");
-                Directory.CreateDirectory(uploads);
-                var fname = $"p_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}{ext}";
-                var path = Path.Combine(uploads, fname);
-                using (var stream = System.IO.File.Create(path))
-                {
-                    await ImageFile.CopyToAsync(stream);
-                }
-                imageUrl = $"/uploads/{fname}";
-            }
-
-            var p = new Product
-            {
-                ProductName = Input.ProductName,
-                Description = Input.Description,
-                CurrentPrice = Input.CurrentPrice,
-                OriginalUrl = Input.OriginalUrl,
-                ImageUrl = imageUrl,
-                LastUpdated = DateTime.UtcNow
-            };
-
-            _db.Products.Add(p);
-            await _db.SaveChangesAsync();
-
-            return RedirectToPage("Index");
+            return Task.FromResult<IActionResult>(NotFound());
         }
 
         public static bool IsValidTikiUrl(string? url)

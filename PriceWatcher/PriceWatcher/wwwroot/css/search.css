@@ -1,6 +1,6 @@
 .search-page .search-card {
     border-radius: 16px;
-    background: #fff;
+    background: var(--bg-white);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     display: flex;
     flex-direction: column;
@@ -12,7 +12,7 @@
     position: relative;
     width: 100%;
     padding-top: 65%;
-    background: #f8f9fa;
+    background: var(--bg-light);
 }
 
 .search-card__media img {
@@ -47,7 +47,7 @@
 .search-card__price {
     font-size: 1.15rem;
     font-weight: 700;
-    color: #e83c3c;
+    color: var(--tiki-secondary);
 }
 
 .search-card__rating {
@@ -73,14 +73,17 @@
 
 .search-banner-card {
     display: block;
-    background: #fff;
+    background: var(--bg-white);
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, .08);
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
-.search-banner-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(0,0,0,.12); }
+.search-banner-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+}
 
 .search-banner-card img {
     width: 100%;
@@ -102,4 +105,3 @@
         grid-template-columns: 1fr;
     }
 }
-

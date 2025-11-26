@@ -145,9 +145,114 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "GetFavorites",
+    "RelativePath": "api/Favorites",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "collection",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "AddFavorite",
+    "RelativePath": "api/Favorites",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "PriceWatcher.Controllers.AddFavoriteRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "RemoveFavorite",
+    "RelativePath": "api/Favorites/{favoriteId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "favoriteId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "UpdateFavorite",
+    "RelativePath": "api/Favorites/{favoriteId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "favoriteId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "PriceWatcher.Controllers.UpdateFavoriteRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "CheckFavorite",
+    "RelativePath": "api/Favorites/check/{productId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "productId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "GetCollections",
+    "RelativePath": "api/Favorites/collections",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.FavoritesController",
+    "Method": "GetFavoriteCount",
+    "RelativePath": "api/Favorites/count",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "PriceWatcher.Controllers.HomeController",
-    "Method": "GetFeaturedProducts",
-    "RelativePath": "api/home/featured",
+    "Method": "GetSuggestions",
+    "RelativePath": "api/home/suggestions",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -155,6 +260,64 @@
       {
         "Name": "limit",
         "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.HomeController",
+    "Method": "GetSuggestionsByPlatform",
+    "RelativePath": "api/home/suggestions/{platform}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "platform",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.HomeController",
+    "Method": "GetPersonalSuggestions",
+    "RelativePath": "api/home/suggestions/personal",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.HomeController",
+    "Method": "TestCategoryCrawl",
+    "RelativePath": "api/home/suggestions/test",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "perCategory",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "save",
+        "Type": "System.Boolean",
         "IsRequired": false
       }
     ],
@@ -383,6 +546,91 @@
     ]
   },
   {
+    "ContainingType": "PriceWatcher.Controllers.AdvancedSearchController",
+    "Method": "AdvancedSearch",
+    "RelativePath": "api/search/advanced",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "filters",
+        "Type": "PriceWatcher.Dtos.SearchFilters",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.AdvancedSearchController",
+    "Method": "GetCategoryCounts",
+    "RelativePath": "api/search/filters/categories",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "q",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.AdvancedSearchController",
+    "Method": "GetPlatformCounts",
+    "RelativePath": "api/search/filters/platforms",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "q",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.AdvancedSearchController",
+    "Method": "GetPriceRange",
+    "RelativePath": "api/search/filters/price-range",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "q",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.AdvancedSearchController",
+    "Method": "GetSuggestions",
+    "RelativePath": "api/search/suggestions",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "q",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "limit",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "PriceWatcher.Controllers.PriceAlertsController",
     "Method": "GetAlerts",
     "RelativePath": "api/users/{userId}/alerts",
@@ -520,6 +768,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "PriceWatcher.Controllers.MetricsController",
+    "Method": "RecordJsLog",
+    "RelativePath": "metrics/js",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "entry",
+        "Type": "PriceWatcher.Controllers.MetricsController\u002BJsLogEntry",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

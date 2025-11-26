@@ -71,7 +71,10 @@
             item.addEventListener('click', function () {
                 searchInput.value = this.dataset.value;
                 autocompleteDiv.style.display = 'none';
-                searchInput.closest('form').submit();
+                const form = searchInput.closest('form');
+                if (form && typeof form.submit === 'function') {
+                    form.submit();
+                }
             });
         });
 
@@ -161,6 +164,9 @@
         const carousel = document.getElementById('heroCarousel');
         if (!carousel) return;
 
+        if (!(window.bootstrap && bootstrap.Carousel)) {
+            return;
+        }
         const bsCarousel = new bootstrap.Carousel(carousel, {
             interval: 5000,
             ride: 'carousel',

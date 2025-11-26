@@ -1,11 +1,11 @@
 /* Authentication Pages Styles */
 :root {
-    --auth-primary: #1a94ff;
-    --auth-bg: #f5f5fa;
-    --auth-text: #38383d;
-    --auth-border: #dddde3;
-    --auth-error: #ff424e;
-    --auth-success: #00ea96;
+    --auth-primary: var(--tiki-primary);
+    --auth-bg: var(--bg-light);
+    --auth-text: var(--text-primary);
+    --auth-border: var(--border-color);
+    --auth-error: var(--danger);
+    --auth-success: var(--success);
 }
 
 body {
@@ -23,7 +23,7 @@ body {
 }
 
 .auth-card {
-    background: white;
+    background: var(--bg-white);
     border-radius: 20px;
     padding: 40px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -159,7 +159,7 @@ body {
 
 .btn-primary-auth {
     background: var(--auth-primary);
-    color: white;
+    color: var(--bg-white);
 }
 
 .btn-primary-auth:hover {
@@ -180,7 +180,7 @@ body {
 .auth-divider::after {
     content: '';
     flex: 1;
-    border-bottom: 1px solid #ebebf0;
+    border-bottom: 1px solid var(--bg-gray);
 }
 
 .auth-divider span {
@@ -188,13 +188,13 @@ body {
 }
 
 .btn-google-auth {
-    background: white;
+    background: var(--bg-white);
     border: 1px solid var(--auth-border);
     color: var(--auth-text);
 }
 
 .btn-google-auth:hover {
-    background: #f8f9fa;
+    background: var(--bg-light);
     border-color: #c4c4cf;
 }
 
@@ -202,7 +202,7 @@ body {
     text-align: center;
     margin-top: 24px;
     font-size: 14px;
-    color: #808089;
+    color: var(--text-medium);
 }
 
 .auth-link {
@@ -223,7 +223,7 @@ body {
 
 .strength-bar {
     height: 4px;
-    background: #ebebf0;
+    background: var(--bg-gray);
     border-radius: 2px;
     overflow: hidden;
     margin-bottom: 4px;

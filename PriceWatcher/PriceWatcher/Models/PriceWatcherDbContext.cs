@@ -41,6 +41,29 @@ public partial class PriceWatcherDbContext : DbContext
 
     public virtual DbSet<CartItem> CartItems { get; set; }
 
+    // New models for advanced features
+    public virtual DbSet<StoreListing> StoreListings { get; set; }
+
+    public virtual DbSet<Favorite> Favorites { get; set; }
+
+    public virtual DbSet<DiscountCode> DiscountCodes { get; set; }
+
+    public virtual DbSet<Store> Stores { get; set; }
+
+    public virtual DbSet<ProductNews> ProductNews { get; set; }
+
+    public virtual DbSet<AdminRole> AdminRoles { get; set; }
+
+    public virtual DbSet<Permission> Permissions { get; set; }
+
+    public virtual DbSet<RolePermission> RolePermissions { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
+
+    public virtual DbSet<AffiliateLink> AffiliateLinks { get; set; }
+
+    public virtual DbSet<UserPreference> UserPreferences { get; set; }
+
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -197,6 +220,172 @@ public partial class PriceWatcherDbContext : DbContext
                 .WithMany(c => c.Items)
                 .HasForeignKey(d => d.CartId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AdminRole>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+        });
+
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Name).HasMaxLength(100);
+            entity.Property(e => e.Resource).HasMaxLength(100);
+            entity.Property(e => e.Action).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<RolePermission>(entity =>
+        {
+            entity.HasKey(e => new { e.RoleId, e.PermissionId });
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.RolePermissions)
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Permission)
+                .WithMany(p => p.RolePermissions)
+                .HasForeignKey(e => e.PermissionId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId });
+            entity.Property(e => e.AssignedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.UserRoles)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Role)
+                .WithMany(r => r.UserRoles)
+                .HasForeignKey(e => e.RoleId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.AssignedBy)
+                .WithMany()
+                .HasForeignKey(e => e.AssignedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        modelBuilder.Entity<UserPreference>(entity =>
+        {
+            entity.HasKey(e => e.UserId);
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+            entity.HasOne(e => e.User)
+                .WithOne(u => u.UserPreference)
+                .HasForeignKey<UserPreference>(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Favorite>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.TargetPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.LastViewedAt).HasColumnType("datetime");
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.Favorites)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.Favorites)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Store>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Rating).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.ResponseRate).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.JoinedDate).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+            entity.HasOne(e => e.Platform)
+                .WithMany()
+                .HasForeignKey(e => e.PlatformId);
+        });
+
+        modelBuilder.Entity<StoreListing>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.OriginalPrice).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.ShippingCost).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.LastUpdated)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.StoreListings)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Platform)
+                .WithMany()
+                .HasForeignKey(e => e.PlatformId);
+        });
+
+        modelBuilder.Entity<DiscountCode>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.DiscountValue).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.MinPurchase).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.MaxDiscount).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.LastVerifiedAt).HasColumnType("datetime");
+            entity.HasOne(e => e.Platform)
+                .WithMany()
+                .HasForeignKey(e => e.PlatformId);
+            entity.HasOne(e => e.Product)
+                .WithMany()
+                .HasForeignKey(e => e.ProductId);
+            entity.HasOne(e => e.SubmittedBy)
+                .WithMany()
+                .HasForeignKey(e => e.SubmittedByUserId);
+        });
+
+        modelBuilder.Entity<ProductNews>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.PublishedAt).HasColumnType("datetime");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.ProductNews)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<AffiliateLink>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Revenue).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CommissionRate).HasColumnType("decimal(18, 2)");
+            entity.Property(e => e.CreatedAt)
+                .HasColumnType("datetime")
+                .HasDefaultValueSql("(getutcdate())");
+            entity.Property(e => e.LastClickedAt).HasColumnType("datetime");
+            entity.HasOne(e => e.Product)
+                .WithMany(p => p.AffiliateLinks)
+                .HasForeignKey(e => e.ProductId)
+                .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Platform)
+                .WithMany()
+                .HasForeignKey(e => e.PlatformId);
         });
 
         OnModelCreatingPartial(modelBuilder);

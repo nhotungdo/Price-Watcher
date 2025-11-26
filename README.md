@@ -91,6 +91,8 @@ Khuyến nghị dùng [dotnet user-secrets](https://learn.microsoft.com/aspnet/c
 2. Dán URL sản phẩm hoặc tải lên ảnh
 3. Bấm “Phân tích giá” và xem Top đề xuất theo từng sàn
 
+- Nút "Thêm vào giỏ" trên trang chi tiết: thêm sản phẩm vào giỏ hàng và cập nhật badge giỏ. Nút dùng phong cách giao diện hiện tại (màu chủ đạo Tiki, bo tròn lớn, hiệu ứng hover/focus, responsive). Liên kết "Tới nơi bán" vẫn mở trang sản phẩm của sàn.
+
 API nội bộ:
 
 - `POST /search/submit` — tạo job tìm kiếm

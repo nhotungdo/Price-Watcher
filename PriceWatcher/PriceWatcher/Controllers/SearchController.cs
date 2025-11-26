@@ -14,7 +14,7 @@ namespace PriceWatcher.Controllers;
 public class SearchController : ControllerBase
 {
     private const long MaxImageBytes = 5 * 1024 * 1024;
-    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png" , "image/webp", "image/gif"};
+    private static readonly string[] AllowedContentTypes = { "image/jpeg", "image/png", "image/webp", "image/gif" };
 
     private readonly ISearchJobQueue _jobQueue;
     private readonly ISearchStatusService _statusService;
@@ -41,6 +41,7 @@ public class SearchController : ControllerBase
         _productSearchService = productSearchService;
         _searchHistoryService = searchHistoryService;
     }
+
 
     [HttpPost("submit")]
     [Consumes("application/json")]
@@ -301,4 +302,3 @@ public class SearchController : ControllerBase
         return null;
     }
 }
-

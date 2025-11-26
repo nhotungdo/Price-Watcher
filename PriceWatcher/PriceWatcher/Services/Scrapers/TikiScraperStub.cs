@@ -27,9 +27,16 @@ public class TikiScraperStub : IProductScraper
         try
         {
             var keyword = string.IsNullOrWhiteSpace(query.TitleHint) ? query.ProductId : query.TitleHint!;
+            var page = 1;
+            var limit = 20;
+            if (query.Metadata != null)
+            {
+                if (query.Metadata.TryGetValue("page", out var p) && int.TryParse(p, out var pv) && pv > 0) page = pv;
+                if (query.Metadata.TryGetValue("limit", out var l) && int.TryParse(l, out var lv) && lv > 0 && lv <= 50) limit = lv;
+            }
             var list = new List<ProductCandidateDto>();
             // cố gắng API trước
-            var url = $"https://api.tiki.vn/raiden/v2/products?q={Uri.EscapeDataString(keyword)}&page=1&limit=20";
+            var url = $"https://api.tiki.vn/raiden/v2/products?q={Uri.EscapeDataString(keyword)}&page={page}&limit={limit}";
             var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Referrer = new Uri("https://tiki.vn");
             req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
@@ -85,7 +92,7 @@ public class TikiScraperStub : IProductScraper
                 if (snippet.Length > 256) snippet = snippet[..256];
                 _logger.LogWarning("Tiki API returned {Status} for {Keyword}. Snippet={Snippet}", res.StatusCode, keyword, snippet);
                 // fallback HTML: parse __NEXT_DATA__
-                var searchUrl = $"https://tiki.vn/search?q={Uri.EscapeDataString(keyword)}";
+                var searchUrl = $"https://tiki.vn/search?q={Uri.EscapeDataString(keyword)}&page={page}";
                 var html = await _http.GetStringAsync(searchUrl, cancellationToken);
                 var m = System.Text.RegularExpressions.Regex.Match(html, @"id=""__NEXT_DATA__""[^>]*>([\s\S]*?)</script>", System.Text.RegularExpressions.RegexOptions.Singleline);
                 if (m.Success)
@@ -172,4 +179,3 @@ public class TikiScraperStub : IProductScraper
         });
     }
 }
-

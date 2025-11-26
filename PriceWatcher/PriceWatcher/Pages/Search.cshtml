@@ -131,7 +131,7 @@
                                 <span class="badge bg-light text-dark">Score @item.MatchScore.ToString("P0")</span>
                                 @if (!string.IsNullOrWhiteSpace(item.ProductUrl))
                                 {
-                                    <a class="btn btn-outline-primary btn-sm" href="@item.ProductUrl" target="_blank" rel="noopener">Tới nơi bán</a>
+                                    <a class="buy-btn buy-btn--sm" href="@item.ProductUrl" target="_blank" rel="noopener">Tới nơi bán</a>
                                 }
                             </div>
                         </div>
@@ -176,4 +176,3 @@
     </script>
     <script src="~/js/search.js" asp-append-version="true"></script>
 }
-

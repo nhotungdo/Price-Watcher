@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "BaFhlGjFEE8QGOl12llJkk5qECdEphipA67ndc+CkQk=",
+  "Hash": "fljthH8uV56qDES9clUiHInN/jd7XI8p3Xmxk8Z3ZoY=",
   "Source": "PriceWatcher",
   "BasePath": "_content/PriceWatcher",
   "Mode": "Default",
@@ -167,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\suggestions.css",
+      "SourceId": "PriceWatcher",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\",
+      "BasePath": "_content/PriceWatcher",
+      "RelativePath": "css/suggestions.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\suggestions.css"
     },
     {
       "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\favicon.ico",

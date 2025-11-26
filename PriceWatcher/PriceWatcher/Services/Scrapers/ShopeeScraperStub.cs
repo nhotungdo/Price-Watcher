@@ -33,7 +33,14 @@ public class ShopeeScraperStub : IProductScraper
             var preflight = new HttpRequestMessage(HttpMethod.Get, $"https://shopee.vn/search?keyword={Uri.EscapeDataString(keyword)}");
             preflight.Headers.Referrer = new Uri("https://shopee.vn/");
             await _http.SendAsync(preflight, cancellationToken);
-            var url = $"https://shopee.vn/api/v4/search/search_items?by=relevancy&order=desc&keyword={Uri.EscapeDataString(keyword)}&limit=20&newest=0";
+            var limit = 20;
+            var offset = 0;
+            if (query.Metadata != null)
+            {
+                if (query.Metadata.TryGetValue("limit", out var l) && int.TryParse(l, out var lv) && lv > 0 && lv <= 50) limit = lv;
+                if (query.Metadata.TryGetValue("offset", out var o) && int.TryParse(o, out var ov) && ov >= 0) offset = ov;
+            }
+            var url = $"https://shopee.vn/api/v4/search/search_items?by=relevancy&order=desc&keyword={Uri.EscapeDataString(keyword)}&limit={limit}&newest={offset}";
             var req = new HttpRequestMessage(HttpMethod.Get, url);
             req.Headers.Referrer = new Uri($"https://shopee.vn/search?keyword={Uri.EscapeDataString(keyword)}");
             req.Headers.Add("x-api-source", "pc");
@@ -285,4 +292,3 @@ public class ShopeeScraperStub : IProductScraper
         return (decimal)raw; // fallback
     }
 }
-
