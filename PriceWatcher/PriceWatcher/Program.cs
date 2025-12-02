@@ -123,6 +123,9 @@ builder.Services.AddScoped<IMultiPlatformSearchService, MultiPlatformSearchServi
 // Category Management
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 
+// Search Suggestions
+builder.Services.AddScoped<ISearchSuggestionService, SearchSuggestionService>();
+
 // SerpApi HTTP Client
 builder.Services.AddHttpClient("serpapi", c =>
 {

@@ -41,8 +41,8 @@ public class CartController : ControllerBase
         return Ok(cart);
     }
 
-    [HttpPatch("items/{productId:int}")]
-    public async Task<IActionResult> UpdateItem(int productId, [FromBody] UpdateCartItemRequest request, [FromQuery] int? platformId, CancellationToken cancellationToken = default)
+    [HttpPatch("items/{cartItemId:int}")]
+    public async Task<IActionResult> UpdateItem(int cartItemId, [FromBody] UpdateCartItemRequest request, CancellationToken cancellationToken = default)
     {
         if (!ModelState.IsValid)
         {
@@ -50,15 +50,15 @@ public class CartController : ControllerBase
         }
 
         var context = ResolveContext(createAnonymous: false);
-        var cart = await _cartService.UpdateQuantityAsync(productId, platformId, request.Quantity, context.UserId, context.AnonymousId, cancellationToken);
+        var cart = await _cartService.UpdateQuantityByCartItemIdAsync(cartItemId, request.Quantity, context.UserId, context.AnonymousId, cancellationToken);
         return Ok(cart);
     }
 
-    [HttpDelete("items/{productId:int}")]
-    public async Task<IActionResult> RemoveItem(int productId, [FromQuery] int? platformId, CancellationToken cancellationToken = default)
+    [HttpDelete("items/{cartItemId:int}")]
+    public async Task<IActionResult> RemoveItem(int cartItemId, CancellationToken cancellationToken = default)
     {
         var context = ResolveContext(createAnonymous: false);
-        var cart = await _cartService.RemoveItemAsync(productId, platformId, context.UserId, context.AnonymousId, cancellationToken);
+        var cart = await _cartService.RemoveItemByCartItemIdAsync(cartItemId, context.UserId, context.AnonymousId, cancellationToken);
         return Ok(cart);
     }
 

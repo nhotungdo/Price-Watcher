@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "xxQjc8/h858+wqyBr/kG3dXoWyqcJcLjkQ9jui7wv0Q=",
+  "Hash": "SZ8acvEd+VKhkh66BVK1ipgOxqnbL07hBUmL/BUxcqY=",
   "Source": "PriceWatcher",
   "BasePath": "_content/PriceWatcher",
   "Mode": "Default",
@@ -167,6 +167,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\search.css"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\search-suggestions.css",
+      "SourceId": "PriceWatcher",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\",
+      "BasePath": "_content/PriceWatcher",
+      "RelativePath": "css/search-suggestions.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\search-suggestions.css"
     },
     {
       "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\site.css",
@@ -395,6 +414,25 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\search.js"
+    },
+    {
+      "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\search-suggestions.js",
+      "SourceId": "PriceWatcher",
+      "SourceType": "Discovered",
+      "ContentRoot": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\",
+      "BasePath": "_content/PriceWatcher",
+      "RelativePath": "js/search-suggestions.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\search-suggestions.js"
     },
     {
       "Identity": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\site.js",

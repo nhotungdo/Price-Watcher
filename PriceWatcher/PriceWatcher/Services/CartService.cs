@@ -36,7 +36,11 @@ public class CartService : ICartService
 
         await CleanupExpiredCartsAsync(cancellationToken);
         var cart = await LoadCartAsync(userId, anonymousId, createIfMissing: true, cancellationToken);
-        var item = cart.Items.FirstOrDefault(i => i.ProductId == request.ProductId && i.PlatformId == request.PlatformId);
+        
+        // Find existing item by ProductUrl (for external products) or by ProductId+PlatformId (for tracked products)
+        var item = cart.Items.FirstOrDefault(i => 
+            (!string.IsNullOrEmpty(request.ProductUrl) && i.ProductUrl == request.ProductUrl) ||
+            (request.ProductId > 0 && i.ProductId == request.ProductId && i.PlatformId == request.PlatformId));
 
         if (item == null)
         {
@@ -97,6 +101,32 @@ public class CartService : ICartService
         return ToDto(cart);
     }
 
+    public async Task<CartDto> UpdateQuantityByCartItemIdAsync(int cartItemId, int quantity, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default)
+    {
+        if (quantity < 1 || quantity > MaxQuantity)
+        {
+            throw new ArgumentOutOfRangeException(nameof(quantity));
+        }
+
+        await CleanupExpiredCartsAsync(cancellationToken);
+        var cart = await LoadCartAsync(userId, anonymousId, createIfMissing: false, cancellationToken);
+        if (cart == null)
+        {
+            return new CartDto();
+        }
+
+        var item = cart.Items.FirstOrDefault(i => i.CartItemId == cartItemId);
+        if (item == null)
+        {
+            return ToDto(cart);
+        }
+
+        item.Quantity = quantity;
+        item.UpdatedAt = DateTime.UtcNow;
+        await UpdateCartTimestampsAsync(cart, cancellationToken);
+        return ToDto(cart);
+    }
+
     public async Task<CartDto> RemoveItemAsync(int productId, int? platformId, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default)
     {
         await CleanupExpiredCartsAsync(cancellationToken);
@@ -107,6 +137,25 @@ public class CartService : ICartService
         }
 
         var item = cart.Items.FirstOrDefault(i => i.ProductId == productId && i.PlatformId == platformId);
+        if (item != null)
+        {
+            cart.Items.Remove(item);
+        }
+
+        await UpdateCartTimestampsAsync(cart, cancellationToken);
+        return ToDto(cart);
+    }
+
+    public async Task<CartDto> RemoveItemByCartItemIdAsync(int cartItemId, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default)
+    {
+        await CleanupExpiredCartsAsync(cancellationToken);
+        var cart = await LoadCartAsync(userId, anonymousId, createIfMissing: false, cancellationToken);
+        if (cart == null)
+        {
+            return new CartDto();
+        }
+
+        var item = cart.Items.FirstOrDefault(i => i.CartItemId == cartItemId);
         if (item != null)
         {
             cart.Items.Remove(item);

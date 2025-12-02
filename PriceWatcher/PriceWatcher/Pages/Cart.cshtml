@@ -132,19 +132,19 @@
         function formatCurrency(amount) { return currencyFormatter.format(amount || 0); }
 
         const selectedKeys = new Set();
-        const getKey = (item) => `${item.productId}:${item.platformId ?? 'null'}`;
+        const getKey = (item) => `${item.cartItemId}`;
 
         // Cập nhật số lượng sản phẩm
-        async function updateQuantity(productId, platformId, quantity) {
+        async function updateQuantity(cartItemId, quantity) {
             if (!window.cartClient) return;
-            await window.cartClient.updateQuantity(productId, platformId, Number(quantity));
+            await window.cartClient.updateQuantity(cartItemId, Number(quantity));
         }
 
         // Mở modal xác nhận xóa sản phẩm
         let pendingRemove = null;
-        async function removeItem(productId, platformId, name) {
+        async function removeItem(cartItemId, name) {
             if (!window.cartClient) return;
-            pendingRemove = { productId, platformId };
+            pendingRemove = { cartItemId };
             const nameEl = document.getElementById('removeItemName');
             if (nameEl) nameEl.textContent = name || '';
             const modal = new bootstrap.Modal(document.getElementById('removeConfirmModal'));
@@ -176,7 +176,7 @@
                     const discountPercent = hasDiscount ? Math.round(((item.originalPrice - item.price) / item.originalPrice) * 100) : 0;
                     const subtotal = (item.price || 0) * (item.quantity || 0);
                     return `
-                    <div class="cart-item animate-in" data-product-id="${item.productId}" data-platform-id="${item.platformId}">
+                    <div class="cart-item animate-in" data-cart-item-id="${item.cartItemId}">
                         <div class="row align-items-center g-3">
                             <div class="col-auto d-flex align-items-center gap-3">
                                 <input type="checkbox" class="form-check-input item-select" data-index="${idx}" data-key="${key}" ${selectedKeys.has(key) ? 'checked' : ''}>
@@ -185,7 +185,7 @@
                             <div class="col">
                                 <div class="cart-item-details">
                                     <span class="cart-item-platform">${item.platformName || ''}</span>
-                                    <h5 class="cart-item-name">${item.name}</h5>
+                                    ${item.productUrl ? `<a href="${item.productUrl}" target="_blank" class="cart-item-name text-decoration-none" style="color: inherit;">${item.name}</a>` : `<h5 class="cart-item-name">${item.name}</h5>`}
                                     <div class="d-flex align-items-center gap-2">
                                         <div class="cart-item-price">
                                             ${formatCurrency(item.price)}
@@ -195,18 +195,19 @@
                                     </div>
                                     <div class="item-subtotal">Tạm tính: <span>${formatCurrency(subtotal)}</span></div>
                                     <div class="text-muted small">Vận chuyển: Miễn phí</div>
+                                    ${item.productUrl ? `<a href="${item.productUrl}" target="_blank" class="btn btn-sm btn-outline-primary mt-2"><i class="bi bi-box-arrow-up-right"></i> Xem sản phẩm</a>` : ''}
                                 </div>
                             </div>
                             <div class="col-auto">
                                 <div class="d-flex flex-column align-items-end gap-3">
                                     <div class="quantity-control">
-                                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
+                                        <button class="quantity-btn" onclick="updateQuantity(${item.cartItemId}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>−</button>
                                         <input type="number" class="quantity-input" value="${item.quantity}" min="1" max="99"
                                                oninput="document.getElementById('updateCartBtn')?.classList.remove('d-none')"
-                                               onchange="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, this.value)">
-                                        <button class="quantity-btn" onclick="updateQuantity(${item.productId}, ${item.platformId ?? 'null'}, ${item.quantity + 1})" ${item.quantity >= 99 ? 'disabled' : ''}>+</button>
+                                               onchange="updateQuantity(${item.cartItemId}, this.value)">
+                                        <button class="quantity-btn" onclick="updateQuantity(${item.cartItemId}, ${item.quantity + 1})" ${item.quantity >= 99 ? 'disabled' : ''}>+</button>
                                     </div>
-                                    <button class="remove-item-btn" onclick="removeItem(${item.productId}, ${item.platformId ?? 'null'}, '${item.name.replace(/"/g, '&quot;')}')">
+                                    <button class="remove-item-btn" onclick="removeItem(${item.cartItemId}, '${item.name.replace(/"/g, '&quot;')}')">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
                                             <polyline points="3 6 5 6 21 6"></polyline>
                                             <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
@@ -296,7 +297,7 @@
                 for (const it of items) {
                     const key = getKey(it);
                     if (selectedKeys.has(key)) {
-                        await window.cartClient.removeItem(it.productId, it.platformId);
+                        await window.cartClient.removeItem(it.cartItemId);
                     }
                 }
                 selectedKeys.clear();
@@ -307,7 +308,7 @@
         document.getElementById('confirmRemoveBtn')?.addEventListener('click', async () => {
             if (!pendingRemove) return;
             try {
-                await window.cartClient.removeItem(pendingRemove.productId, pendingRemove.platformId);
+                await window.cartClient.removeItem(pendingRemove.cartItemId);
             } finally {
                 const modalEl = document.getElementById('removeConfirmModal');
                 const modal = bootstrap.Modal.getInstance(modalEl);

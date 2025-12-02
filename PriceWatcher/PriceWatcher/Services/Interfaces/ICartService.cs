@@ -7,7 +7,9 @@ public interface ICartService
     Task<CartDto> GetCartAsync(int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
     Task<CartDto> AddItemAsync(AddCartItemRequest request, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
     Task<CartDto> UpdateQuantityAsync(int productId, int? platformId, int quantity, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
+    Task<CartDto> UpdateQuantityByCartItemIdAsync(int cartItemId, int quantity, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
     Task<CartDto> RemoveItemAsync(int productId, int? platformId, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
+    Task<CartDto> RemoveItemByCartItemIdAsync(int cartItemId, int? userId, Guid? anonymousId, CancellationToken cancellationToken = default);
     Task MergeAsync(int userId, Guid anonymousId, CancellationToken cancellationToken = default);
     Task DeactivateAnonymousCartAsync(Guid anonymousId, CancellationToken cancellationToken = default);
 }
