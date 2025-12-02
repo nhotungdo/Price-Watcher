@@ -1,0 +1,107 @@
+@page "/category/{categoryName}"
+@model PriceWatcher.Pages.CategoryModel
+@{
+    ViewData["Title"] = $"{Model.CategoryName} - Danh mục sản phẩm";
+    ViewData["Description"] = $"Khám phá và so sánh giá {Model.CategoryName} từ Tiki, Shopee, Lazada. Tìm sản phẩm {Model.CategoryName} giá tốt nhất.";
+}
+
+<div class="category-page container-fluid px-3 py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.CategoryName</li>
+        </ol>
+    </nav>
+
+    <!-- Category Header -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex align-items-center gap-3">
+                <div class="category-icon-large">@Model.CategoryIcon</div>
+                <div>
+                    <h1 class="h3 mb-1">@Model.CategoryName</h1>
+                    <p class="text-muted mb-0">@Model.ProductCount sản phẩm</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and Sort Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#categoryFilters">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                </svg>
+                Bộ lọc
+            </button>
+        </div>
+        <select class="form-select form-select-sm" id="categorySort" style="width: auto;">
+            <option value="">Sắp xếp</option>
+            <option value="price_asc">Giá tăng dần</option>
+            <option value="price_desc">Giá giảm dần</option>
+            <option value="discount">Khuyến mãi</option>
+            <option value="rating">Đánh giá cao</option>
+        </select>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row g-3" id="categoryProducts">
+        <div class="col-12 text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const categoryName = '@Model.CategoryName';
+            const container = document.getElementById('categoryProducts');
+            
+            try {
+                const response = await fetch(`/api/products/category/${encodeURIComponent(categoryName)}`);
+                const products = await response.json();
+                
+                if (!products || products.length === 0) {
+                    container.innerHTML = '<div class="col-12 text-center py-5"><p class="text-muted">Chưa có sản phẩm trong danh mục này</p></div>';
+                    return;
+                }
+                
+                container.innerHTML = products.map(p => `
+                    <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+                        <div class="product-card">
+                            <div class="product-image-wrapper">
+                                <img src="${p.imageUrl || '/images/placeholder.png'}" alt="${p.productName}" class="product-image" loading="lazy">
+                                ${p.discountRate ? `<span class="product-badge">-${p.discountRate}%</span>` : ''}
+                                <span class="platform-badge platform-${p.platform?.toLowerCase()}">${p.platform}</span>
+                            </div>
+                            <div class="product-info">
+                                <div class="product-name">${p.productName}</div>
+                                <div class="product-price-block">
+                                    ${p.originalPrice && p.originalPrice > p.currentPrice ? `<span class="product-price-old">${formatPrice(p.originalPrice)}</span>` : ''}
+                                    <span class="product-price">${formatPrice(p.currentPrice)}</span>
+                                </div>
+                                <a class="buy-btn" href="${p.originalUrl}" target="_blank">Tới nơi bán</a>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading products:', error);
+                container.innerHTML = '<div class="col-12 text-center py-5 text-danger">Không thể tải sản phẩm</div>';
+            }
+            
+            function formatPrice(price) {
+                if (!price) return '0₫';
+                return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+            }
+        });
+    </script>
+}

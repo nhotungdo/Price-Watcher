@@ -30,6 +30,7 @@ builder.Services.AddDbContext<PriceWatcherDbContext>(options =>
 builder.Services.Configure<RecommendationOptions>(builder.Configuration.GetSection("Recommendation"));
 builder.Services.Configure<TelegramOptions>(builder.Configuration.GetSection("Telegram"));
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
+builder.Services.Configure<SerpApiOptions>(builder.Configuration.GetSection("SerpApi"));
 
 builder.Services.AddHttpClient("telegram")
     .AddPolicyHandler(CreateRetryPolicy());
@@ -82,7 +83,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
 builder.Services.AddScoped<ILinkProcessor, LinkProcessor>();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IImageSearchService, ImageSearchServiceStub>();
+builder.Services.AddScoped<IVisualSearchService, VisualSearchService>();
 builder.Services.AddSingleton<IImageEmbeddingService, ImageEmbeddingService>();
 builder.Services.AddSingleton<IMetricsService, MetricsService>();
 builder.Services.AddScoped<IRecommendationService, RecommendationService>();
@@ -91,12 +94,17 @@ builder.Services.AddScoped<ISearchHistoryService, SearchHistoryService>();
 builder.Services.AddScoped<ITelegramNotifier, TelegramNotifier>();
 builder.Services.AddSingleton<ISearchStatusService, SearchStatusService>();
 builder.Services.AddScoped<ISearchProcessingService, SearchProcessingService>();
+// Scrapers - HTTP-based (fast for bulk operations)
 builder.Services.AddScoped<IProductScraper, ShopeeScraperStub>();
-builder.Services.AddScoped<IProductScraper, LazadaScraperStub>();
 builder.Services.AddScoped<IProductScraper, TikiScraperStub>();
+
+// Playwright-based scraper (for anti-bot scenarios, registered as singleton for browser reuse)
+builder.Services.AddSingleton<ShopeePlaywrightScraper>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICartSessionService, CartSessionService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IOnboardingService, OnboardingService>();
+builder.Services.AddScoped<IShippingCalculator, ShippingCalculator>();
 
 // Register new feature services
 builder.Services.AddMemoryCache();
@@ -108,6 +116,20 @@ builder.Services.AddScoped<ISuggestedProductsService, SuggestedProductsService>(
 builder.Services.AddScoped<IAdvancedSearchService, AdvancedSearchService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
 builder.Services.AddScoped<IStoreListingService, StoreListingService>();
+
+// Multi-Platform Search
+builder.Services.AddScoped<IMultiPlatformSearchService, MultiPlatformSearchService>();
+
+// Category Management
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+// SerpApi HTTP Client
+builder.Services.AddHttpClient("serpapi", c =>
+{
+    c.BaseAddress = new Uri("https://serpapi.com");
+    c.Timeout = TimeSpan.FromSeconds(30);
+    c.DefaultRequestHeaders.Accept.ParseAdd("application/json");
+});
 
 // Crawler Services
 builder.Services.AddHttpClient("tiki", c =>
@@ -135,17 +157,7 @@ builder.Services.AddHttpClient("shopee", c =>
     CookieContainer = new System.Net.CookieContainer(),
     AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
 }).AddPolicyHandler(CreateRetryPolicy());
-builder.Services.AddHttpClient("lazada", c =>
-{
-    c.BaseAddress = new Uri("https://www.lazada.vn");
-    c.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
-    c.DefaultRequestHeaders.Accept.ParseAdd("text/html,application/json");
-    c.DefaultRequestHeaders.AcceptLanguage.ParseAdd("vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7");
-}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-{
-    CookieContainer = new System.Net.CookieContainer(),
-    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-}).AddPolicyHandler(CreateRetryPolicy());
+
 
 
 builder.Services.AddSingleton(Channel.CreateUnbounded<SearchJob>());
@@ -213,6 +225,18 @@ BEGIN
     ALTER TABLE dbo.CartItems WITH CHECK ADD CONSTRAINT FK_CartItems_Carts_CartId FOREIGN KEY(CartId) REFERENCES dbo.Carts(CartId) ON DELETE CASCADE;
 END;
 
+");
+    }
+    catch { }
+
+    try
+    {
+        db.Database.ExecuteSqlRaw(@"
+IF COL_LENGTH('UserPreferences','OnboardingStatus') IS NULL ALTER TABLE UserPreferences ADD OnboardingStatus NVARCHAR(50) NULL;
+IF COL_LENGTH('UserPreferences','HasCompletedOnboarding') IS NULL ALTER TABLE UserPreferences ADD HasCompletedOnboarding BIT NOT NULL DEFAULT(0);
+IF COL_LENGTH('UserPreferences','OnboardingDraft') IS NULL ALTER TABLE UserPreferences ADD OnboardingDraft NVARCHAR(MAX) NULL;
+IF COL_LENGTH('UserPreferences','WalletsJson') IS NULL ALTER TABLE UserPreferences ADD WalletsJson NVARCHAR(MAX) NULL;
+IF COL_LENGTH('UserPreferences','SavingGoalsJson') IS NULL ALTER TABLE UserPreferences ADD SavingGoalsJson NVARCHAR(MAX) NULL;
 ");
     }
     catch { }

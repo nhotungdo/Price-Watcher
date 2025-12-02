@@ -1,0 +1,15 @@
+# robots.txt for Săn Sale Tốt
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /cart
+Disallow: /tracking
+Disallow: /login
+Disallow: /register
+
+# Sitemap
+Sitemap: https://sansaletot.vn/sitemap.xml
+
+# Crawl-delay
+Crawl-delay: 1

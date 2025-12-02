@@ -1,0 +1,414 @@
+/* Premium Tiki-like UI Enhancements */
+
+/* Gradients and Premium Effects */
+:root {
+  --gradient-blue: linear-gradient(135deg, #1a94ff 0%, #0d87f0 100%);
+  --gradient-red: linear-gradient(135deg, #ff424e 0%, #ff1744 100%);
+  --gradient-gold: linear-gradient(135deg, #ffc400 0%, #ffb300 100%);
+  --gradient-green: linear-gradient(135deg, #00ab56 0%, #00953f 100%);
+  
+  --shadow-hover: 0 12px 24px rgba(26, 148, 255, 0.25);
+  --shadow-active: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Premium Card Styles */
+.product-card {
+  position: relative;
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  z-index: 1;
+}
+
+.product-card:hover::before {
+  opacity: 0.5;
+}
+
+.product-card:hover {
+  box-shadow: 0 16px 32px rgba(26, 148, 255, 0.15);
+  border-color: rgba(26, 148, 255, 0.3);
+}
+
+/* Enhanced Image Effects */
+.product-image {
+  filter: brightness(1);
+  transition: filter 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  filter: brightness(1.08);
+}
+
+/* Discount Badge Animation */
+@keyframes badge-bounce {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.product-badge {
+  animation: badge-bounce 2s ease-in-out infinite;
+  background: var(--gradient-red) !important;
+  box-shadow: 0 4px 12px rgba(255, 66, 78, 0.4);
+}
+
+/* Enhanced Button Styles */
+.buy-btn {
+  background: var(--gradient-blue) !important;
+  position: relative;
+  overflow: hidden;
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.buy-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.buy-btn:hover::before {
+  left: 100%;
+}
+
+.buy-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(26, 148, 255, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.buy-btn:active {
+  transform: translateY(-1px);
+}
+
+/* Flash Deal Styles */
+.flash-deal-section-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.flash-deal-section-wrapper::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  animation: shine 3s infinite;
+  pointer-events: none;
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Countdown Timer Enhancement */
+.countdown-timer {
+  background: linear-gradient(135deg, #fff8e1 0%, #fffde7 100%);
+  border: 1px solid rgba(255, 196, 0, 0.3);
+  box-shadow: 0 2px 8px rgba(255, 196, 0, 0.2);
+}
+
+.countdown-value {
+  font-variant-numeric: tabular-nums;
+  color: #f57f17;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Platform Badge Enhancements */
+.platform-badge {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.platform-tiki {
+  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%) !important;
+}
+
+.platform-shopee {
+  background: linear-gradient(135deg, #ee4d2d 0%, #cc3a1a 100%) !important;
+}
+
+.platform-lazada {
+  background: linear-gradient(135deg, #0099cc 0%, #0077aa 100%) !important;
+}
+
+/* Rating Stars Enhancement */
+.rating-stars {
+  display: inline-flex;
+  font-size: 1.2em;
+  letter-spacing: -0.3em;
+  filter: drop-shadow(0 1px 2px rgba(255, 196, 0, 0.3));
+}
+
+.rating-count {
+  font-size: 0.85em;
+  font-weight: 500;
+  color: #999;
+}
+
+/* Free Ship Badge */
+.free-ship-badge {
+  position: relative;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%) !important;
+  border-left: 3px solid var(--success) !important;
+  padding: 0.5rem 0.75rem !important;
+  border-radius: 4px;
+  font-weight: 600;
+  color: #00953f;
+  transition: all 0.3s ease;
+}
+
+.free-ship-badge::before {
+  content: '✓ ';
+  font-weight: 700;
+}
+
+.product-card:hover .free-ship-badge {
+  background: linear-gradient(135deg, #c8e6c9 0%, #e8f5e9 100%) !important;
+  transform: translateX(2px);
+}
+
+/* Category Link Hover Effects */
+.category-link {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-link::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) scaleX(0);
+  width: 2px;
+  height: 80%;
+  background: var(--gradient-blue);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.category-link:hover::after {
+  transform: translateY(-50%) scaleX(1);
+}
+
+/* Section Header Styles */
+.section-header {
+  position: relative;
+  border-bottom-color: rgba(26, 148, 255, 0.1) !important;
+}
+
+.section-header::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--gradient-blue);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.section-header:hover::after {
+  width: 20%;
+}
+
+/* View All Link Enhancement */
+.view-all-link {
+  position: relative;
+  overflow: hidden;
+  color: var(--tiki-blue);
+}
+
+.view-all-link::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--gradient-blue);
+  transition: width 0.3s ease;
+}
+
+.view-all-link:hover::before {
+  width: 100%;
+}
+
+/* Platform Tab Enhancement */
+.platform-tab {
+  position: relative;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.platform-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--gradient-blue);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.3s ease;
+}
+
+.platform-tab.active::after {
+  transform: scaleX(1);
+}
+
+.platform-tab.active {
+  background: var(--gradient-blue);
+  color: white;
+  box-shadow: 0 4px 12px rgba(26, 148, 255, 0.3);
+}
+
+.platform-tab:hover:not(.active) {
+  background: rgba(26, 148, 255, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Ad Sub Card Enhancement */
+.ad-sub-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-light);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ad-sub-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.ad-sub-card:hover::after {
+  left: 100%;
+}
+
+.ad-sub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+/* Crawl Section Enhancements */
+.crawl-section .card {
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
+}
+
+.crawl-section .card:hover {
+  border-color: var(--tiki-blue);
+  box-shadow: 0 8px 20px rgba(26, 148, 255, 0.15);
+}
+
+.crawl-section .form-control:focus {
+  border-color: var(--tiki-blue);
+  box-shadow: 0 0 0 4px rgba(26, 148, 255, 0.1);
+  transform: scale(1.01);
+}
+
+.crawl-section .btn-primary {
+  background: var(--gradient-blue);
+  border: none;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.crawl-section .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(26, 148, 255, 0.4);
+}
+
+/* Smooth Transitions */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+a, button, input, textarea, select {
+  transition: all 0.3s ease;
+}
+
+/* Loading States */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner-border {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive Enhancements */
+@media (max-width: 768px) {
+  .flash-deal-section {
+    padding: 1rem;
+  }
+
+  .countdown-timer {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .product-card {
+    margin: 0 auto;
+  }
+
+  .buy-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

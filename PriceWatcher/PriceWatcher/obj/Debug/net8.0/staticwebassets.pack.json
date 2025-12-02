@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets\\css\\layout.css"
     },
     {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\multi-search.css",
+      "PackagePath": "staticwebassets\\css\\multi-search.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\search.css",
       "PackagePath": "staticwebassets\\css\\search.css"
     },
@@ -33,16 +37,40 @@
       "PackagePath": "staticwebassets\\css\\suggestions.css"
     },
     {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\tiki-premium.css",
+      "PackagePath": "staticwebassets\\css\\tiki-premium.css"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\css\\visual-search.css",
+      "PackagePath": "staticwebassets\\css\\visual-search.css"
+    },
+    {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\images\\platforms\\shopee-icon.png",
+      "PackagePath": "staticwebassets\\images\\platforms\\shopee-icon.png"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\images\\platforms\\tiki-icon.png",
+      "PackagePath": "staticwebassets\\images\\platforms\\tiki-icon.png"
     },
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\cart.js",
       "PackagePath": "staticwebassets\\js\\cart.js"
     },
     {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\categories.js",
+      "PackagePath": "staticwebassets\\js\\categories.js"
+    },
+    {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\homepage.js",
       "PackagePath": "staticwebassets\\js\\homepage.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\multi-search.js",
+      "PackagePath": "staticwebassets\\js\\multi-search.js"
     },
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\search.js",
@@ -51,6 +79,14 @@
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\tiki-ui.js",
+      "PackagePath": "staticwebassets\\js\\tiki-ui.js"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\js\\visual-search.js",
+      "PackagePath": "staticwebassets\\js\\visual-search.js"
     },
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\lib\\bootstrap\\LICENSE",
@@ -279,6 +315,10 @@
     {
       "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\lib\\jquery\\dist\\jquery.min.map",
       "PackagePath": "staticwebassets\\lib\\jquery\\dist\\jquery.min.map"
+    },
+    {
+      "Id": "F:\\OJT-Review\\PriceWatcher\\Price-Watcher\\PriceWatcher\\PriceWatcher\\wwwroot\\robots.txt",
+      "PackagePath": "staticwebassets\\robots.txt"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.PriceWatcher.Microsoft.AspNetCore.StaticWebAssets.props",

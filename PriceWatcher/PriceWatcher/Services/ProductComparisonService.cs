@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using PriceWatcher.Models;
 using PriceWatcher.Dtos;
+using PriceWatcher.Services.Interfaces;
 
 namespace PriceWatcher.Services
 {
@@ -13,12 +14,14 @@ namespace PriceWatcher.Services
     {
         private readonly PriceWatcherDbContext _context;
         private readonly IMemoryCache _cache;
+        private readonly IShippingCalculator _shippingCalculator;
         private const int CacheDurationMinutes = 5;
 
-        public ProductComparisonService(PriceWatcherDbContext context, IMemoryCache cache)
+        public ProductComparisonService(PriceWatcherDbContext context, IMemoryCache cache, IShippingCalculator shippingCalculator)
         {
             _context = context;
             _cache = cache;
+            _shippingCalculator = shippingCalculator;
         }
 
         public async Task<List<ProductComparisonDto>> GetProductComparisonsAsync(
@@ -51,26 +54,31 @@ namespace PriceWatcher.Services
                 .Where(p => p.ProductName.Contains(mapping.SourceProductId ?? ""))
                 .ToListAsync();
 
-            var comparisons = products.Select(p => new ProductComparisonDto
+            var comparisons = new List<ProductComparisonDto>();
+            foreach (var p in products)
             {
-                ProductId = p.ProductId,
-                PlatformId = p.PlatformId ?? 0,
-                PlatformName = p.Platform?.PlatformName ?? "",
-                PlatformLogo = $"/images/platforms/{p.Platform?.PlatformName?.ToLower()}.png",
-                Domain = p.Platform?.Domain ?? "",
-                ColorCode = p.Platform?.ColorCode ?? "#000000",
-                ShopName = p.ShopName ?? "",
-                Price = p.CurrentPrice,
-                LastUpdated = p.LastUpdated,
-                AffiliateUrl = p.AffiliateUrl ?? "",
-                OriginalUrl = p.OriginalUrl,
-                ShippingInfo = "Free shipping", // TODO: Implement shipping calculation
-                IsCheapest = false,
-                Rating = p.Rating,
-                ReviewCount = p.ReviewCount,
-                ProductName = p.ProductName,
-                ImageUrl = p.ImageUrl
-            }).ToList();
+                var shippingInfo = await _shippingCalculator.CalculateShippingInfoAsync(p.ProductId, p.PlatformId ?? 0);
+                comparisons.Add(new ProductComparisonDto
+                {
+                    ProductId = p.ProductId,
+                    PlatformId = p.PlatformId ?? 0,
+                    PlatformName = p.Platform?.PlatformName ?? "",
+                    PlatformLogo = $"/images/platforms/{p.Platform?.PlatformName?.ToLower()}.png",
+                    Domain = p.Platform?.Domain ?? "",
+                    ColorCode = p.Platform?.ColorCode ?? "#000000",
+                    ShopName = p.ShopName ?? "",
+                    Price = p.CurrentPrice,
+                    LastUpdated = p.LastUpdated,
+                    AffiliateUrl = p.AffiliateUrl ?? "",
+                    OriginalUrl = p.OriginalUrl,
+                    ShippingInfo = shippingInfo,
+                    IsCheapest = false,
+                    Rating = p.Rating,
+                    ReviewCount = p.ReviewCount,
+                    ProductName = p.ProductName,
+                    ImageUrl = p.ImageUrl
+                });
+            }
 
             // Filter only available products
             if (onlyAvailable)
@@ -119,26 +127,31 @@ namespace PriceWatcher.Services
                 .Where(p => p.ProductName.Contains(product.ProductName.Substring(0, Math.Min(20, product.ProductName.Length))))
                 .ToListAsync();
 
-            var comparisons = similarProducts.Select(p => new ProductComparisonDto
+            var comparisons = new List<ProductComparisonDto>();
+            foreach (var p in similarProducts)
             {
-                ProductId = p.ProductId,
-                PlatformId = p.PlatformId ?? 0,
-                PlatformName = p.Platform?.PlatformName ?? "",
-                PlatformLogo = $"/images/platforms/{p.Platform?.PlatformName?.ToLower()}.png",
-                Domain = p.Platform?.Domain ?? "",
-                ColorCode = p.Platform?.ColorCode ?? "#000000",
-                ShopName = p.ShopName ?? "",
-                Price = p.CurrentPrice,
-                LastUpdated = p.LastUpdated,
-                AffiliateUrl = p.AffiliateUrl ?? "",
-                OriginalUrl = p.OriginalUrl,
-                ShippingInfo = "Free shipping",
-                IsCheapest = false,
-                Rating = p.Rating,
-                ReviewCount = p.ReviewCount,
-                ProductName = p.ProductName,
-                ImageUrl = p.ImageUrl
-            }).ToList();
+                var shippingInfo = await _shippingCalculator.CalculateShippingInfoAsync(p.ProductId, p.PlatformId ?? 0);
+                comparisons.Add(new ProductComparisonDto
+                {
+                    ProductId = p.ProductId,
+                    PlatformId = p.PlatformId ?? 0,
+                    PlatformName = p.Platform?.PlatformName ?? "",
+                    PlatformLogo = $"/images/platforms/{p.Platform?.PlatformName?.ToLower()}.png",
+                    Domain = p.Platform?.Domain ?? "",
+                    ColorCode = p.Platform?.ColorCode ?? "#000000",
+                    ShopName = p.ShopName ?? "",
+                    Price = p.CurrentPrice,
+                    LastUpdated = p.LastUpdated,
+                    AffiliateUrl = p.AffiliateUrl ?? "",
+                    OriginalUrl = p.OriginalUrl,
+                    ShippingInfo = shippingInfo,
+                    IsCheapest = false,
+                    Rating = p.Rating,
+                    ReviewCount = p.ReviewCount,
+                    ProductName = p.ProductName,
+                    ImageUrl = p.ImageUrl
+                });
+            }
 
             // Determine cheapest
             if (comparisons.Any(c => c.Price.HasValue))

@@ -14,6 +14,12 @@ public class UserPreference
     public string? Currency { get; set; } = "VND";
     public DateTime? LastUpdated { get; set; }
 
+    public string? OnboardingStatus { get; set; } = "NotStarted";
+    public bool HasCompletedOnboarding { get; set; }
+    public string? OnboardingDraft { get; set; }
+    public string? WalletsJson { get; set; }
+    public string? SavingGoalsJson { get; set; }
+
     // Navigation properties
     public User? User { get; set; }
 }

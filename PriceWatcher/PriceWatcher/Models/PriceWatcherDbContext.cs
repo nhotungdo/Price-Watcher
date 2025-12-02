@@ -276,6 +276,12 @@ public partial class PriceWatcherDbContext : DbContext
         {
             entity.HasKey(e => e.UserId);
             entity.Property(e => e.LastUpdated).HasColumnType("datetime");
+            entity.Property(e => e.Language).HasMaxLength(10);
+            entity.Property(e => e.Currency).HasMaxLength(10);
+            entity.Property(e => e.OnboardingStatus).HasMaxLength(50);
+            entity.Property(e => e.OnboardingDraft).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.WalletsJson).HasColumnType("nvarchar(max)");
+            entity.Property(e => e.SavingGoalsJson).HasColumnType("nvarchar(max)");
             entity.HasOne(e => e.User)
                 .WithOne(u => u.UserPreference)
                 .HasForeignKey<UserPreference>(e => e.UserId)

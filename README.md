@@ -30,7 +30,7 @@ Price-Watcher là ứng dụng web giúp người dùng tìm các sản phẩm t
 
 ## Tính năng chính
 
-- Tìm kiếm theo URL sản phẩm (Shopee, Lazada, Tiki)
+- Tìm kiếm theo URL sản phẩm (Shopee, Tiki)
 - Tìm kiếm theo Ảnh (image search, stub)
 - Máy gợi ý: lọc outliers, tính điểm theo giá/ship/rating/tiêu đề
 - Lưu lịch sử tìm kiếm và snapshot giá
@@ -176,9 +176,9 @@ Deliverables:
 
 ### ✅ DAY 2 — Xử lý Link, Ảnh & Scraper
 
-- `POST /search/submit` + `LinkProcessor` để chuẩn hóa URL, detect marketplace (Shopee/Lazada/Tiki).
+- `POST /search/submit` + `LinkProcessor` để chuẩn hóa URL, detect marketplace (Shopee/Tiki).
 - Upload ảnh + image-search stub (`IImageSearchService`) để trả keywords/response; validate image <= 8MB.
-- Mock scrapers (`IShopeeScraper`, `ILazadaScraper`, `ITikiScraper`) trả list sản phẩm mẫu.
+- Mock scrapers (`IShopeeScraper`, `ITikiScraper`) trả list sản phẩm mẫu.
 
 Deliverables:
 

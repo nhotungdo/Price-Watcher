@@ -10,6 +10,8 @@ namespace PriceWatcher.Services
         public string Url { get; set; }
         public int PlatformId { get; set; }
         public DateTime QueuedAt { get; set; } = DateTime.Now;
+        public int RetryCount { get; set; } = 0;
+        public int MaxRetries { get; set; } = 3;
     }
 
     public interface ICrawlQueue

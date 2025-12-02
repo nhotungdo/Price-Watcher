@@ -5,11 +5,39 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - Săn Sale Tốt</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@(ViewData["Description"] ?? "Săn Sale Tốt - So sánh giá sản phẩm từ Tiki, Shopee, Lazada. Tìm giá tốt nhất, theo dõi giá, nhận thông báo giảm giá. Mua sắm thông minh, tiết kiệm hơn!")" />
+    <meta name="keywords" content="so sánh giá, săn sale, giá rẻ, tiki, shopee, lazada, theo dõi giá, giảm giá" />
+    <meta name="author" content="Săn Sale Tốt" />
+    <link rel="canonical" href="@(ViewData["CanonicalUrl"] ?? $"https://sansaletot.vn{Context.Request.Path}")" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="@(ViewData["CanonicalUrl"] ?? $"https://sansaletot.vn{Context.Request.Path}")" />
+    <meta property="og:title" content="@ViewData["Title"] - Săn Sale Tốt" />
+    <meta property="og:description" content="@(ViewData["Description"] ?? "So sánh giá sản phẩm từ Tiki, Shopee, Lazada. Tìm giá tốt nhất và tiết kiệm hơn!")" />
+    <meta property="og:image" content="@(ViewData["OgImage"] ?? "https://sansaletot.vn/images/og-image.jpg")" />
+    <meta property="og:site_name" content="Săn Sale Tốt" />
+    <meta property="og:locale" content="vi_VN" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="@(ViewData["CanonicalUrl"] ?? $"https://sansaletot.vn{Context.Request.Path}")" />
+    <meta name="twitter:title" content="@ViewData["Title"] - Săn Sale Tốt" />
+    <meta name="twitter:description" content="@(ViewData["Description"] ?? "So sánh giá sản phẩm từ Tiki, Shopee, Lazada")" />
+    <meta name="twitter:image" content="@(ViewData["OgImage"] ?? "https://sansaletot.vn/images/og-image.jpg")" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="~/favicon.ico" />
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/homepage.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/cart.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/tiki-premium.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
@@ -74,6 +102,16 @@
                 <!-- Header Actions -->
                 <div class="col-auto">
                     <div class="d-flex align-items-center gap-3">
+                        <!-- Visual Search -->
+                        <a asp-page="/VisualSearch" class="header-action-btn" aria-label="Tìm kiếm bằng hình ảnh"
+                            title="Tìm kiếm bằng hình ảnh">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </a>
                         <!-- Shopping Cart -->
                         <a asp-page="/Admin/Products/Index" class="header-action-btn" aria-label="Quản trị"
                             title="Quản trị">
@@ -150,6 +188,7 @@
         <div class="offcanvas-body">
             <ul class="list-unstyled">
                 <li class="mb-3"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+                <li class="mb-3"><a href="/VisualSearch" class="text-decoration-none">🔍 Tìm kiếm bằng hình ảnh</a></li>
                 <li class="mb-3"><a href="/deals" class="text-decoration-none">Ưu đãi</a></li>
                 <li class="mb-3"><a href="/categories" class="text-decoration-none">Danh mục</a></li>
                 <li class="mb-3"><a href="/about" class="text-decoration-none">Về chúng tôi</a></li>
@@ -378,6 +417,7 @@
             }
         })();
     </script>
+    <script src="~/js/tiki-ui.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

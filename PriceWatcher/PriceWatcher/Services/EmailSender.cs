@@ -47,4 +47,43 @@ public class EmailSender : IEmailSender
 
         await client.SendMailAsync(message, cancellationToken);
     }
+
+    public async Task SendEmailAsync(string to, string subject, string htmlBody)
+    {
+        if (string.IsNullOrWhiteSpace(_options.Host) || string.IsNullOrWhiteSpace(_options.FromEmail))
+        {
+            _logger.LogWarning("Email options not configured. Skipping email to {Email}", to);
+            return;
+        }
+
+        try
+        {
+            using var client = new SmtpClient(_options.Host!, _options.Port)
+            {
+                EnableSsl = _options.EnableSsl
+            };
+
+            if (!string.IsNullOrWhiteSpace(_options.Username) && !string.IsNullOrWhiteSpace(_options.Password))
+            {
+                client.Credentials = new NetworkCredential(_options.Username, _options.Password);
+            }
+
+            var from = new MailAddress(_options.FromEmail!, _options.FromName ?? "Săn Sale Tốt");
+            var toAddress = new MailAddress(to);
+            using var message = new MailMessage(from, toAddress)
+            {
+                Subject = subject,
+                Body = htmlBody,
+                IsBodyHtml = true
+            };
+
+            await client.SendMailAsync(message);
+            _logger.LogInformation("Email sent successfully to {Email}", to);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send email to {Email}", to);
+            throw;
+        }
+    }
 }

@@ -29,10 +29,29 @@ public class ShopeeScraperStub : IProductScraper
             var keyword = string.IsNullOrWhiteSpace(query.TitleHint) ? query.ProductId : query.TitleHint!;
             // làm sạch keyword nếu chứa chuỗi id Shopee
             keyword = System.Text.RegularExpressions.Regex.Replace(keyword, @"\bi\.\d+\.\d+\b", string.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase).Trim();
+            
+            if (string.IsNullOrWhiteSpace(keyword))
+            {
+                _logger.LogWarning("Empty keyword for Shopee search");
+                return Array.Empty<ProductCandidateDto>();
+            }
+            
+            // Add delay to avoid rate limiting
+            await Task.Delay(500, cancellationToken);
+            
             // preflight để lấy cookie/session hợp lệ
-            var preflight = new HttpRequestMessage(HttpMethod.Get, $"https://shopee.vn/search?keyword={Uri.EscapeDataString(keyword)}");
-            preflight.Headers.Referrer = new Uri("https://shopee.vn/");
-            await _http.SendAsync(preflight, cancellationToken);
+            try
+            {
+                var preflight = new HttpRequestMessage(HttpMethod.Get, $"https://shopee.vn/search?keyword={Uri.EscapeDataString(keyword)}");
+                preflight.Headers.Referrer = new Uri("https://shopee.vn/");
+                preflight.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+                await _http.SendAsync(preflight, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Shopee preflight request failed for {Keyword}", keyword);
+            }
+            
             var limit = 20;
             var offset = 0;
             if (query.Metadata != null)
@@ -46,13 +65,31 @@ public class ShopeeScraperStub : IProductScraper
             req.Headers.Add("x-api-source", "pc");
             req.Headers.Add("x-shopee-language", "vi");
             req.Headers.Add("x-requested-with", "XMLHttpRequest");
-            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36");
+            req.Headers.Add("af-ac-enc-dat", "null");
+            req.Headers.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36");
+            
             var res = await _http.SendAsync(req, cancellationToken);
             var list = new List<ProductCandidateDto>();
             if (res.IsSuccessStatusCode)
             {
-                var body = await res.Content.ReadAsStreamAsync(cancellationToken);
-                using var doc = await JsonDocument.ParseAsync(body, cancellationToken: cancellationToken);
+                var bodyText = await res.Content.ReadAsStringAsync(cancellationToken);
+                _logger.LogDebug("Shopee API response length: {Length} bytes", bodyText.Length);
+                
+                if (string.IsNullOrWhiteSpace(bodyText))
+                {
+                    _logger.LogWarning("Shopee API returned empty response for {Keyword}", keyword);
+                    return list;
+                }
+                
+                using var doc = JsonDocument.Parse(bodyText);
+                
+                // Log the root properties to understand the structure
+                if (doc.RootElement.ValueKind == JsonValueKind.Object)
+                {
+                    var props = string.Join(", ", doc.RootElement.EnumerateObject().Select(p => p.Name));
+                    _logger.LogDebug("Shopee API response properties: {Props}", props);
+                }
+                
                 if (doc.RootElement.TryGetProperty("items", out var items) && items.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var it in items.EnumerateArray())
@@ -102,21 +139,27 @@ public class ShopeeScraperStub : IProductScraper
                         });
                     }
                 }
+                _logger.LogInformation("Shopee parsed {Count} items for {Keyword}", list.Count, keyword);
             }
             else
             {
                 var payloadSnippet = await res.Content.ReadAsStringAsync(cancellationToken);
                 if (payloadSnippet.Length > 256) payloadSnippet = payloadSnippet[..256];
                 _logger.LogWarning("Shopee search_items returned {Status} for {Keyword}. Snippet={Snippet}", res.StatusCode, keyword, payloadSnippet);
+                _metrics.RecordScraperCall(Platform, success: false, elapsedMs: sw.ElapsedMilliseconds);
             }
-            _logger.LogInformation("Shopee parsed {Count} items for {Keyword}", list.Count, keyword);
             return list;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error searching Shopee for {Keyword}", query.TitleHint);
+            _metrics.RecordScraperCall(Platform, success: false, elapsedMs: sw.ElapsedMilliseconds);
+            return Array.Empty<ProductCandidateDto>();
         }
         finally
         {
             _rate.Release();
             sw.Stop();
-            _metrics.RecordScraperCall(Platform, success: true, elapsedMs: sw.ElapsedMilliseconds);
         }
     }
 

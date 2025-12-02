@@ -53,8 +53,22 @@ namespace PriceWatcher.Services
                         }
                         else
                         {
-                            _logger.LogWarning("Failed to crawl product: {Url}. Error: {Error}", job.Url, crawledData.ErrorMessage);
-                            // TODO: Implement retry logic here (re-enqueue with retry count)
+                            _logger.LogWarning("Failed to crawl product: {Url}. Error: {Error}. Retry: {RetryCount}/{MaxRetries}", 
+                                job.Url, crawledData.ErrorMessage, job.RetryCount, job.MaxRetries);
+                            
+                            // Retry logic with exponential backoff
+                            if (job.RetryCount < job.MaxRetries)
+                            {
+                                job.RetryCount++;
+                                var delaySeconds = Math.Pow(2, job.RetryCount); // 2, 4, 8 seconds
+                                await Task.Delay(TimeSpan.FromSeconds(delaySeconds), stoppingToken);
+                                _queue.Enqueue(job);
+                                _logger.LogInformation("Re-queued job for retry. URL: {Url}", job.Url);
+                            }
+                            else
+                            {
+                                _logger.LogError("Max retries reached for URL: {Url}. Giving up.", job.Url);
+                            }
                         }
                     }
                 }
